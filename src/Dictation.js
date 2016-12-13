@@ -7,6 +7,7 @@ export default class Dictation extends Component {
     onChange: PT.func,
     visible: PT.bool,
     listening: PT.bool,
+    language: PT.string,
     showInterimResults: PT.bool,
     showFinalResults: PT.bool,
     entities: PT.arrayOf(PT.string),
@@ -43,7 +44,9 @@ export default class Dictation extends Component {
       const recognition = new SpeechRecognition()
       recognition.continuous = true
       recognition.interimResults = true
-      recognition.lang = 'en-UK'
+      if (this.props.language) {
+        recognition.lang = this.props.language
+      }
       recognition.onresult = this.updateTranscript.bind(this)
       recognition.onend = this.restartRecognition.bind(this)
       if (this.props.listening) {
