@@ -145,11 +145,14 @@ export default class SpeechRecognition extends Component {
   }
 
   findEntity(entities, transcript) {
-    const words = transcript.toLowerCase().split(' ')
-    const normalisedEntities = entities.map(e => e.toLowerCase())
-    for (let i = 0; i < normalisedEntities.length; ++i) {
-      if (words[words.length - 1] === normalisedEntities[i]) {
-        return normalisedEntities[i]
+    const splitTranscript = transcript.toLowerCase().split(' ')
+    const splitEntities = entities.map(e => e.toLowerCase().split(' '))
+    for (let i = 0; i < splitEntities.length; ++i) {
+      const entityStartingWordIndex = Math.max(0, splitTranscript.length - splitEntities[i].length)
+      const endOfTranscript = splitTranscript.slice(entityStartingWordIndex).join(' ')
+      const entity = splitEntities[i].join(' ')
+      if (endOfTranscript === entity) {
+        return entity
       }
     }
     return null
