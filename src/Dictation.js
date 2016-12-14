@@ -12,6 +12,7 @@ export default class Dictation extends Component {
     showFinalResults: PT.bool,
     entities: PT.arrayOf(PT.string),
     onHearEntity: PT.func,
+    onLoad: PT.func,
     name: PT.string
   };
 
@@ -34,6 +35,7 @@ export default class Dictation extends Component {
   }
 
   componentWillMount() {
+    const { language, listening, onLoad } = this.props
     const root = typeof window !== 'undefined' ? window : this
     const SpeechRecognition = root.SpeechRecognition ||
                               root.webkitSpeechRecognition ||
@@ -44,17 +46,19 @@ export default class Dictation extends Component {
       const recognition = new SpeechRecognition()
       recognition.continuous = true
       recognition.interimResults = true
-      if (this.props.language) {
-        recognition.lang = this.props.language
+      if (language) {
+        recognition.lang = language
       }
       recognition.onresult = this.updateTranscript.bind(this)
       recognition.onend = this.restartRecognition.bind(this)
-      if (this.props.listening) {
+      if (listening) {
         recognition.start()
       }
       this.setState({ recognition })
+      onLoad({ success: true })
     } else {
       this.setState({ browserSupportsSpeechRecognition: false })
+      onLoad({ success: false })
     }
   }
 
@@ -151,16 +155,8 @@ export default class Dictation extends Component {
     const { className, visible, showInterimResults, showFinalResults } = this.props
     const { interimTranscript, finalTranscript, browserSupportsSpeechRecognition } = this.state
 
-    if (!visible) {
+    if (!visible || !browserSupportsSpeechRecognition) {
       return null
-    }
-
-    if (!browserSupportsSpeechRecognition) {
-      return (
-        <div>
-          Browser does not support speech recognition.
-        </div>
-      )
     }
 
     const transcriptParts = []
