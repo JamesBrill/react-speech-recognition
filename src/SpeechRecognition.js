@@ -55,10 +55,14 @@ export default class SpeechRecognition extends Component {
         recognition.start()
       }
       this.setState({ recognition })
-      onLoad({ success: true })
+      if (onLoad) {
+        onLoad({ success: true })
+      }
     } else {
       this.setState({ browserSupportsSpeechRecognition: false })
-      onLoad({ success: false })
+      if (onLoad) {
+        onLoad({ success: false })
+      }
     }
   }
 
