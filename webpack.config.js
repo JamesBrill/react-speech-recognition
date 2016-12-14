@@ -1,12 +1,12 @@
 /* eslint-env node */
 
 module.exports = {
-  entry: './src/Dictation.js',
+  entry: './src/SpeechRecognition.js',
   devtool: 'source-map',
   output: {
     path: __dirname + '/dist',
-    filename: 'Dictation.js',
-    library: 'Dictation',
+    filename: 'SpeechRecognition.js',
+    library: 'SpeechRecognition',
     libraryTarget: 'umd'
   },
   externals: {

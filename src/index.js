@@ -1,3 +1,3 @@
-import Dictation from './Dictation'
+import SpeechRecognition from './SpeechRecognition'
 
-export default Dictation
+export default SpeechRecognition

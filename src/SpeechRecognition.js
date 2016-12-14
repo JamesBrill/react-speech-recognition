@@ -1,7 +1,7 @@
 import React, { Component, PropTypes as PT } from 'react'
 import { debounce } from 'core-decorators'
 
-export default class Dictation extends Component {
+export default class SpeechRecognition extends Component {
   static propTypes = {
     className: PT.string,
     onChange: PT.func,
@@ -37,13 +37,13 @@ export default class Dictation extends Component {
   componentWillMount() {
     const { language, listening, onLoad } = this.props
     const root = typeof window !== 'undefined' ? window : this
-    const SpeechRecognition = root.SpeechRecognition ||
-                              root.webkitSpeechRecognition ||
-                              root.mozSpeechRecognition ||
-                              root.msSpeechRecognition ||
-                              root.oSpeechRecognition
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition()
+    const BrowserSpeechRecognition = root.SpeechRecognition ||
+                                     root.webkitSpeechRecognition ||
+                                     root.mozSpeechRecognition ||
+                                     root.msSpeechRecognition ||
+                                     root.oSpeechRecognition
+    if (BrowserSpeechRecognition) {
+      const recognition = new BrowserSpeechRecognition()
       recognition.continuous = true
       recognition.interimResults = true
       if (language) {
