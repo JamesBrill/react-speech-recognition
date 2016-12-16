@@ -1,98 +1,110 @@
 # react-speech-recognition
 A React component that converts speech from the microphone to text.
 
+## How it works
+`SpeechRecognition` is a higher order component that wraps one of your React components.
+In doing so, it injects some additional properties into the component that allow it
+to access a transcript of speech picked up from the user's microphone.
+
+Under the hood,
+it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
+Currently, **this component will only work in Chrome**. It fails gracefully on other browsers.
+
+You will need a dependency manager like Browserify or Webpack to bundle this module
+with your web code.
+
+
 ## Installation
+
+To install:
 
 `npm install --save react-speech-recognition`
 
-## Example
+To import in your React code:
+
+`import SpeechRecognition from 'react-speech-recognition'`
+
+## Example usage
+
+As only one component can be wrapped by `SpeechRecognition`, it is recommended that you add it to one of your root React components such as `App`. The transcription can then be passed down to child components.
 
 ```
-import React, { Component } from 'react'
+import React, { PropTypes, Component } from 'react'
 import SpeechRecognition from 'react-speech-recognition'
-import save from 'api'
 
-export default class Notepad extends Component {
-  constructor(props) {
-    super(props)
+const propTypes = {
+  // Props injected by SpeechRecognition
+  transcript: PropTypes.string,
+  resetTranscript: PropTypes.func,
+  browserSupportsSpeechRecognition: PropTypes.bool
+}
 
-    this.state = {
-      transcript: ''
-    }
-  }
-
-  handleHearEntity(entity, transcript) {
-    if (entity === 'save') {
-      save(transcript)
-    }
-  }
-
+class Dictaphone extends Component {
   render() {
+    const { transcript, resetTranscript, browserSupportsSpeechRecognition } = this.props
+
+    if (!browserSupportsSpeechRecognition) {
+      return null
+    }
+
     return (
       <div>
-        <SpeechRecognition
-          onChange={transcript => this.setState({ transcript })}
-          entities={['save']}
-          onHearEntity={entity => this.handleHearEntity(entity, this.state.transcript)} />
+        <button onClick={resetTranscript}>Reset</button>
+        <span>{transcript}</span>
       </div>
     )
   }
 }
+
+Dictaphone.propTypes = propTypes
+
+export default SpeechRecognition(Dictaphone)
 ```
 
-## Props
+If you are writing ES7 code, you can add the `@SpeechRecognition` decorator
+to your component's class. To use the decorator syntax, add the
+[decorator plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy) to Babel.
 
-### className [string]
+## Props added to your component
 
-CSS class name for the component styling.
+### transcript [string]
 
-### onChange [function]
+Transcription of all speech that has been spoken into the microphone. Is equivalent to the final transcript followed by the interim transcript, separated by a space.
 
-Whenever the transcript changes, it's passed to this function.
+### resetTranscript [function]
 
-### visible [bool]
+Sets the transcription to an empty string.
 
-If false, the component is not rendered. Defaults to true.
+### browserSupportsSpeechRecognition [bool]
 
-### listening [bool]
+If false, the browser does not support the Speech Recognition API.
 
-If false, speech is not transcribed. Defaults to true.
+### interimTranscript [string]
 
-### language [string]
+Transcription of speech for which transcription hasn't finished yet.
 
-The language that is transcribed. Defaults to the browser language.
+For the current words being spoken, the interim transcript reflects each successive guess made by the transcription algorithm. When the browser’s confidence in its guess is maximized, it is added to the final transcript.
 
-### showInterimResults [bool]
+The difference between interim and final transcripts can be illustrated by an example over four iterations of the transcription algorithm:
 
-If true, interim results are included in the transcript. Defaults to true.
+| Final transcript | Interim transcript |
+|-------------------|--------------------|
+| 'Hello, I am' | 'jam' |
+| 'Hello, I am' | 'jams' |
+| 'Hello, I am' | 'James' |
+| 'Hello, I am James' | '' |
 
-### showFinalResults [bool]
+### finalTranscript [string]
 
-If true, final results are included in the transcript. Defaults to true.
+Transcription of speech for which transcription has finished.
 
-### entities [array of strings]
+### recognition [Object]
 
-Words or phrases that the component listens for in the transcript.
+The underlying [object](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) used
+by Web Speech API. It can be used to change the
+transcription language, which is the browser language if not specified. For example, to set the transcription language to Chinese:
 
-### onHearEntity [function]
-
-When an entity appears in the transcript, this function is called with the entity that was heard.
-
-### onLoad [function]
-
-When the Speech Recognition API finishes loading, this function receives this object:
-
-```javascript
-{
-  success: [bool]
-}
-```
-
-The success flag is false if the browser doesn't support the Speech Recognition API or it failed to load.
-
-### name [string]
-
-Change this to reset the transcript.
+`recognition.lang = 'zh-CN'`
 
 ## License
 
