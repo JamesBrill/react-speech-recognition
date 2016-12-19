@@ -6,6 +6,10 @@
   "scripts": {
     "build": "babel src --out-dir lib && webpack -p"
   },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/FoundersFactory/react-speech-recognition.git"
+  },
   "keywords": [
     "react",
     "reactjs",
