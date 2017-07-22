@@ -1,6 +1,6 @@
 {
   "name": "react-speech-recognition",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A React component that converts speech from the microphone to text.",
   "main": "lib/index.js",
   "scripts": {
@@ -10,17 +10,8 @@
     "type": "git",
     "url": "https://github.com/FoundersFactory/react-speech-recognition.git"
   },
-  "keywords": [
-    "react",
-    "reactjs",
-    "speech",
-    "recognition"
-  ],
-  "files": [
-    "dist",
-    "lib",
-    "src"
-  ],
+  "keywords": ["react", "reactjs", "speech", "recognition"],
+  "files": ["dist", "lib", "src"],
   "author": "James Brill <james.brill@foundersfactory.co>",
   "license": "MIT",
   "dependencies": {
