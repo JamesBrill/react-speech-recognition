@@ -87,6 +87,30 @@ export default function SpeechRecognition(WrappedComponent) {
       }
     }
 
+    @autobind
+    startListening() {
+      if (this.state.recognition) {
+        this.state.recognition.start()
+        this.setState({ listening: true })
+      }
+    }
+
+    @autobind
+    abortListening() {
+      this.setState({ listening: false })
+      if (this.state.recognition) {
+        this.state.recognition.abort()
+      }
+    }
+
+    @autobind
+    stopListening() {
+      this.setState({ listening: false })
+      if (this.state.recognition) {
+        this.state.recognition.stop()
+      }
+    }
+
     render() {
       const { finalTranscript, interimTranscript } = this.state
       const transcript = this.concatTranscripts(
@@ -97,6 +121,9 @@ export default function SpeechRecognition(WrappedComponent) {
       return (
         <WrappedComponent
           resetTranscript={this.resetTranscript}
+          startListening={this.startListening}
+          abortListening={this.abortListening}
+          stopListening={this.stopListening}
           transcript={transcript}
           {...this.state}
           {...this.props} />
