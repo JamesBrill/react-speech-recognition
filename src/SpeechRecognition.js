@@ -2,68 +2,90 @@ import React, { Component } from 'react'
 import { debounce, autobind } from 'core-decorators'
 
 export default function SpeechRecognition(WrappedComponent) {
+  const BrowserSpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition ||
+    window.mozSpeechRecognition ||
+    window.msSpeechRecognition ||
+    window.oSpeechRecognition
+  const recognition = BrowserSpeechRecognition
+    ? new BrowserSpeechRecognition()
+    : null
+  const browserSupportsSpeechRecognition = recognition !== null
+  recognition.start()
+  let listening = true
+  let pauseAfterDisconnect = false
+  let interimTranscript = ''
+  let finalTranscript = ''
+
   return class SpeechRecognitionContainer extends Component {
     constructor(props) {
       super(props)
 
       this.state = {
-        interimTranscript: '',
-        finalTranscript: '',
-        recognition: null,
-        browserSupportsSpeechRecognition: true
+        interimTranscript,
+        finalTranscript,
+        listening: false
       }
     }
 
     componentWillMount() {
-      const root = typeof window !== 'undefined' ? window : this
-      const BrowserSpeechRecognition = root.SpeechRecognition ||
-                                       root.webkitSpeechRecognition ||
-                                       root.mozSpeechRecognition ||
-                                       root.msSpeechRecognition ||
-                                       root.oSpeechRecognition
-      if (BrowserSpeechRecognition) {
-        const recognition = new BrowserSpeechRecognition()
+      if (recognition) {
         recognition.continuous = true
         recognition.interimResults = true
         recognition.onresult = this.updateTranscript.bind(this)
-        recognition.onend = this.restartRecognition.bind(this)
-        recognition.start()
-        this.setState({ recognition })
-      } else {
-        this.setState({ browserSupportsSpeechRecognition: false })
+        recognition.onend = this.onRecognitionDisconnect.bind(this)
+        this.setState({ listening })
       }
     }
 
-    componentWillUnmount() {
-      if (this.state.recognition) {
-        this.state.recognition.abort()
+    @autobind
+    disconnect(disconnectType) {
+      if (recognition) {
+        switch (disconnectType) {
+          case 'ABORT':
+            pauseAfterDisconnect = true
+            recognition.abort()
+            break
+          case 'RESET':
+            pauseAfterDisconnect = false
+            recognition.abort()
+            break
+          case 'STOP':
+          default:
+            pauseAfterDisconnect = true
+            recognition.stop()
+        }
       }
     }
 
     @debounce(1000)
-    restartRecognition() {
-      if (this.state.recognition) {
-        this.state.recognition.start()
+    onRecognitionDisconnect() {
+      listening = false
+      if (pauseAfterDisconnect) {
+        this.setState({ listening })
+      } else {
+        this.startListening()
       }
+      pauseAfterDisconnect = false
     }
 
     updateTranscript(event) {
-      const { finalTranscript, interimTranscript } = this.getNewTranscript(event)
-
-      this.setState({ finalTranscript, interimTranscript })
-    }
-
-    getNewTranscript(event) {
-      let finalTranscript = this.state.finalTranscript
-      let interimTranscript = ''
+      interimTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalTranscript = this.concatTranscripts(finalTranscript, event.results[i][0].transcript)
+          finalTranscript = this.concatTranscripts(
+            finalTranscript,
+            event.results[i][0].transcript
+          )
         } else {
-          interimTranscript = this.concatTranscripts(interimTranscript, event.results[i][0].transcript)
+          interimTranscript = this.concatTranscripts(
+            interimTranscript,
+            event.results[i][0].transcript
+          )
         }
       }
-      return { finalTranscript, interimTranscript }
+      this.setState({ finalTranscript, interimTranscript })
     }
 
     concatTranscripts(...transcriptParts) {
@@ -72,20 +94,50 @@ export default function SpeechRecognition(WrappedComponent) {
 
     @autobind
     resetTranscript() {
-      this.setState({ interimTranscript: '', finalTranscript: '' })
-      if (this.state.recognition) {
-        this.state.recognition.abort()
+      interimTranscript = ''
+      finalTranscript = ''
+      this.disconnect('RESET')
+      this.setState({ interimTranscript, finalTranscript })
+    }
+
+    @autobind
+    startListening() {
+      if (recognition && !listening) {
+        recognition.start()
+        listening = true
+        this.setState({ listening })
       }
     }
 
+    @autobind
+    abortListening() {
+      listening = false
+      this.setState({ listening })
+      this.disconnect('ABORT')
+    }
+
+    @autobind
+    stopListening() {
+      listening = false
+      this.setState({ listening })
+      this.disconnect('STOP')
+    }
+
     render() {
-      const { finalTranscript, interimTranscript } = this.state
-      const transcript = this.concatTranscripts(finalTranscript, interimTranscript)
+      const transcript = this.concatTranscripts(
+        finalTranscript,
+        interimTranscript
+      )
 
       return (
         <WrappedComponent
           resetTranscript={this.resetTranscript}
+          startListening={this.startListening}
+          abortListening={this.abortListening}
+          stopListening={this.stopListening}
           transcript={transcript}
+          recognition={recognition}
+          browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
           {...this.state}
           {...this.props} />
       )
