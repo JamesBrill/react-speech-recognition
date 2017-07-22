@@ -51,7 +51,9 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     updateTranscript(event) {
-      const { finalTranscript, interimTranscript } = this.getNewTranscript(event)
+      const { finalTranscript, interimTranscript } = this.getNewTranscript(
+        event
+      )
 
       this.setState({ finalTranscript, interimTranscript })
     }
@@ -61,9 +63,15 @@ export default function SpeechRecognition(WrappedComponent) {
       let interimTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          finalTranscript = this.concatTranscripts(finalTranscript, event.results[i][0].transcript)
+          finalTranscript = this.concatTranscripts(
+            finalTranscript,
+            event.results[i][0].transcript
+          )
         } else {
-          interimTranscript = this.concatTranscripts(interimTranscript, event.results[i][0].transcript)
+          interimTranscript = this.concatTranscripts(
+            interimTranscript,
+            event.results[i][0].transcript
+          )
         }
       }
       return { finalTranscript, interimTranscript }
@@ -83,7 +91,10 @@ export default function SpeechRecognition(WrappedComponent) {
 
     render() {
       const { finalTranscript, interimTranscript } = this.state
-      const transcript = this.concatTranscripts(finalTranscript, interimTranscript)
+      const transcript = this.concatTranscripts(
+        finalTranscript,
+        interimTranscript
+      )
 
       return (
         <WrappedComponent
