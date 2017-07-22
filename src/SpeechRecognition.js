@@ -10,6 +10,7 @@ const BrowserSpeechRecognition =
 const recognition = BrowserSpeechRecognition
   ? new BrowserSpeechRecognition()
   : null
+const browserSupportsSpeechRecognition = recognition !== null
 recognition.start()
 let listening = true
 let isManuallyDisconnected = false
@@ -24,8 +25,6 @@ export default function SpeechRecognition(WrappedComponent) {
       this.state = {
         interimTranscript,
         finalTranscript,
-        recognition: null,
-        browserSupportsSpeechRecognition: true,
         listening: false
       }
     }
@@ -36,23 +35,21 @@ export default function SpeechRecognition(WrappedComponent) {
         recognition.interimResults = true
         recognition.onresult = this.updateTranscript.bind(this)
         recognition.onend = this.onRecognitionDisconnect.bind(this)
-        this.setState({ recognition, listening })
-      } else {
-        this.setState({ browserSupportsSpeechRecognition: false })
+        this.setState({ listening })
       }
     }
 
     @autobind
     manualDisconnect(disconnectType) {
-      if (this.state.recognition) {
+      if (recognition) {
         isManuallyDisconnected = true
         switch (disconnectType) {
           case 'ABORT':
-            this.state.recognition.abort()
+            recognition.abort()
             break
           case 'STOP':
           default:
-            this.state.recognition.stop()
+            recognition.stop()
         }
       }
     }
@@ -98,14 +95,14 @@ export default function SpeechRecognition(WrappedComponent) {
     resetTranscript() {
       interimTranscript = ''
       finalTranscript = ''
-      this.state.recognition.abort()
+      recognition.abort()
       this.setState({ interimTranscript, finalTranscript })
     }
 
     @autobind
     startListening() {
-      if (this.state.recognition && !listening) {
-        this.state.recognition.start()
+      if (recognition && !listening) {
+        recognition.start()
         listening = true
         this.setState({ listening })
       }
@@ -138,6 +135,8 @@ export default function SpeechRecognition(WrappedComponent) {
           abortListening={this.abortListening}
           stopListening={this.stopListening}
           transcript={transcript}
+          recognition={recognition}
+          browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
           {...this.state}
           {...this.props} />
       )
