@@ -14,7 +14,7 @@ export default function SpeechRecognition(WrappedComponent) {
   const browserSupportsSpeechRecognition = recognition !== null
   recognition.start()
   let listening = true
-  let isManuallyDisconnected = false
+  let pauseAfterDisconnect = false
   let interimTranscript = ''
   let finalTranscript = ''
 
@@ -40,15 +40,20 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     @autobind
-    manualDisconnect(disconnectType) {
+    disconnect(disconnectType) {
       if (recognition) {
-        isManuallyDisconnected = true
         switch (disconnectType) {
           case 'ABORT':
+            pauseAfterDisconnect = true
+            recognition.abort()
+            break
+          case 'RESET':
+            pauseAfterDisconnect = false
             recognition.abort()
             break
           case 'STOP':
           default:
+            pauseAfterDisconnect = true
             recognition.stop()
         }
       }
@@ -57,12 +62,12 @@ export default function SpeechRecognition(WrappedComponent) {
     @debounce(1000)
     onRecognitionDisconnect() {
       listening = false
-      if (!isManuallyDisconnected) {
+      if (!pauseAfterDisconnect) {
         this.startListening()
       } else {
         this.setState({ listening })
       }
-      isManuallyDisconnected = false
+      pauseAfterDisconnect = false
     }
 
     updateTranscript(event) {
@@ -91,7 +96,7 @@ export default function SpeechRecognition(WrappedComponent) {
     resetTranscript() {
       interimTranscript = ''
       finalTranscript = ''
-      recognition.abort()
+      this.disconnect('RESET')
       this.setState({ interimTranscript, finalTranscript })
     }
 
@@ -108,14 +113,14 @@ export default function SpeechRecognition(WrappedComponent) {
     abortListening() {
       listening = false
       this.setState({ listening })
-      this.manualDisconnect('ABORT')
+      this.disconnect('ABORT')
     }
 
     @autobind
     stopListening() {
       listening = false
       this.setState({ listening })
-      this.manualDisconnect('STOP')
+      this.disconnect('STOP')
     }
 
     render() {
