@@ -13,6 +13,8 @@ const recognition = BrowserSpeechRecognition
 recognition.start()
 let listening = true
 let isManuallyDisconnected = false
+let interimTranscript = ''
+let finalTranscript = ''
 
 export default function SpeechRecognition(WrappedComponent) {
   return class SpeechRecognitionContainer extends Component {
@@ -20,8 +22,8 @@ export default function SpeechRecognition(WrappedComponent) {
       super(props)
 
       this.state = {
-        interimTranscript: '',
-        finalTranscript: '',
+        interimTranscript,
+        finalTranscript,
         recognition: null,
         browserSupportsSpeechRecognition: true,
         listening: false
@@ -67,16 +69,12 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     updateTranscript(event) {
-      const { finalTranscript, interimTranscript } = this.getNewTranscript(
-        event
-      )
-
+      this.setNewTranscript(event)
       this.setState({ finalTranscript, interimTranscript })
     }
 
-    getNewTranscript(event) {
-      let finalTranscript = this.state.finalTranscript
-      let interimTranscript = ''
+    setNewTranscript(event) {
+      interimTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
           finalTranscript = this.concatTranscripts(
@@ -90,7 +88,6 @@ export default function SpeechRecognition(WrappedComponent) {
           )
         }
       }
-      return { finalTranscript, interimTranscript }
     }
 
     concatTranscripts(...transcriptParts) {
@@ -99,8 +96,10 @@ export default function SpeechRecognition(WrappedComponent) {
 
     @autobind
     resetTranscript() {
-      this.setState({ interimTranscript: '', finalTranscript: '' })
-      this.manualDisconnect('ABORT')
+      interimTranscript = ''
+      finalTranscript = ''
+      this.state.recognition.abort()
+      this.setState({ interimTranscript, finalTranscript })
     }
 
     @autobind
@@ -127,7 +126,6 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     render() {
-      const { finalTranscript, interimTranscript } = this.state
       const transcript = this.concatTranscripts(
         finalTranscript,
         interimTranscript
