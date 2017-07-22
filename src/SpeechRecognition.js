@@ -57,10 +57,10 @@ export default function SpeechRecognition(WrappedComponent) {
 
     @debounce(1000)
     onRecognitionDisconnect() {
+      listening = false
       if (!isManuallyDisconnected) {
         this.startListening()
       } else {
-        listening = false
         this.setState({ listening })
       }
       isManuallyDisconnected = false
@@ -105,7 +105,7 @@ export default function SpeechRecognition(WrappedComponent) {
 
     @autobind
     startListening() {
-      if (this.state.recognition) {
+      if (this.state.recognition && !listening) {
         this.state.recognition.start()
         listening = true
         this.setState({ listening })
