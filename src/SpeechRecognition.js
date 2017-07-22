@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { autobind } from 'core-decorators'
+import { debounce, autobind } from 'core-decorators'
 
 const BrowserSpeechRecognition =
   window.SpeechRecognition ||
@@ -10,6 +10,9 @@ const BrowserSpeechRecognition =
 const recognition = BrowserSpeechRecognition
   ? new BrowserSpeechRecognition()
   : null
+recognition.start()
+let listening = true
+let isManuallyDisconnected = false
 
 export default function SpeechRecognition(WrappedComponent) {
   return class SpeechRecognitionContainer extends Component {
@@ -31,21 +34,36 @@ export default function SpeechRecognition(WrappedComponent) {
         recognition.interimResults = true
         recognition.onresult = this.updateTranscript.bind(this)
         recognition.onend = this.onRecognitionDisconnect.bind(this)
-        recognition.start()
-        this.setState({ recognition, listening: true })
+        this.setState({ recognition, listening })
       } else {
         this.setState({ browserSupportsSpeechRecognition: false })
       }
     }
 
-    componentWillUnmount() {
+    @autobind
+    manualDisconnect(disconnectType) {
       if (this.state.recognition) {
-        this.state.recognition.abort()
+        isManuallyDisconnected = true
+        switch (disconnectType) {
+          case 'ABORT':
+            this.state.recognition.abort()
+            break
+          case 'STOP':
+          default:
+            this.state.recognition.stop()
+        }
       }
     }
 
+    @debounce(1000)
     onRecognitionDisconnect() {
-      this.setState({ listening: false })
+      if (!isManuallyDisconnected) {
+        this.startListening()
+      } else {
+        listening = false
+        this.setState({ listening })
+      }
+      isManuallyDisconnected = false
     }
 
     updateTranscript(event) {
@@ -82,33 +100,30 @@ export default function SpeechRecognition(WrappedComponent) {
     @autobind
     resetTranscript() {
       this.setState({ interimTranscript: '', finalTranscript: '' })
-      if (this.state.recognition) {
-        this.state.recognition.abort()
-      }
+      this.manualDisconnect('ABORT')
     }
 
     @autobind
     startListening() {
       if (this.state.recognition) {
         this.state.recognition.start()
-        this.setState({ listening: true })
+        listening = true
+        this.setState({ listening })
       }
     }
 
     @autobind
     abortListening() {
-      this.setState({ listening: false })
-      if (this.state.recognition) {
-        this.state.recognition.abort()
-      }
+      listening = false
+      this.setState({ listening })
+      this.manualDisconnect('ABORT')
     }
 
     @autobind
     stopListening() {
-      this.setState({ listening: false })
-      if (this.state.recognition) {
-        this.state.recognition.stop()
-      }
+      listening = false
+      this.setState({ listening })
+      this.manualDisconnect('STOP')
     }
 
     render() {
