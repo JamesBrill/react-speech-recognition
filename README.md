@@ -75,9 +75,25 @@ Transcription of all speech that has been spoken into the microphone. Is equival
 
 Sets the transcription to an empty string.
 
+### startListening [function]
+
+Causes the Web Speech API to start listening to speech from the microphone.
+
+### stopListening [function]
+
+Causes the Web Speech API to stop listening to speech from the microphone, but will finish processing any remaining speech.
+
+### abortListening [function]
+
+Causes the Web Speech API to stop listening to speech from the microphone, and also stop processing the current speech. Initially, the Web Speech API is turned on, so you may want to call this in `componentWillMount` if you don't want speech to be collected when your component is first mounted.
+
 ### browserSupportsSpeechRecognition [bool]
 
 If false, the browser does not support the Speech Recognition API.
+
+### listening [bool]
+
+If true, the Web Speech API is listening to speech from the microphone.
 
 ### interimTranscript [string]
 
