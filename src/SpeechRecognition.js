@@ -1,23 +1,23 @@
 import React, { Component } from 'react'
 import { debounce, autobind } from 'core-decorators'
 
-const BrowserSpeechRecognition =
-  window.SpeechRecognition ||
-  window.webkitSpeechRecognition ||
-  window.mozSpeechRecognition ||
-  window.msSpeechRecognition ||
-  window.oSpeechRecognition
-const recognition = BrowserSpeechRecognition
-  ? new BrowserSpeechRecognition()
-  : null
-const browserSupportsSpeechRecognition = recognition !== null
-recognition.start()
-let listening = true
-let isManuallyDisconnected = false
-let interimTranscript = ''
-let finalTranscript = ''
-
 export default function SpeechRecognition(WrappedComponent) {
+  const BrowserSpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition ||
+    window.mozSpeechRecognition ||
+    window.msSpeechRecognition ||
+    window.oSpeechRecognition
+  const recognition = BrowserSpeechRecognition
+    ? new BrowserSpeechRecognition()
+    : null
+  const browserSupportsSpeechRecognition = recognition !== null
+  recognition.start()
+  let listening = true
+  let isManuallyDisconnected = false
+  let interimTranscript = ''
+  let finalTranscript = ''
+
   return class SpeechRecognitionContainer extends Component {
     constructor(props) {
       super(props)
