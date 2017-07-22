@@ -1,6 +1,16 @@
 import React, { Component } from 'react'
 import { debounce, autobind } from 'core-decorators'
 
+const BrowserSpeechRecognition =
+  window.SpeechRecognition ||
+  window.webkitSpeechRecognition ||
+  window.mozSpeechRecognition ||
+  window.msSpeechRecognition ||
+  window.oSpeechRecognition
+const recognition = BrowserSpeechRecognition
+  ? new BrowserSpeechRecognition()
+  : null
+
 export default function SpeechRecognition(WrappedComponent) {
   return class SpeechRecognitionContainer extends Component {
     constructor(props) {
@@ -15,14 +25,7 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     componentWillMount() {
-      const root = typeof window !== 'undefined' ? window : this
-      const BrowserSpeechRecognition = root.SpeechRecognition ||
-                                       root.webkitSpeechRecognition ||
-                                       root.mozSpeechRecognition ||
-                                       root.msSpeechRecognition ||
-                                       root.oSpeechRecognition
-      if (BrowserSpeechRecognition) {
-        const recognition = new BrowserSpeechRecognition()
+      if (recognition) {
         recognition.continuous = true
         recognition.interimResults = true
         recognition.onresult = this.updateTranscript.bind(this)
