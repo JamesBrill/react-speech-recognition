@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { debounce, autobind } from 'core-decorators'
+import { autobind } from 'core-decorators'
 
 const BrowserSpeechRecognition =
   window.SpeechRecognition ||
@@ -29,7 +29,6 @@ export default function SpeechRecognition(WrappedComponent) {
         recognition.continuous = true
         recognition.interimResults = true
         recognition.onresult = this.updateTranscript.bind(this)
-        recognition.onend = this.restartRecognition.bind(this)
         recognition.start()
         this.setState({ recognition })
       } else {
@@ -40,13 +39,6 @@ export default function SpeechRecognition(WrappedComponent) {
     componentWillUnmount() {
       if (this.state.recognition) {
         this.state.recognition.abort()
-      }
-    }
-
-    @debounce(1000)
-    restartRecognition() {
-      if (this.state.recognition) {
-        this.state.recognition.start()
       }
     }
 
