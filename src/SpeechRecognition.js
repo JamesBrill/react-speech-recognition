@@ -20,7 +20,8 @@ export default function SpeechRecognition(WrappedComponent) {
         interimTranscript: '',
         finalTranscript: '',
         recognition: null,
-        browserSupportsSpeechRecognition: true
+        browserSupportsSpeechRecognition: true,
+        listening: false
       }
     }
 
@@ -29,8 +30,9 @@ export default function SpeechRecognition(WrappedComponent) {
         recognition.continuous = true
         recognition.interimResults = true
         recognition.onresult = this.updateTranscript.bind(this)
+        recognition.onend = this.onRecognitionDisconnect.bind(this)
         recognition.start()
-        this.setState({ recognition })
+        this.setState({ recognition, listening: true })
       } else {
         this.setState({ browserSupportsSpeechRecognition: false })
       }
@@ -40,6 +42,10 @@ export default function SpeechRecognition(WrappedComponent) {
       if (this.state.recognition) {
         this.state.recognition.abort()
       }
+    }
+
+    onRecognitionDisconnect() {
+      this.setState({ listening: false })
     }
 
     updateTranscript(event) {
