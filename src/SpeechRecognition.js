@@ -62,10 +62,10 @@ export default function SpeechRecognition(WrappedComponent) {
     @debounce(1000)
     onRecognitionDisconnect() {
       listening = false
-      if (!pauseAfterDisconnect) {
-        this.startListening()
-      } else {
+      if (pauseAfterDisconnect) {
         this.setState({ listening })
+      } else {
+        this.startListening()
       }
       pauseAfterDisconnect = false
     }
