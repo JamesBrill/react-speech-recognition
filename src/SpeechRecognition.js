@@ -66,11 +66,6 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     updateTranscript(event) {
-      this.setNewTranscript(event)
-      this.setState({ finalTranscript, interimTranscript })
-    }
-
-    setNewTranscript(event) {
       interimTranscript = ''
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
@@ -85,6 +80,7 @@ export default function SpeechRecognition(WrappedComponent) {
           )
         }
       }
+      this.setState({ finalTranscript, interimTranscript })
     }
 
     concatTranscripts(...transcriptParts) {
