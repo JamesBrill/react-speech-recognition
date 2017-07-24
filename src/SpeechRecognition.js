@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { debounce, autobind } from 'core-decorators'
 
 export default function SpeechRecognition(options) {
-  return function SpeechRecognitionInner(WrappedComponent) {
+  const SpeechRecognitionInner = function (WrappedComponent) {
     const BrowserSpeechRecognition =
       window.SpeechRecognition ||
       window.webkitSpeechRecognition ||
@@ -149,5 +149,11 @@ export default function SpeechRecognition(options) {
         )
       }
     }
+  }
+
+  if (typeof options === 'function') {
+    return SpeechRecognitionInner(options)
+  } else {
+    return SpeechRecognitionInner
   }
 }
