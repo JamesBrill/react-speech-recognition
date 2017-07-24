@@ -14,7 +14,7 @@ export default function SpeechRecognition(options) {
       : null
     const browserSupportsSpeechRecognition = recognition !== null
     let listening
-    if (options.autoStart === false) {
+    if (options && options.autoStart === false) {
       listening = false
     } else {
       recognition.start()
