@@ -45,6 +45,11 @@ export default function SpeechRecognition(options) {
         }
       }
 
+      componentWillUnmount() {
+        recognition.onresult = null
+        recognition.onend = null
+      }
+
       @autobind
       disconnect(disconnectType) {
         if (recognition) {
