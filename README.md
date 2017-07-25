@@ -65,6 +65,26 @@ If you are writing ES7 code, you can add the `@SpeechRecognition` decorator
 to your component's class. To use the decorator syntax, add the
 [decorator plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy) to Babel.
 
+## Global options
+
+You can configure the default initial state of the Speech Recognition API. To change these defaults, you need to pass an options object into the wrapper like so:
+
+```
+const options = {
+  autoStart: false
+}
+
+export default SpeechRecognition(options)(YourComponent)
+```
+
+or in ES7:
+
+`@SpeechRecognition(options)`
+
+### autoStart [bool]
+
+By default, the Speech Recognition API is listening to speech from the microphone. To have the API turned off by default, set this to `false`.
+
 ## Props added to your component
 
 ### transcript [string]
