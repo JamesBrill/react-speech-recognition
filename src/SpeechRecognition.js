@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { debounce, autobind } from 'core-decorators'
+import { autobind } from 'core-decorators'
 
 export default function SpeechRecognition(options) {
   const SpeechRecognitionInner = function (WrappedComponent) {
@@ -45,11 +45,6 @@ export default function SpeechRecognition(options) {
         }
       }
 
-      componentWillUnmount() {
-        recognition.onresult = null
-        recognition.onend = null
-      }
-
       @autobind
       disconnect(disconnectType) {
         if (recognition) {
@@ -70,7 +65,6 @@ export default function SpeechRecognition(options) {
         }
       }
 
-      @debounce(1000)
       onRecognitionDisconnect() {
         listening = false
         if (pauseAfterDisconnect) {
