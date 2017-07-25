@@ -108,7 +108,11 @@ export default function SpeechRecognition(options) {
       @autobind
       startListening() {
         if (recognition && !listening) {
-          recognition.start()
+          try {
+            recognition.start()
+          } catch (DOMException) {
+            // Tried to start recognition after it has already started - safe to swallow this error
+          }
           listening = true
           this.setState({ listening })
         }
