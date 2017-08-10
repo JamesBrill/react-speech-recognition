@@ -105,7 +105,7 @@ Causes the Web Speech API to stop listening to speech from the microphone, but w
 
 ### abortListening [function]
 
-Causes the Web Speech API to stop listening to speech from the microphone, and also stop processing the current speech. Initially, the Web Speech API is turned on, so you may want to call this in `componentWillMount` if you don't want speech to be collected when your component is first mounted.
+Causes the Web Speech API to stop listening to speech from the microphone, and also stop processing the current speech. 
 
 ### browserSupportsSpeechRecognition [bool]
 
