@@ -1,6 +1,11 @@
 # react-speech-recognition
 A React component that converts speech from the microphone to text.
 
+[![npm version](https://img.shields.io/npm/v/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
+[![npm downloads](https://img.shields.io/npm/dm/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
+[![license](https://img.shields.io/github/license/FoundersFactory/react-speech-recognition.svg)](https://opensource.org/licenses/MIT)
+
+
 ## How it works
 `SpeechRecognition` is a higher order component that wraps one of your React components.
 In doing so, it injects some additional properties into the component that allow it
