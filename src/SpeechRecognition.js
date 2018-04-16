@@ -1,20 +1,23 @@
 import React, { Component } from 'react'
-import { autobind } from 'core-decorators'
 
 export default function SpeechRecognition(options) {
   const SpeechRecognitionInner = function (WrappedComponent) {
     const BrowserSpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition ||
-      window.mozSpeechRecognition ||
-      window.msSpeechRecognition ||
-      window.oSpeechRecognition
+      typeof window !== 'undefined' &&
+      (window.SpeechRecognition ||
+        window.webkitSpeechRecognition ||
+        window.mozSpeechRecognition ||
+        window.msSpeechRecognition ||
+        window.oSpeechRecognition)
     const recognition = BrowserSpeechRecognition
       ? new BrowserSpeechRecognition()
       : null
     const browserSupportsSpeechRecognition = recognition !== null
     let listening
-    if (options && options.autoStart === false) {
+    if (
+      !browserSupportsSpeechRecognition ||
+      (options && options.autoStart === false)
+    ) {
       listening = false
     } else {
       recognition.start()
@@ -45,8 +48,7 @@ export default function SpeechRecognition(options) {
         }
       }
 
-      @autobind
-      disconnect(disconnectType) {
+      disconnect = disconnectType => {
         if (recognition) {
           switch (disconnectType) {
             case 'ABORT':
@@ -97,16 +99,14 @@ export default function SpeechRecognition(options) {
         return transcriptParts.map(t => t.trim()).join(' ').trim()
       }
 
-      @autobind
-      resetTranscript() {
+      resetTranscript = () => {
         interimTranscript = ''
         finalTranscript = ''
         this.disconnect('RESET')
         this.setState({ interimTranscript, finalTranscript })
       }
 
-      @autobind
-      startListening() {
+      startListening = () => {
         if (recognition && !listening) {
           try {
             recognition.start()
@@ -118,15 +118,13 @@ export default function SpeechRecognition(options) {
         }
       }
 
-      @autobind
-      abortListening() {
+      abortListening = () => {
         listening = false
         this.setState({ listening })
         this.disconnect('ABORT')
       }
 
-      @autobind
-      stopListening() {
+      stopListening = () => {
         listening = false
         this.setState({ listening })
         this.disconnect('STOP')
