@@ -3,17 +3,21 @@ import React, { Component } from 'react'
 export default function SpeechRecognition(options) {
   const SpeechRecognitionInner = function (WrappedComponent) {
     const BrowserSpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition ||
-      window.mozSpeechRecognition ||
-      window.msSpeechRecognition ||
-      window.oSpeechRecognition
+      typeof window !== 'undefined' &&
+      (window.SpeechRecognition ||
+        window.webkitSpeechRecognition ||
+        window.mozSpeechRecognition ||
+        window.msSpeechRecognition ||
+        window.oSpeechRecognition)
     const recognition = BrowserSpeechRecognition
       ? new BrowserSpeechRecognition()
       : null
     const browserSupportsSpeechRecognition = recognition !== null
     let listening
-    if (options && options.autoStart === false) {
+    if (
+      !browserSupportsSpeechRecognition ||
+      (options && options.autoStart === false)
+    ) {
       listening = false
     } else {
       recognition.start()
