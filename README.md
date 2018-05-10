@@ -15,8 +15,7 @@ Under the hood,
 it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
 Currently, **this component will only work in Chrome**. It fails gracefully on other browsers.
 
-You will need a dependency manager like Browserify or Webpack to bundle this module
-with your web code.
+It is recommended that you use Webpack to bundle this module with your web code.
 
 
 ## Installation
