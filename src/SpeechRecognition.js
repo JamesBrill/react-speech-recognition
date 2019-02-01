@@ -40,7 +40,7 @@ export default function SpeechRecognition(options) {
 
       componentWillMount() {
         if (recognition) {
-          recognition.continuous = options.continuous || true
+          recognition.continuous = recognition.continuous = options.continuous ? true : false
           recognition.interimResults = true
           recognition.onresult = this.updateTranscript.bind(this)
           recognition.onend = this.onRecognitionDisconnect.bind(this)
