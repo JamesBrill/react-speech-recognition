@@ -89,6 +89,10 @@ or in ES7:
 
 By default, the Speech Recognition API is listening to speech from the microphone. To have the API turned off by default, set this to `false`.
 
+### continuous [bool]
+
+By default, the Speech Recognition API is continously listening to speech from the microphone. To have the API turned off after the user has finished speaking, or the input is no longer there, set this to `false`.
+
 ## Props added to your component
 
 ### transcript [string]
