@@ -71,7 +71,7 @@ export default function SpeechRecognition(options) {
         listening = false
         if (pauseAfterDisconnect) {
           this.setState({ listening })
-        } else if (typeof options.continuous === 'undefined') {
+        } else if (recognition && recognition.continuous) {
           this.startListening()
         }
         pauseAfterDisconnect = false
