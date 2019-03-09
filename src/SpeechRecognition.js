@@ -108,6 +108,9 @@ export default function SpeechRecognition(options) {
 
       startListening = () => {
         if (recognition && !listening) {
+          if (!recognition.continuous) {
+            this.resetTranscript()
+          }
           try {
             recognition.start()
           } catch (DOMException) {
