@@ -72,9 +72,9 @@ export default function SpeechRecognition(options) {
         if (pauseAfterDisconnect) {
           this.setState({ listening })
         } else if (recognition) {
-          if(recognition.continuous) {
+          if (recognition.continuous) {
             this.startListening()
-          }else{
+          } else {
             this.setState({ listening })
           }
         }
