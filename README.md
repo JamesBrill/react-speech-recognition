@@ -114,6 +114,9 @@ Sets the transcription to an empty string.
 
 Causes the Web Speech API to start listening to speech from the microphone.
 
+*NOTE: if `continuous` option is set to `false`, then it will reset the `transcript` prop after the next invoke of `startListening` 
+[here](https://github.com/FoundersFactory/react-speech-recognition#continuous-bool)
+
 ### stopListening [function]
 
 Causes the Web Speech API to stop listening to speech from the microphone, but will finish processing any remaining speech.
