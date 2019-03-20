@@ -40,7 +40,7 @@ export default function SpeechRecognition(options) {
 
       componentWillMount() {
         if (recognition) {
-          recognition.continuous = true
+          recognition.continuous = options.continuous !== false
           recognition.interimResults = true
           recognition.onresult = this.updateTranscript.bind(this)
           recognition.onend = this.onRecognitionDisconnect.bind(this)
@@ -71,8 +71,12 @@ export default function SpeechRecognition(options) {
         listening = false
         if (pauseAfterDisconnect) {
           this.setState({ listening })
-        } else {
-          this.startListening()
+        } else if (recognition) {
+          if (recognition.continuous) {
+            this.startListening()
+          } else {
+            this.setState({ listening })
+          }
         }
         pauseAfterDisconnect = false
       }
@@ -108,6 +112,9 @@ export default function SpeechRecognition(options) {
 
       startListening = () => {
         if (recognition && !listening) {
+          if (!recognition.continuous) {
+            this.resetTranscript()
+          }
           try {
             recognition.start()
           } catch (DOMException) {
