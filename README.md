@@ -87,18 +87,11 @@ or in ES7:
 
 ### autoStart [bool]
 
-By default, the Speech Recognition API is listening to speech from the microphone. To have the API turned off by default, set this to `false`.
+By default, the Speech Recognition API will immediately start listening to speech from the microphone. To have the API initially turned off, set this to `false`.
 
 ### continuous [bool]
 
-By default, the Speech Recognition API is continously listening to speech from the microphone. To have the API turned off after the user has finished speaking, or the input is no longer there, set this to `false`. For example, if you had a chat app that should start listening to user's speech/input after clicking a button, you should set `continuous` to `false` like this:
-```
-const options = {
-  autoStart: false,
-  continuous: false 
-}
-export default SpeechRecognition(options)(YourComponent)
-```
+By default, the Speech Recognition API is continuously listening to speech from the microphone when it is turned on. To have the API stop listening after the user has finished speaking, set this to `false`. For example, if you are building a chat app that only starts listening to the user's speech after a button click, you should set both `continuous` and `autoStart` options to `false`. Call [startListening](https://github.com/FoundersFactory/react-speech-recognition#startListening-function) to make the API start listening again.
 
 ## Props added to your component
 
@@ -114,8 +107,7 @@ Sets the transcription to an empty string.
 
 Causes the Web Speech API to start listening to speech from the microphone.
 
-*NOTE: if `continuous` option is set to `false`, then it will reset the `transcript` prop after the next invoke of `startListening` 
-[here](https://github.com/FoundersFactory/react-speech-recognition#continuous-bool)
+NOTE: if the `continuous` option is set to `false`, then `startListening` will reset the `transcript` prop.
 
 ### stopListening [function]
 
