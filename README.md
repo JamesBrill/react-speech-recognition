@@ -33,20 +33,24 @@ To import in your React code:
 As only one component can be wrapped by `SpeechRecognition`, it is recommended that you add it to one of your root React components such as `App`. The transcription can then be passed down to child components.
 
 ```
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import SpeechRecognition from 'react-speech-recognition'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import SpeechRecognition from "react-speech-recognition";
 
 const propTypes = {
   // Props injected by SpeechRecognition
   transcript: PropTypes.string,
   resetTranscript: PropTypes.func,
   browserSupportsSpeechRecognition: PropTypes.bool
-}
+};
 
-const Dictaphone = ({ transcript, resetTranscript, browserSupportsSpeechRecognition }) => {
+const Dictaphone = ({
+  transcript,
+  resetTranscript,
+  browserSupportsSpeechRecognition
+}) => {
   if (!browserSupportsSpeechRecognition) {
-    return null
+    return null;
   }
 
   return (
@@ -54,12 +58,12 @@ const Dictaphone = ({ transcript, resetTranscript, browserSupportsSpeechRecognit
       <button onClick={resetTranscript}>Reset</button>
       <span>{transcript}</span>
     </div>
-  )
-}
+  );
+};
 
-Dictaphone.propTypes = propTypes
+Dictaphone.propTypes = propTypes;
 
-export default SpeechRecognition(Dictaphone)
+export default SpeechRecognition(Dictaphone);
 ```
 
 ## Global options
@@ -73,10 +77,6 @@ const options = {
 
 export default SpeechRecognition(options)(YourComponent)
 ```
-
-or in ES7:
-
-`@SpeechRecognition(options)`
 
 ### autoStart [bool]
 
