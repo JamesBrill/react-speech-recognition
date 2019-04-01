@@ -33,7 +33,8 @@ To import in your React code:
 As only one component can be wrapped by `SpeechRecognition`, it is recommended that you add it to one of your root React components such as `App`. The transcription can then be passed down to child components.
 
 ```
-import React, { PropTypes, Component } from 'react'
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import SpeechRecognition from 'react-speech-recognition'
 
 const propTypes = {
@@ -43,31 +44,23 @@ const propTypes = {
   browserSupportsSpeechRecognition: PropTypes.bool
 }
 
-class Dictaphone extends Component {
-  render() {
-    const { transcript, resetTranscript, browserSupportsSpeechRecognition } = this.props
-
-    if (!browserSupportsSpeechRecognition) {
-      return null
-    }
-
-    return (
-      <div>
-        <button onClick={resetTranscript}>Reset</button>
-        <span>{transcript}</span>
-      </div>
-    )
+const Dictaphone = ({ transcript, resetTranscript, browserSupportsSpeechRecognition }) => {
+  if (!browserSupportsSpeechRecognition) {
+    return null
   }
+
+  return (
+    <div>
+      <button onClick={resetTranscript}>Reset</button>
+      <span>{transcript}</span>
+    </div>
+  )
 }
 
 Dictaphone.propTypes = propTypes
 
 export default SpeechRecognition(Dictaphone)
 ```
-
-If you are writing ES7 code, you can add the `@SpeechRecognition` decorator
-to your component's class. To use the decorator syntax, add the
-[decorator plugin](https://github.com/loganfsmyth/babel-plugin-transform-decorators-legacy) to Babel.
 
 ## Global options
 
