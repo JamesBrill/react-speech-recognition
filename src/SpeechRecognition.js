@@ -31,20 +31,15 @@ export default function SpeechRecognition(options) {
       constructor(props) {
         super(props)
 
+        recognition.continuous = options.continuous !== false
+        recognition.interimResults = true
+        recognition.onresult = this.updateTranscript.bind(this)
+        recognition.onend = this.onRecognitionDisconnect.bind(this)
+
         this.state = {
           interimTranscript,
           finalTranscript,
-          listening: false
-        }
-      }
-
-      componentWillMount() {
-        if (recognition) {
-          recognition.continuous = options.continuous !== false
-          recognition.interimResults = true
-          recognition.onresult = this.updateTranscript.bind(this)
-          recognition.onend = this.onRecognitionDisconnect.bind(this)
-          this.setState({ listening })
+          listening
         }
       }
 
