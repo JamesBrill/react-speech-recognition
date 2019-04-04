@@ -31,7 +31,7 @@ export default function SpeechRecognition(options) {
       constructor(props) {
         super(props)
 
-        if (browserSupportsSpeechRecognition  && recognition != null) {
+        if (browserSupportsSpeechRecognition) {
           recognition.continuous = options.continuous !== false
           recognition.interimResults = true
           recognition.onresult = this.updateTranscript.bind(this)
