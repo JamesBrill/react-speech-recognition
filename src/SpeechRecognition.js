@@ -45,6 +45,17 @@ export default function SpeechRecognition(options) {
         }
       }
 
+      unmounted=false
+
+      componentWillUnmount() {
+        this.unmounted = true
+      }
+
+      updateState=(state)=> {
+        if (this.unmounted) return
+        this.setState(state)
+      }
+
       disconnect = disconnectType => {
         if (recognition) {
           switch (disconnectType) {
@@ -67,12 +78,12 @@ export default function SpeechRecognition(options) {
       onRecognitionDisconnect() {
         listening = false
         if (pauseAfterDisconnect) {
-          this.setState({ listening })
+          this.updateState({ listening })
         } else if (recognition) {
           if (recognition.continuous) {
             this.startListening()
           } else {
-            this.setState({ listening })
+            this.updateState({ listening })
           }
         }
         pauseAfterDisconnect = false
@@ -93,7 +104,7 @@ export default function SpeechRecognition(options) {
             )
           }
         }
-        this.setState({ finalTranscript, interimTranscript })
+        this.updateState({ finalTranscript, interimTranscript })
       }
 
       concatTranscripts(...transcriptParts) {
@@ -104,7 +115,7 @@ export default function SpeechRecognition(options) {
         interimTranscript = ''
         finalTranscript = ''
         this.disconnect('RESET')
-        this.setState({ interimTranscript, finalTranscript })
+        this.updateState({ interimTranscript, finalTranscript })
       }
 
       startListening = () => {
@@ -118,19 +129,19 @@ export default function SpeechRecognition(options) {
             // Tried to start recognition after it has already started - safe to swallow this error
           }
           listening = true
-          this.setState({ listening })
+          this.updateState({ listening })
         }
       }
 
       abortListening = () => {
         listening = false
-        this.setState({ listening })
+        this.updateState({ listening })
         this.disconnect('ABORT')
       }
 
       stopListening = () => {
         listening = false
-        this.setState({ listening })
+        this.updateState({ listening })
         this.disconnect('STOP')
       }
 
