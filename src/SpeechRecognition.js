@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import { debounce } from './utils'
 
 export default function SpeechRecognition(options) {
   const SpeechRecognitionInner = function (WrappedComponent) {
@@ -13,6 +14,7 @@ export default function SpeechRecognition(options) {
       ? new BrowserSpeechRecognition()
       : null
     const browserSupportsSpeechRecognition = recognition !== null
+    const isAndroid = /(android)/i.test(navigator.userAgent)
     let listening
     if (
       !browserSupportsSpeechRecognition ||
@@ -36,6 +38,10 @@ export default function SpeechRecognition(options) {
           recognition.interimResults = true
           recognition.onresult = this.updateTranscript.bind(this)
           recognition.onend = this.onRecognitionDisconnect.bind(this)
+        }
+
+        if (isAndroid) {
+          this.updateFinalTranscript = debounce(this.updateFinalTranscript.bind(this), 250, true)
         }
 
         this.state = {
@@ -81,11 +87,8 @@ export default function SpeechRecognition(options) {
       updateTranscript(event) {
         interimTranscript = ''
         for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal) {
-            finalTranscript = this.concatTranscripts(
-              finalTranscript,
-              event.results[i][0].transcript
-            )
+          if (event.results[i].isFinal && (!isAndroid || event.results[i][0].confidence > 0)) {
+            this.updateFinalTranscript(event.results[i][0].transcript)
           } else {
             interimTranscript = this.concatTranscripts(
               interimTranscript,
@@ -94,6 +97,13 @@ export default function SpeechRecognition(options) {
           }
         }
         this.setState({ finalTranscript, interimTranscript })
+      }
+
+      updateFinalTranscript(newFinalTranscript) {
+        finalTranscript = this.concatTranscripts(
+          finalTranscript,
+          newFinalTranscript
+        )
       }
 
       concatTranscripts(...transcriptParts) {
