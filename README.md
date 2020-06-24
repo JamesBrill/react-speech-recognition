@@ -159,6 +159,16 @@ There is a [bug in Android Chrome](https://stackoverflow.com/questions/35112561/
 - Set the `continuous` option to `false`
 - [Detect Android Chrome](https://stackoverflow.com/questions/21741841/detecting-ios-android-operating-system) and render fallback content on that browser
 
+## Developing
+
+You can run an example React app that uses `react-speech-recognition` with:
+```
+npm i
+npm run dev
+```
+
+On `http://localhost:3000`, you'll be able to speak into the microphone and see your speech as text on the web page. There are also controls for turning speech recognition on and off. You can make changes to the web app itself in the `example` directory. Any changes you make to the web app or `react-speech-recognition` itself will be live reloaded in the browser.
+
 ## License
 
 MIT
