@@ -6,7 +6,13 @@
   "scripts": {
     "build": "babel src --out-dir lib && webpack -p",
     "postinstall": "cd example && npm i",
-    "dev": "cp -R src/ example/src/SpeechRecognition/ && cd example && npm start"
+    "update-example": "cp -R src/ example/src/SpeechRecognition",
+    "run-example": "cd example && npm start",
+    "dev": "npm run watch & npm run update-example && npm run run-example",
+    "watch": "npm-watch update-example"
+  },
+  "watch": {
+    "update-example": "src/*.js"
   },
   "repository": {
     "type": "git",
@@ -43,6 +49,7 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-react": "^7.14.2",
     "eslint-plugin-standard": "^4.0.0",
+    "npm-watch": "^0.6.0",
     "webpack": "^1.14.0"
   }
 }
