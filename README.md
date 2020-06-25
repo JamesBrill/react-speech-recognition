@@ -3,7 +3,7 @@ A React component that converts speech from the microphone to text.
 
 [![npm version](https://img.shields.io/npm/v/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
 [![npm downloads](https://img.shields.io/npm/dm/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
-[![license](https://img.shields.io/github/license/FoundersFactory/react-speech-recognition.svg)](https://opensource.org/licenses/MIT)
+[![license](https://img.shields.io/github/license/JamesBrill/react-speech-recognition.svg)](https://opensource.org/licenses/MIT)
 
 
 ## How it works
@@ -84,7 +84,7 @@ By default, the Speech Recognition API will immediately start listening to speec
 
 ### continuous [bool]
 
-By default, the Speech Recognition API is continuously listening to speech from the microphone when it is turned on. To have the API stop listening after the user has finished speaking, set this to `false`. For example, if you are building a chat app that only starts listening to the user's speech after a button click, you should set both `continuous` and `autoStart` options to `false`. Call [startListening](https://github.com/FoundersFactory/react-speech-recognition#startListening-function) to make the API start listening again.
+By default, the Speech Recognition API is continuously listening to speech from the microphone when it is turned on. To have the API stop listening after the user has finished speaking, set this to `false`. For example, if you are building a chat app that only starts listening to the user's speech after a button click, you should set both `continuous` and `autoStart` options to `false`. Call [startListening](https://github.com/JamesBrill/react-speech-recognition#startListening-function) to make the API start listening again.
 
 ## Props added to your component
 

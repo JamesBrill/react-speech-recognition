@@ -1,13 +1,12 @@
 {
   "name": "react-speech-recognition",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "A React component that converts speech from the microphone to text.",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src --out-dir lib && webpack -p",
-    "postinstall": "cd example && npm i",
     "update-example": "cp -R src/ example/src/SpeechRecognition",
-    "run-example": "cd example && npm start",
+    "run-example": "cd example && npm i && npm start",
     "dev": "npm run watch & npm run update-example && npm run run-example",
     "watch": "npm-watch update-example"
   },
@@ -16,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/FoundersFactory/react-speech-recognition.git"
+    "url": "https://github.com/JamesBrill/react-speech-recognition.git"
   },
   "keywords": [
     "react",
