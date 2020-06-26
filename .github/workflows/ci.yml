@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags-ignore:
+      - v*
 
 jobs:
   bump-version:
@@ -16,10 +18,10 @@ jobs:
       - run: git config --global user.name 'james.brill'
       - run: git config --global user.email 'contact@jamesbrill.co.uk'
       - run: npm version patch -m "v%s"
+      - run: git push --tags
       - run: git push
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - run: git push --tags
+          NODE_AUTH_TOKEN: ${{secrets.PAT}}
 
   publish-npm:
     needs: bump-version
