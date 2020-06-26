@@ -1,6 +1,6 @@
 {
   "name": "react-speech-recognition",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "A React component that converts speech from the microphone to text.",
   "main": "lib/index.js",
   "scripts": {
@@ -9,7 +9,8 @@
     "update-example": "cp -R src/ example/src/SpeechRecognition",
     "run-example": "cd example && npm i && npm start",
     "dev": "npm run watch & npm run update-example && npm run run-example",
-    "watch": "npm-watch update-example"
+    "watch": "npm-watch update-example",
+    "bump": "npm version patch -m \"v%s\" && git push --tags"
   },
   "watch": {
     "update-example": "src/*.js"
