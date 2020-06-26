@@ -40,6 +40,12 @@ export default function SpeechRecognition(options) {
           recognition.onend = this.onRecognitionDisconnect.bind(this)
         }
 
+        this.disconnect = this.disconnect.bind(this)
+        this.resetTranscript = this.resetTranscript.bind(this)
+        this.startListening = this.startListening.bind(this)
+        this.abortListening = this.abortListening.bind(this)
+        this.stopListening = this.stopListening.bind(this)
+
         if (isAndroid) {
           this.updateFinalTranscript = debounce(this.updateFinalTranscript.bind(this), 250, true)
         }
@@ -51,7 +57,7 @@ export default function SpeechRecognition(options) {
         }
       }
 
-      disconnect = disconnectType => {
+      disconnect(disconnectType) {
         if (recognition) {
           switch (disconnectType) {
             case 'ABORT':
@@ -110,14 +116,14 @@ export default function SpeechRecognition(options) {
         return transcriptParts.map(t => t.trim()).join(' ').trim()
       }
 
-      resetTranscript = () => {
+      resetTranscript() {
         interimTranscript = ''
         finalTranscript = ''
         this.disconnect('RESET')
         this.setState({ interimTranscript, finalTranscript })
       }
 
-      startListening = () => {
+      startListening() {
         if (recognition && !listening) {
           if (!recognition.continuous) {
             this.resetTranscript()
@@ -132,13 +138,13 @@ export default function SpeechRecognition(options) {
         }
       }
 
-      abortListening = () => {
+      abortListening() {
         listening = false
         this.setState({ listening })
         this.disconnect('ABORT')
       }
 
-      stopListening = () => {
+      stopListening() {
         listening = false
         this.setState({ listening })
         this.disconnect('STOP')
