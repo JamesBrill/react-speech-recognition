@@ -1,27 +1,8 @@
-name: CI
+name: Publish
 
 on:
-  push:
-    branches:
-      - master
-    tags-ignore:
-      - v*
-
-jobs:
-  bump-version:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - run: git config --global user.name 'james.brill'
-      - run: git config --global user.email 'contact@jamesbrill.co.uk'
-      - run: npm version patch -m "v%s"
-      - run: git push --tags
-      - run: git push
-        env:
-          GITHUB_TOKEN: ${{secrets.PAT}}
+  release:
+    types: [created]
 
   publish-npm:
     needs: bump-version
