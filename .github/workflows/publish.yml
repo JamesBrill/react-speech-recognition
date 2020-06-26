@@ -6,7 +6,6 @@ on:
 
 jobs:
   publish-npm:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,7 +19,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
   publish-gpr:
-    needs: bump-version
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
