@@ -8,8 +8,6 @@ on:
 jobs:
   bump-version:
     runs-on: ubuntu-latest
-    env:
-      NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -19,6 +17,8 @@ jobs:
       - run: git config --global user.email 'contact@jamesbrill.co.uk'
       - run: npm version patch -m "v%s"
       - run: git push
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
       - run: git push --tags
 
   publish-npm:
