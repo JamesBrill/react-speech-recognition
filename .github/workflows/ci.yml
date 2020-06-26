@@ -13,11 +13,10 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: 12
-      - run: |
-          git config --global user.name 'james.brill'
-          git config --global user.email 'contact@jamesbrill.co.uk'
-          npm version patch -m "v%s"
-          git push origin --tags
+      - run: git config --global user.name 'james.brill'
+      - run: git config --global user.email 'contact@jamesbrill.co.uk'
+      - run: npm version patch -m "v%s"
+      - run: git push origin --tags
 
   publish-npm:
     needs: bump-version
