@@ -16,7 +16,8 @@ jobs:
       - run: git config --global user.name 'james.brill'
       - run: git config --global user.email 'contact@jamesbrill.co.uk'
       - run: npm version patch -m "v%s"
-      - run: git push origin --tags
+      - run: git push
+      - run: git push --tags
 
   publish-npm:
     needs: bump-version
