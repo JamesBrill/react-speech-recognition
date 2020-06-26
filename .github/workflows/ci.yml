@@ -21,7 +21,7 @@ jobs:
       - run: git push --tags
       - run: git push
         env:
-          NODE_AUTH_TOKEN: ${{secrets.PAT}}
+          GITHUB_TOKEN: ${{secrets.PAT}}
 
   publish-npm:
     needs: bump-version
