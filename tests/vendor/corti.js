@@ -138,7 +138,7 @@ export default function (_root) {
         item: itemFunction,
         0: {
           item: itemFunction,
-          final: true
+          isFinal: true
         }
       }
       for (commandIterator = 0; commandIterator < _maxAlternatives; commandIterator++) {
