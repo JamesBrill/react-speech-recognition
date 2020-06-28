@@ -100,52 +100,20 @@ export default function (_root) {
       return _self._started
     }
 
-    this.say = function(sentence) {
-      if (!_self._started) {
-        return
-      }
-      // Create some speech alternatives
-      var results = []
-      var commandIterator
-      var etcIterator
-      var itemFunction = function(index) {
-        if (undefined === index) {
-          throw new DOMException('Failed to execute \'item\' on \'SpeechRecognitionResult\': 1 argument required, but only 0 present.')
-        }
-        index = Number(index)
-        if (isNaN(index)) {
-          index = 0
-        }
-        if (index >= this.length) {
-          return null
-        } else {
-          return this[index]
-        }
-      }
-      for (commandIterator = 0; commandIterator < _maxAlternatives; commandIterator++) {
-        var etc = ''
-        for (etcIterator = 0; etcIterator < commandIterator; etcIterator++) {
-          etc += ' and so on'
-        }
-        results.push(sentence + etc)
-      }
-
-      // Create the start event
+    this.emitStartEvent = function(text, isFinal, itemFunction, isAndroid) {
       var startEvent = document.createEvent('CustomEvent')
-      startEvent.initCustomEvent('result', false, false, { sentence: sentence })
+      startEvent.initCustomEvent('result', false, false, { sentence: text })
       startEvent.resultIndex = 0
       startEvent.results = {
         item: itemFunction,
         0: {
           item: itemFunction,
-          isFinal: true
+          isFinal: isFinal || isAndroid
         }
       }
-      for (commandIterator = 0; commandIterator < _maxAlternatives; commandIterator++) {
-        startEvent.results[0][commandIterator] = {
-          transcript: results[commandIterator],
-          confidence: Math.max(1 - 0.01 * commandIterator, 0.001)
-        }
+      startEvent.results[0][0] = {
+        transcript: text,
+        confidence: isAndroid && !isFinal ? 0 : 1
       }
       Object.defineProperty(startEvent.results, 'length', {
         get: function() { return 1 }
@@ -163,6 +131,45 @@ export default function (_root) {
         var soundStartEvent = document.createEvent('CustomEvent')
         soundStartEvent.initCustomEvent('soundstart', false, false, null)
         _listeners.dispatchEvent(soundStartEvent)
+      }
+    }
+
+    this.say = function(sentence, {
+      onlyFirstResult = false,
+      isAndroid = false
+    } = {}) {
+      if (!_self._started) {
+        return
+      }
+
+      var itemFunction = function(index) {
+        if (undefined === index) {
+          throw new DOMException('Failed to execute \'item\' on \'SpeechRecognitionResult\': 1 argument required, but only 0 present.')
+        }
+        index = Number(index)
+        if (isNaN(index)) {
+          index = 0
+        }
+        if (index >= this.length) {
+          return null
+        } else {
+          return this[index]
+        }
+      }
+
+      const words = sentence.split(' ')
+      if (onlyFirstResult) {
+        this.emitStartEvent(words[0], false, itemFunction)
+      } else {
+        let text = ''
+        words.forEach(word => {
+          text = [text, word].join(' ')
+          this.emitStartEvent(text, false, itemFunction, isAndroid)
+        })
+        this.emitStartEvent(sentence, true, itemFunction)
+        if (isAndroid) {
+          this.emitStartEvent(sentence, true, itemFunction)
+        }
       }
 
       // stop if not set to continuous mode

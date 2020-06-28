@@ -6,6 +6,15 @@ import SpeechRecognition from '../src'
 
 configure({ adapter: new Adapter() })
 
+const setUserAgent = (userAgent) => {
+  Object.defineProperty(navigator, 'userAgent', {
+    get: function () {
+      return userAgent
+    },
+    configurable: true
+  })
+}
+
 describe('SpeechRecognition', () => {
   const mockSpeechRecognition = Corti(global)
 
@@ -178,6 +187,51 @@ describe('SpeechRecognition', () => {
     const props = component.props()
     expect(props.transcript).toEqual(speech)
     expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual(speech)
+  })
+
+  test('sets interim transcript correctly', () => {
+    mockSpeechRecognition.patch()
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent />)
+    const speech = 'This is a test'
+
+    component.props().recognition.say(speech, { onlyFirstResult: true })
+
+    const props = component.props()
+    expect(props.transcript).toEqual('This')
+    expect(props.interimTranscript).toEqual('This')
+    expect(props.finalTranscript).toEqual('')
+  })
+
+  test('appends interim transcript correctly', () => {
+    mockSpeechRecognition.patch()
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent />)
+    const speech = 'This is a test'
+
+    component.props().recognition.say(speech)
+    component.props().recognition.say(speech, { onlyFirstResult: true })
+
+    const props = component.props()
+    expect(props.transcript).toEqual('This is a test This')
+    expect(props.interimTranscript).toEqual('This')
+    expect(props.finalTranscript).toEqual(speech)
+  })
+
+  test('appends interim transcript correctly on Android', () => {
+    mockSpeechRecognition.patch()
+    setUserAgent('android')
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent />)
+    const speech = 'This is a test'
+
+    component.props().recognition.say(speech, { isAndroid: true })
+    component.props().recognition.say(speech, { onlyFirstResult: true, isAndroid: true })
+
+    const props = component.props()
+    expect(props.transcript).toEqual('This is a test This')
+    expect(props.interimTranscript).toEqual('This')
     expect(props.finalTranscript).toEqual(speech)
   })
 })
