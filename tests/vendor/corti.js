@@ -9,6 +9,7 @@ export default function (_root) {
   var _productionVersion = false
 
   // Patch DOMException
+  // eslint-disable-next-line no-use-before-define
   var DOMException = DOMException || TypeError
 
   // Speech Recognition attributes
