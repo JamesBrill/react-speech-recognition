@@ -1,180 +1,65 @@
 import React, { Component } from 'react'
-import { debounce } from './utils'
+import { concatTranscripts, RecognitionManager } from './utils'
 
-export default function SpeechRecognition(options) {
-  const SpeechRecognitionInner = function (WrappedComponent) {
-    const BrowserSpeechRecognition =
-      typeof window !== 'undefined' &&
-      (window.SpeechRecognition ||
-        window.webkitSpeechRecognition ||
-        window.mozSpeechRecognition ||
-        window.msSpeechRecognition ||
-        window.oSpeechRecognition)
-    const recognition = BrowserSpeechRecognition
-      ? new BrowserSpeechRecognition()
-      : null
-    const browserSupportsSpeechRecognition = recognition !== null
-    const isAndroid = /(android)/i.test(navigator.userAgent)
-    let listening
-    if (
-      !browserSupportsSpeechRecognition ||
-      (options && options.autoStart === false)
-    ) {
-      listening = false
-    } else {
-      recognition.start()
-      listening = true
-    }
-    let pauseAfterDisconnect = false
-    let interimTranscript = ''
-    let finalTranscript = ''
+let id = 0
+export default function SpeechRecognition(WrappedComponent) {
+  const recognitionManager = new RecognitionManager()
 
-    return class SpeechRecognitionContainer extends Component {
-      constructor(props) {
-        super(props)
+  return class SpeechRecognitionContainer extends Component {
+    constructor(props) {
+      super(props)
 
-        if (browserSupportsSpeechRecognition) {
-          recognition.continuous = options.continuous !== false
-          recognition.interimResults = true
-          recognition.onresult = this.updateTranscript.bind(this)
-          recognition.onend = this.onRecognitionDisconnect.bind(this)
-        }
-
-        this.disconnect = this.disconnect.bind(this)
-        this.resetTranscript = this.resetTranscript.bind(this)
-        this.startListening = this.startListening.bind(this)
-        this.abortListening = this.abortListening.bind(this)
-        this.stopListening = this.stopListening.bind(this)
-
-        if (isAndroid) {
-          this.updateFinalTranscript = debounce(this.updateFinalTranscript.bind(this), 250, true)
-        }
-
-        this.state = {
-          interimTranscript,
-          finalTranscript,
-          listening
-        }
-      }
-
-      disconnect(disconnectType) {
-        if (recognition) {
-          switch (disconnectType) {
-            case 'ABORT':
-              pauseAfterDisconnect = true
-              recognition.abort()
-              break
-            case 'RESET':
-              pauseAfterDisconnect = false
-              recognition.abort()
-              break
-            case 'STOP':
-            default:
-              pauseAfterDisconnect = true
-              recognition.stop()
-          }
-        }
-      }
-
-      onRecognitionDisconnect() {
-        listening = false
-        if (pauseAfterDisconnect) {
-          this.setState({ listening })
-        } else if (recognition) {
-          if (recognition.continuous) {
-            this.startListening()
-          } else {
-            this.setState({ listening })
-          }
-        }
-        pauseAfterDisconnect = false
-      }
-
-      updateTranscript(event) {
-        interimTranscript = ''
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-          if (event.results[i].isFinal && (!isAndroid || event.results[i][0].confidence > 0)) {
-            this.updateFinalTranscript(event.results[i][0].transcript)
-          } else {
-            interimTranscript = this.concatTranscripts(
-              interimTranscript,
-              event.results[i][0].transcript
-            )
-          }
-        }
-        this.setState({ finalTranscript, interimTranscript })
-      }
-
-      updateFinalTranscript(newFinalTranscript) {
-        finalTranscript = this.concatTranscripts(
-          finalTranscript,
-          newFinalTranscript
-        )
-      }
-
-      concatTranscripts(...transcriptParts) {
-        return transcriptParts.map(t => t.trim()).join(' ').trim()
-      }
-
-      resetTranscript() {
-        interimTranscript = ''
-        finalTranscript = ''
-        this.disconnect('RESET')
-        this.setState({ interimTranscript, finalTranscript })
-      }
-
-      startListening() {
-        if (recognition && !listening) {
-          if (!recognition.continuous) {
-            this.resetTranscript()
-          }
-          try {
-            recognition.start()
-          } catch (DOMException) {
-            // Tried to start recognition after it has already started - safe to swallow this error
-          }
-          listening = true
-          this.setState({ listening })
-        }
-      }
-
-      abortListening() {
-        listening = false
-        this.setState({ listening })
-        this.disconnect('ABORT')
-      }
-
-      stopListening() {
-        listening = false
-        this.setState({ listening })
-        this.disconnect('STOP')
-      }
-
-      render() {
-        const transcript = this.concatTranscripts(
-          finalTranscript,
-          interimTranscript
-        )
-
-        return (
-          <WrappedComponent
-            resetTranscript={this.resetTranscript}
-            startListening={this.startListening}
-            abortListening={this.abortListening}
-            stopListening={this.stopListening}
-            transcript={transcript}
-            recognition={recognition}
-            browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
-            {...this.state}
-            {...this.props} />
-        )
+      this.state = {
+        interimTranscript: recognitionManager.interimTranscript,
+        finalTranscript: recognitionManager.finalTranscript, // TODO: probably should not be global
+        listening: recognitionManager.listening
       }
     }
-  }
 
-  if (typeof options === 'function') {
-    return SpeechRecognitionInner(options)
-  } else {
-    return SpeechRecognitionInner
+    componentDidMount() {
+      const autoStart = this.props.autoStart === undefined ? true : this.props.autoStart
+      const continuous = this.props.continuous === undefined ? true : this.props.continuous
+      this.id = id
+      id += 1
+
+      recognitionManager.subscribe(this.id, { autoStart, continuous }, {
+        onListeningChange: this.handleListeningChange.bind(this),
+        onTranscriptChange: this.handleTranscriptChange.bind(this)
+      })
+    }
+
+    componentWillUnmount() {
+      recognitionManager.unsubscribe(this.id)
+    }
+
+    handleListeningChange(listening) {
+      this.setState({ listening })
+    }
+
+    handleTranscriptChange(interimTranscript, finalTranscript) {
+      this.setState({ interimTranscript, finalTranscript })
+    }
+
+    render() {
+      const { autoStart, continuous, ...otherProps } = this.props
+      const { interimTranscript, finalTranscript } = this.state
+      const transcript = concatTranscripts(
+        finalTranscript,
+        interimTranscript
+      )
+
+      return (
+        <WrappedComponent
+          resetTranscript={recognitionManager.resetTranscript}
+          startListening={recognitionManager.startListening}
+          abortListening={recognitionManager.abortListening}
+          stopListening={recognitionManager.stopListening}
+          transcript={transcript}
+          recognition={recognitionManager.getRecognition()}
+          browserSupportsSpeechRecognition={recognitionManager.browserSupportsSpeechRecognition}
+          {...this.state}
+          {...otherProps} />
+      )
+    }
   }
 }

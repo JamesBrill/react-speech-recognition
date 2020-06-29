@@ -3,17 +3,11 @@ import { shallow, configure } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import Corti from './vendor/corti'
 import SpeechRecognition from '../src'
+import isAndroid from '../src/isAndroid'
+
+jest.mock('../src/isAndroid')
 
 configure({ adapter: new Adapter() })
-
-const setUserAgent = (userAgent) => {
-  Object.defineProperty(navigator, 'userAgent', {
-    get: function () {
-      return userAgent
-    },
-    configurable: true
-  })
-}
 
 describe('SpeechRecognition', () => {
   const mockSpeechRecognition = Corti(global)
@@ -129,9 +123,8 @@ describe('SpeechRecognition', () => {
 
   test('can turn auto-start off', () => {
     mockSpeechRecognition.patch()
-    const options = { autoStart: false }
-    const WrappedComponent = SpeechRecognition(options)(() => null)
-    const component = shallow(<WrappedComponent />)
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent autoStart={false} />)
     const speech = 'This is a test'
 
     component.props().recognition.say(speech)
@@ -144,9 +137,8 @@ describe('SpeechRecognition', () => {
 
   test('can listen again after auto-start turned off', () => {
     mockSpeechRecognition.patch()
-    const options = { autoStart: false }
-    const WrappedComponent = SpeechRecognition(options)(() => null)
-    const component = shallow(<WrappedComponent />)
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent autoStart={false} />)
     const speech = 'This is a test'
 
     component.props().startListening()
@@ -176,9 +168,8 @@ describe('SpeechRecognition', () => {
 
   test('can turn continuous listening off', () => {
     mockSpeechRecognition.patch()
-    const options = { continuous: false }
-    const WrappedComponent = SpeechRecognition(options)(() => null)
-    const component = shallow(<WrappedComponent />)
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent continuous={false} />)
     const speech = 'This is a test'
 
     component.props().recognition.say(speech)
@@ -221,7 +212,7 @@ describe('SpeechRecognition', () => {
 
   test('appends interim transcript correctly on Android', () => {
     mockSpeechRecognition.patch()
-    setUserAgent('android')
+    isAndroid.mockReturnValue(true)
     const WrappedComponent = SpeechRecognition(() => null)
     const component = shallow(<WrappedComponent />)
     const speech = 'This is a test'
