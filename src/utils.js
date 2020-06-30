@@ -40,6 +40,7 @@ class RecognitionManager {
     this.subscribers = {}
 
     if (this.browserSupportsSpeechRecognition) {
+      this.recognition.continuous = true
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
       this.recognition.onend = this.onRecognitionDisconnect.bind(this)
@@ -55,15 +56,20 @@ class RecognitionManager {
     }
   }
 
-  subscribe(id, options, listeners) {
-    this.subscribers[id] = listeners
-    const { autoStart, continuous } = options
+  setContinuous(continuous) {
     if (this.browserSupportsSpeechRecognition) {
-      this.recognition.continuous = continuous !== false
+      this.recognition.continuous = continuous
     }
-    if (autoStart) {
-      this.startListening()
+  }
+
+  setLanguage(language) {
+    if (this.browserSupportsSpeechRecognition) {
+      this.recognition.lang = language
     }
+  }
+
+  subscribe(id, listeners) {
+    this.subscribers[id] = listeners
   }
 
   unsubscribe(id) {

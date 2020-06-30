@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import { concatTranscripts, RecognitionManager } from './utils'
 
 let id = 0
+const recognitionManager = new RecognitionManager()
 const SpeechRecognition = (WrappedComponent) => {
-  const recognitionManager = new RecognitionManager()
-
   return class SpeechRecognitionContainer extends Component {
     constructor(props) {
       super(props)
@@ -24,10 +23,7 @@ const SpeechRecognition = (WrappedComponent) => {
     }
 
     componentDidMount() {
-      const autoStart = this.props.autoStart === undefined ? true : this.props.autoStart
-      const continuous = this.props.continuous === undefined ? true : this.props.continuous
-
-      recognitionManager.subscribe(this.id, { autoStart, continuous }, {
+      recognitionManager.subscribe(this.id, {
         onListeningChange: this.handleListeningChange,
         onTranscriptChange: this.handleTranscriptChange
       })
@@ -58,7 +54,6 @@ const SpeechRecognition = (WrappedComponent) => {
     }
 
     render() {
-      const { autoStart, continuous, ...otherProps } = this.props
       const { interimTranscript, finalTranscript } = this.state
       const transcript = concatTranscripts(
         finalTranscript,
@@ -72,10 +67,30 @@ const SpeechRecognition = (WrappedComponent) => {
           recognition={recognitionManager.getRecognition()}
           browserSupportsSpeechRecognition={recognitionManager.browserSupportsSpeechRecognition}
           {...this.state}
-          {...otherProps} />
+          {...this.props} />
       )
     }
   }
+}
+
+SpeechRecognition.startListening = () => {
+  recognitionManager.startListening()
+}
+
+SpeechRecognition.stopListening = () => {
+  recognitionManager.stopListening()
+}
+
+SpeechRecognition.abortListening = () => {
+  recognitionManager.abortListening()
+}
+
+SpeechRecognition.setContinuous = (continuous) => {
+  recognitionManager.setContinuous(continuous)
+}
+
+SpeechRecognition.setLanguage = (language) => {
+  recognitionManager.setLanguage(language)
 }
 
 export default SpeechRecognition
