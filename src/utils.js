@@ -64,6 +64,7 @@ class RecognitionManager {
   }
 
   emitListeningChange(listening) {
+    this.listening = listening
     Object.keys(this.subscribers).forEach(subscriber => {
       const { onListeningChange } = this.subscribers[subscriber]
       onListeningChange(listening)
@@ -97,6 +98,7 @@ class RecognitionManager {
   }
 
   onRecognitionDisconnect() {
+    this.listening = false
     if (this.pauseAfterDisconnect) {
       this.emitListeningChange(false)
     } else if (this.browserSupportsSpeechRecognition) {
@@ -106,7 +108,6 @@ class RecognitionManager {
         this.emitListeningChange(false)
       }
     }
-    this.listening = false
     this.pauseAfterDisconnect = false
   }
 
@@ -137,21 +138,25 @@ class RecognitionManager {
     this.disconnect('RESET')
   }
 
-  startListening({ continuous, language }) {
+  async startListening({ continuous, language } = {}) {
     if (!this.browserSupportsSpeechRecognition) {
       return
     }
 
-    if (continuous !== undefined) {
-      this.recognition.continuous = continuous
+    const isContinuousChanged =
+      continuous !== undefined && continuous !== this.recognition.continuous
+    const isLanguageChanged = language && language !== this.recognition.lang
+    if (isContinuousChanged || isLanguageChanged) {
+      if (this.listening) {
+        this.stopListening()
+        await new Promise(resolve => setTimeout(() => resolve(), 1000)) // TODO: wait for actual disconnect
+      }
+      this.recognition.continuous =
+        continuous !== undefined ? continuous : this.recognition.continuous
+      this.recognition.lang = language || this.recognition.lang
     }
-
-    if (language) {
-      this.recognition.lang = language
-    }
-
     if (!this.listening) {
-      if (!this.recognition.continuous) {
+      if (!this.recognition.continuous) { // TODO: move to component?
         this.resetTranscript()
       }
       try {
@@ -164,13 +169,13 @@ class RecognitionManager {
   }
 
   abortListening() {
-    this.emitListeningChange(false)
     this.disconnect('ABORT')
+    this.emitListeningChange(false)
   }
 
   stopListening() {
-    this.emitListeningChange(false)
     this.disconnect('STOP')
+    this.emitListeningChange(false)
   }
 
   getRecognition() {
