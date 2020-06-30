@@ -33,7 +33,6 @@ class RecognitionManager {
       ? new BrowserSpeechRecognition()
       : null
     this.browserSupportsSpeechRecognition = this.recognition !== null
-    this.started = false
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
     this.listening = false
@@ -53,18 +52,6 @@ class RecognitionManager {
 
     if (isAndroid()) {
       this.updateFinalTranscript = debounce(this.updateFinalTranscript, 250, true)
-    }
-  }
-
-  setContinuous(continuous) {
-    if (this.browserSupportsSpeechRecognition) {
-      this.recognition.continuous = continuous
-    }
-  }
-
-  setLanguage(language) {
-    if (this.browserSupportsSpeechRecognition) {
-      this.recognition.lang = language
     }
   }
 
@@ -112,13 +99,14 @@ class RecognitionManager {
   onRecognitionDisconnect() {
     if (this.pauseAfterDisconnect) {
       this.emitListeningChange(false)
-    } else if (this.recognition) {
+    } else if (this.browserSupportsSpeechRecognition) {
       if (this.recognition.continuous) {
         this.startListening()
       } else {
         this.emitListeningChange(false)
       }
     }
+    this.listening = false
     this.pauseAfterDisconnect = false
   }
 
@@ -149,8 +137,20 @@ class RecognitionManager {
     this.disconnect('RESET')
   }
 
-  startListening() {
-    if (this.recognition && !this.listening) {
+  startListening({ continuous, language }) {
+    if (!this.browserSupportsSpeechRecognition) {
+      return
+    }
+
+    if (continuous !== undefined) {
+      this.recognition.continuous = continuous
+    }
+
+    if (language) {
+      this.recognition.lang = language
+    }
+
+    if (!this.listening) {
       if (!this.recognition.continuous) {
         this.resetTranscript()
       }
@@ -178,23 +178,23 @@ class RecognitionManager {
   }
 
   start() {
-    if (this.browserSupportsSpeechRecognition && !this.started) {
+    if (this.browserSupportsSpeechRecognition && !this.listening) {
       this.recognition.start()
-      this.started = true
+      this.listening = true
     }
   }
 
   stop() {
-    if (this.browserSupportsSpeechRecognition && this.started) {
+    if (this.browserSupportsSpeechRecognition && this.listening) {
       this.recognition.stop()
-      this.started = false
+      this.listening = false
     }
   }
 
   abort() {
-    if (this.browserSupportsSpeechRecognition && this.started) {
+    if (this.browserSupportsSpeechRecognition && this.listening) {
       this.recognition.abort()
-      this.started = false
+      this.listening = false
     }
   }
 }

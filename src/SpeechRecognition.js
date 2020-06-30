@@ -73,8 +73,8 @@ const SpeechRecognition = (WrappedComponent) => {
   }
 }
 
-SpeechRecognition.startListening = () => {
-  recognitionManager.startListening()
+SpeechRecognition.startListening = ({ continuous, language }) => {
+  recognitionManager.startListening({ continuous, language })
 }
 
 SpeechRecognition.stopListening = () => {
@@ -83,14 +83,6 @@ SpeechRecognition.stopListening = () => {
 
 SpeechRecognition.abortListening = () => {
   recognitionManager.abortListening()
-}
-
-SpeechRecognition.setContinuous = (continuous) => {
-  recognitionManager.setContinuous(continuous)
-}
-
-SpeechRecognition.setLanguage = (language) => {
-  recognitionManager.setLanguage(language)
 }
 
 export default SpeechRecognition
