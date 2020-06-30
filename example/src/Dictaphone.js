@@ -12,8 +12,8 @@ const propTypes = {
 const Dictaphone = ({
   transcript,
   resetTranscript,
-  startListening,
-  stopListening,
+  startTranscribing,
+  stopTranscribing,
   browserSupportsSpeechRecognition
 }) => {
   if (!browserSupportsSpeechRecognition) {
@@ -23,8 +23,8 @@ const Dictaphone = ({
   return (
     <div>
       <button onClick={resetTranscript}>Reset</button>
-      <button onClick={startListening}>Start</button>
-      <button onClick={stopListening}>Stop</button>
+      <button onClick={startTranscribing}>Start</button>
+      <button onClick={stopTranscribing}>Stop</button>
       <span>{transcript}</span>
     </div>
   )

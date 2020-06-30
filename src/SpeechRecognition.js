@@ -10,6 +10,13 @@ export default function SpeechRecognition(WrappedComponent) {
       super(props)
 
       this.resetTranscript = this.resetTranscript.bind(this)
+      this.handleListeningChange = this.handleListeningChange.bind(this)
+      this.handleTranscriptChange = this.handleTranscriptChange.bind(this)
+      this.startTranscribing = this.startTranscribing.bind(this)
+      this.stopTranscribing = this.stopTranscribing.bind(this)
+
+      this.id = id
+      id += 1
 
       this.state = {
         interimTranscript: recognitionManager.interimTranscript,
@@ -19,18 +26,24 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     componentDidMount() {
-      const autoStart = this.props.autoStart === undefined ? true : this.props.autoStart
-      const continuous = this.props.continuous === undefined ? true : this.props.continuous
-      this.id = id
-      id += 1
-
-      recognitionManager.subscribe(this.id, { autoStart, continuous }, {
-        onListeningChange: this.handleListeningChange.bind(this),
-        onTranscriptChange: this.handleTranscriptChange.bind(this)
-      })
+      this.startTranscribing()
     }
 
     componentWillUnmount() {
+      this.stopTranscribing()
+    }
+
+    startTranscribing() {
+      const autoStart = this.props.autoStart === undefined ? true : this.props.autoStart
+      const continuous = this.props.continuous === undefined ? true : this.props.continuous
+
+      recognitionManager.subscribe(this.id, { autoStart, continuous }, {
+        onListeningChange: this.handleListeningChange,
+        onTranscriptChange: this.handleTranscriptChange
+      })
+    }
+
+    stopTranscribing() {
       recognitionManager.unsubscribe(this.id)
     }
 
@@ -62,9 +75,8 @@ export default function SpeechRecognition(WrappedComponent) {
       return (
         <WrappedComponent
           resetTranscript={this.resetTranscript}
-          startListening={recognitionManager.startListening}
-          abortListening={recognitionManager.abortListening}
-          stopListening={recognitionManager.stopListening}
+          startTranscribing={this.startTranscribing}
+          stopTranscribing={this.stopTranscribing}
           transcript={transcript}
           recognition={recognitionManager.getRecognition()}
           browserSupportsSpeechRecognition={recognitionManager.browserSupportsSpeechRecognition}
