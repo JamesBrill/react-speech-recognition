@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { concatTranscripts, RecognitionManager } from './utils'
 
 let id = 0
-export default function SpeechRecognition(WrappedComponent) {
+const SpeechRecognition = (WrappedComponent) => {
   const recognitionManager = new RecognitionManager()
 
   return class SpeechRecognitionContainer extends Component {
@@ -12,8 +12,6 @@ export default function SpeechRecognition(WrappedComponent) {
       this.resetTranscript = this.resetTranscript.bind(this)
       this.handleListeningChange = this.handleListeningChange.bind(this)
       this.handleTranscriptChange = this.handleTranscriptChange.bind(this)
-      this.startTranscribing = this.startTranscribing.bind(this)
-      this.stopTranscribing = this.stopTranscribing.bind(this)
 
       this.id = id
       id += 1
@@ -26,14 +24,6 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     componentDidMount() {
-      this.startTranscribing()
-    }
-
-    componentWillUnmount() {
-      this.stopTranscribing()
-    }
-
-    startTranscribing() {
       const autoStart = this.props.autoStart === undefined ? true : this.props.autoStart
       const continuous = this.props.continuous === undefined ? true : this.props.continuous
 
@@ -43,7 +33,7 @@ export default function SpeechRecognition(WrappedComponent) {
       })
     }
 
-    stopTranscribing() {
+    componentWillUnmount() {
       recognitionManager.unsubscribe(this.id)
     }
 
@@ -52,11 +42,14 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     handleTranscriptChange(interimTranscript, finalTranscript) {
-      this.setState({
-        interimTranscript,
-        finalTranscript:
+      const { transcribing } = this.props
+      if (transcribing) {
+        this.setState({
+          interimTranscript,
+          finalTranscript:
          concatTranscripts(this.state.finalTranscript, finalTranscript)
-      })
+        })
+      }
     }
 
     resetTranscript() {
@@ -75,8 +68,6 @@ export default function SpeechRecognition(WrappedComponent) {
       return (
         <WrappedComponent
           resetTranscript={this.resetTranscript}
-          startTranscribing={this.startTranscribing}
-          stopTranscribing={this.stopTranscribing}
           transcript={transcript}
           recognition={recognitionManager.getRecognition()}
           browserSupportsSpeechRecognition={recognitionManager.browserSupportsSpeechRecognition}
@@ -86,3 +77,5 @@ export default function SpeechRecognition(WrappedComponent) {
     }
   }
 }
+
+export default SpeechRecognition
