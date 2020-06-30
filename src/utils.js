@@ -36,7 +36,6 @@ class RecognitionManager {
     this.started = false
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
-    this.finalTranscript = ''
     this.listening = false
     this.subscribers = {}
 
@@ -119,9 +118,10 @@ class RecognitionManager {
 
   updateTranscript(event) {
     this.interimTranscript = ''
+    this.finalTranscript = ''
     for (let i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal && (!isAndroid() || event.results[i][0].confidence > 0)) {
-        this.updateFinalTranscript(this.finalTranscript, event.results[i][0].transcript)
+        this.updateFinalTranscript(event.results[i][0].transcript)
       } else {
         this.interimTranscript = concatTranscripts(
           this.interimTranscript,
@@ -132,16 +132,15 @@ class RecognitionManager {
     this.emitTranscriptChange(this.interimTranscript, this.finalTranscript)
   }
 
-  updateFinalTranscript(finalTranscript, newFinalTranscript) {
+  updateFinalTranscript(newFinalTranscript) {
     this.finalTranscript = concatTranscripts(
-      finalTranscript,
+      this.finalTranscript,
       newFinalTranscript
     )
   }
 
   resetTranscript() {
     this.disconnect('RESET')
-    this.emitTranscriptChange('', '')
   }
 
   startListening() {

@@ -31,5 +31,4 @@ const Dictaphone = ({
 }
 
 Dictaphone.propTypes = propTypes
-
 export default SpeechRecognition(Dictaphone)

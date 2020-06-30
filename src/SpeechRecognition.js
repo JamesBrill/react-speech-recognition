@@ -9,9 +9,11 @@ export default function SpeechRecognition(WrappedComponent) {
     constructor(props) {
       super(props)
 
+      this.resetTranscript = this.resetTranscript.bind(this)
+
       this.state = {
         interimTranscript: recognitionManager.interimTranscript,
-        finalTranscript: recognitionManager.finalTranscript, // TODO: probably should not be global
+        finalTranscript: '',
         listening: recognitionManager.listening
       }
     }
@@ -37,7 +39,16 @@ export default function SpeechRecognition(WrappedComponent) {
     }
 
     handleTranscriptChange(interimTranscript, finalTranscript) {
-      this.setState({ interimTranscript, finalTranscript })
+      this.setState({
+        interimTranscript,
+        finalTranscript:
+         concatTranscripts(this.state.finalTranscript, finalTranscript)
+      })
+    }
+
+    resetTranscript() {
+      recognitionManager.resetTranscript()
+      this.setState({ interimTranscript: '', finalTranscript: '' })
     }
 
     render() {
@@ -50,7 +61,7 @@ export default function SpeechRecognition(WrappedComponent) {
 
       return (
         <WrappedComponent
-          resetTranscript={recognitionManager.resetTranscript}
+          resetTranscript={this.resetTranscript}
           startListening={recognitionManager.startListening}
           abortListening={recognitionManager.abortListening}
           stopListening={recognitionManager.stopListening}
