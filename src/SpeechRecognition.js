@@ -12,6 +12,7 @@ const SpeechRecognition = (WrappedComponent) => {
       this.resetTranscript = this.resetTranscript.bind(this)
       this.handleListeningChange = this.handleListeningChange.bind(this)
       this.handleTranscriptChange = this.handleTranscriptChange.bind(this)
+      this.handleClearTranscript = this.handleClearTranscript.bind(this)
 
       this.recognitionManager = SpeechRecognition.getRecognitionManager()
       this.id = id
@@ -27,7 +28,8 @@ const SpeechRecognition = (WrappedComponent) => {
     componentDidMount() {
       this.recognitionManager.subscribe(this.id, {
         onListeningChange: this.handleListeningChange,
-        onTranscriptChange: this.handleTranscriptChange
+        onTranscriptChange: this.handleTranscriptChange,
+        onClearTranscript: this.handleClearTranscript
       })
     }
 
@@ -47,6 +49,13 @@ const SpeechRecognition = (WrappedComponent) => {
           finalTranscript:
          concatTranscripts(this.state.finalTranscript, finalTranscript)
         })
+      }
+    }
+
+    handleClearTranscript() {
+      const { clearTranscriptOnListen } = this.props
+      if (clearTranscriptOnListen) {
+        this.setState({ interimTranscript: '', finalTranscript: '' })
       }
     }
 
@@ -76,11 +85,13 @@ const SpeechRecognition = (WrappedComponent) => {
   }
 
   SpeechRecognitionContainer.propTypes = {
-    transcribing: PropTypes.bool
+    transcribing: PropTypes.bool,
+    clearTranscriptOnListen: PropTypes.bool
   }
 
   SpeechRecognitionContainer.defaultProps = {
-    transcribing: true
+    transcribing: true,
+    clearTranscriptOnListen: false
   }
   return SpeechRecognitionContainer
 }

@@ -14,6 +14,10 @@ const mockRecognitionManager = () => {
 }
 
 describe('SpeechRecognition', () => {
+  beforeEach(() => {
+    isAndroid.mockClear()
+  })
+
   test('indicates when SpeechRecognition API is available', () => {
     const recognitionManager = mockRecognitionManager()
     recognitionManager.browserSupportsSpeechRecognition = true
@@ -182,7 +186,7 @@ describe('SpeechRecognition', () => {
   test('can turn continuous listening off', async () => {
     mockRecognitionManager()
     const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent continuous={false} />)
+    const component = shallow(<WrappedComponent />)
     const speech = 'This is a test'
 
     await SpeechRecognition.startListening({ continuous: false })
@@ -241,5 +245,34 @@ describe('SpeechRecognition', () => {
     expect(props.transcript).toEqual('This is a test This')
     expect(props.interimTranscript).toEqual('This')
     expect(props.finalTranscript).toEqual(speech)
+  })
+
+  test('resets transcript on subsequent discontinuous speech', async () => {
+    mockRecognitionManager()
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent clearTranscriptOnListen />)
+    const speech = 'This is a test'
+
+    await SpeechRecognition.startListening({ continuous: false })
+    component.props().recognition.say(speech)
+
+    let props = component.props()
+    expect(props.transcript).toEqual(speech)
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual(speech)
+
+    SpeechRecognition.stopListening()
+
+    props = component.props()
+    expect(props.transcript).toEqual(speech)
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual(speech)
+
+    await SpeechRecognition.startListening({ continuous: false })
+
+    props = component.props()
+    expect(props.transcript).toEqual('')
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual('')
   })
 })

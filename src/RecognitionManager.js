@@ -59,6 +59,13 @@ export default class RecognitionManager {
     })
   }
 
+  emitClearTranscript() {
+    Object.keys(this.subscribers).forEach(subscriber => {
+      const { onClearTranscript } = this.subscribers[subscriber]
+      onClearTranscript()
+    })
+  }
+
   disconnect(disconnectType) {
     if (this.browserSupportsSpeechRecognition) {
       switch (disconnectType) {
@@ -117,6 +124,7 @@ export default class RecognitionManager {
 
   resetTranscript() {
     this.disconnect('RESET')
+    this.emitClearTranscript()
   }
 
   async startListening({ continuous, language } = {}) {
