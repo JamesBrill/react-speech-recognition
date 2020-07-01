@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
+import PropTypes from 'prop-types'
 import { concatTranscripts, RecognitionManager } from './utils'
 
 let id = 0
 const recognitionManager = new RecognitionManager()
 const SpeechRecognition = (WrappedComponent) => {
-  return class SpeechRecognitionContainer extends Component {
+  class SpeechRecognitionContainer extends Component {
     constructor(props) {
       super(props)
 
@@ -71,6 +72,15 @@ const SpeechRecognition = (WrappedComponent) => {
       )
     }
   }
+
+  SpeechRecognitionContainer.propTypes = {
+    transcribing: PropTypes.bool
+  }
+
+  SpeechRecognitionContainer.defaultProps = {
+    transcribing: true
+  }
+  return SpeechRecognitionContainer
 }
 
 SpeechRecognition.startListening = ({ continuous, language }) => {
