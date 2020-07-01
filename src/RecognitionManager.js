@@ -1,7 +1,7 @@
 import isAndroid from './isAndroid'
 import { debounce, concatTranscripts } from './utils'
 
-class RecognitionManager {
+export default class RecognitionManager {
   constructor() {
     const BrowserSpeechRecognition =
       typeof window !== 'undefined' &&
@@ -184,5 +184,3 @@ class RecognitionManager {
     }
   }
 }
-
-export default new RecognitionManager()

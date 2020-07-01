@@ -4,7 +4,7 @@
   "description": "A React component that converts speech from the microphone to text.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel src -d lib",
+    "build": "babel src -d lib --ignore '**/*.test.js'",
     "lint": "eslint src tests",
     "test": "jest --testPathIgnorePatterns=example",
     "prepublishOnly": "npm run build",
@@ -61,6 +61,6 @@
     "prop-types": "^15.7.2"
   },
   "jest": {
-    "setupFilesAfterEnv": ["./tests/setupTests.js"] 
+    "setupFilesAfterEnv": ["./tests/setupTests.js"]
   }
 }

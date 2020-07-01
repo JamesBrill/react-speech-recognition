@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { concatTranscripts } from './utils'
-import recognitionManager from './recognitionManager'
+import RecognitionManager from './RecognitionManager'
 
 let id = 0
 const SpeechRecognition = (WrappedComponent) => {
@@ -13,25 +13,26 @@ const SpeechRecognition = (WrappedComponent) => {
       this.handleListeningChange = this.handleListeningChange.bind(this)
       this.handleTranscriptChange = this.handleTranscriptChange.bind(this)
 
+      this.recognitionManager = SpeechRecognition.getRecognitionManager()
       this.id = id
       id += 1
 
       this.state = {
-        interimTranscript: recognitionManager.interimTranscript,
+        interimTranscript: this.recognitionManager.interimTranscript,
         finalTranscript: '',
-        listening: recognitionManager.listening
+        listening: this.recognitionManager.listening
       }
     }
 
     componentDidMount() {
-      recognitionManager.subscribe(this.id, {
+      this.recognitionManager.subscribe(this.id, {
         onListeningChange: this.handleListeningChange,
         onTranscriptChange: this.handleTranscriptChange
       })
     }
 
     componentWillUnmount() {
-      recognitionManager.unsubscribe(this.id)
+      this.recognitionManager.unsubscribe(this.id)
     }
 
     handleListeningChange(listening) {
@@ -50,7 +51,7 @@ const SpeechRecognition = (WrappedComponent) => {
     }
 
     resetTranscript() {
-      recognitionManager.resetTranscript()
+      this.recognitionManager.resetTranscript()
       this.setState({ interimTranscript: '', finalTranscript: '' })
     }
 
@@ -66,8 +67,8 @@ const SpeechRecognition = (WrappedComponent) => {
         <WrappedComponent
           resetTranscript={this.resetTranscript}
           transcript={transcript}
-          recognition={recognitionManager.getRecognition()}
-          browserSupportsSpeechRecognition={recognitionManager.browserSupportsSpeechRecognition}
+          recognition={this.recognitionManager.getRecognition()}
+          browserSupportsSpeechRecognition={this.recognitionManager.browserSupportsSpeechRecognition}
           {...this.state}
           {...otherProps} />
       )
@@ -85,15 +86,26 @@ const SpeechRecognition = (WrappedComponent) => {
 }
 
 SpeechRecognition.startListening = async ({ continuous, language } = {}) => {
+  const recognitionManager = SpeechRecognition.getRecognitionManager()
   await recognitionManager.startListening({ continuous, language })
 }
 
 SpeechRecognition.stopListening = () => {
+  const recognitionManager = SpeechRecognition.getRecognitionManager()
   recognitionManager.stopListening()
 }
 
 SpeechRecognition.abortListening = () => {
+  const recognitionManager = SpeechRecognition.getRecognitionManager()
   recognitionManager.abortListening()
+}
+
+let recognitionManager
+SpeechRecognition.getRecognitionManager = () => {
+  if (!recognitionManager) {
+    recognitionManager = new RecognitionManager()
+  }
+  return recognitionManager
 }
 
 export default SpeechRecognition
