@@ -1,12 +1,9 @@
 /* eslint-disable import/first */
 import React from 'react'
 import { shallow } from 'enzyme'
-import mockSpeechRecognition from './vendor/corti'
-import SpeechRecognition from '../src'
-import recognitionManager from '../src/recognitionManager'
-import isAndroid from '../src/isAndroid'
-
-jest.mock('../src/isAndroid')
+import mockSpeechRecognition from '../tests/vendor/corti'
+import SpeechRecognition from './SpeechRecognition'
+import recognitionManager from './recognitionManager'
 
 describe('SpeechRecognition', () => {
   beforeEach(() => {

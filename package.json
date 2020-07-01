@@ -6,7 +6,7 @@
   "scripts": {
     "build": "babel src -d lib",
     "lint": "eslint src tests",
-    "test": "jest",
+    "test": "jest --testPathIgnorePatterns=example",
     "prepublishOnly": "npm run build",
     "update-example": "cp -R src/ example/src/SpeechRecognition",
     "run-example": "cd example && npm i && npm start",
