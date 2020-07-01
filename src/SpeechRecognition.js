@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { concatTranscripts, RecognitionManager } from './utils'
+import { concatTranscripts } from './utils'
+import RecognitionManager from './RecognitionManager'
 
 let id = 0
 const recognitionManager = new RecognitionManager()
