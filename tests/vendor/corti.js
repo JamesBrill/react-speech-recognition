@@ -4,7 +4,7 @@
 //! license : MIT
 //! https://github.com/TalAter/Corti
 
-export default function (_root) {
+const Corti = (_root) => {
   // Holds the browser's implementation
   var _productionVersion = false
 
@@ -202,3 +202,7 @@ export default function (_root) {
     }
   }
 }
+
+const mockSpeechRecognition = Corti(global)
+mockSpeechRecognition.patch()
+export default mockSpeechRecognition

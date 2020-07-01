@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { concatTranscripts } from './utils'
-import RecognitionManager from './RecognitionManager'
+import recognitionManager from './recognitionManager'
 
 let id = 0
-const recognitionManager = new RecognitionManager()
 const SpeechRecognition = (WrappedComponent) => {
   class SpeechRecognitionContainer extends Component {
     constructor(props) {
@@ -56,6 +55,7 @@ const SpeechRecognition = (WrappedComponent) => {
     }
 
     render() {
+      const { transcribing, ...otherProps } = this.props
       const { interimTranscript, finalTranscript } = this.state
       const transcript = concatTranscripts(
         finalTranscript,
@@ -69,7 +69,7 @@ const SpeechRecognition = (WrappedComponent) => {
           recognition={recognitionManager.getRecognition()}
           browserSupportsSpeechRecognition={recognitionManager.browserSupportsSpeechRecognition}
           {...this.state}
-          {...this.props} />
+          {...otherProps} />
       )
     }
   }
@@ -84,8 +84,8 @@ const SpeechRecognition = (WrappedComponent) => {
   return SpeechRecognitionContainer
 }
 
-SpeechRecognition.startListening = ({ continuous, language }) => {
-  recognitionManager.startListening({ continuous, language })
+SpeechRecognition.startListening = async ({ continuous, language } = {}) => {
+  await recognitionManager.startListening({ continuous, language })
 }
 
 SpeechRecognition.stopListening = () => {
