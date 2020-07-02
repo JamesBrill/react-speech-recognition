@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { concatTranscripts } from './utils'
+import { concatTranscripts, commandToRegExp } from './utils'
 import RecognitionManager from './RecognitionManager'
 
 let id = 0
@@ -13,6 +13,7 @@ const SpeechRecognition = (WrappedComponent) => {
       this.handleListeningChange = this.handleListeningChange.bind(this)
       this.handleTranscriptChange = this.handleTranscriptChange.bind(this)
       this.handleClearTranscript = this.handleClearTranscript.bind(this)
+      this.matchCommands = this.matchCommands.bind(this)
 
       this.recognitionManager = SpeechRecognition.getRecognitionManager()
       this.id = id
@@ -37,12 +38,26 @@ const SpeechRecognition = (WrappedComponent) => {
       this.recognitionManager.unsubscribe(this.id)
     }
 
+    matchCommands(finalTranscript) {
+      const { commands } = this.props
+      commands.forEach(({ command, callback }) => {
+        const pattern = commandToRegExp(command)
+        const input = finalTranscript.trim()
+        const result = pattern.exec(input)
+        if (result) {
+          const parameters = result.slice(1)
+          callback(...parameters)
+        }
+      })
+    }
+
     handleListeningChange(listening) {
       this.setState({ listening })
     }
 
     handleTranscriptChange(interimTranscript, finalTranscript) {
       const { transcribing } = this.props
+      this.matchCommands(finalTranscript)
       if (transcribing) {
         this.setState({
           interimTranscript,
@@ -86,12 +101,17 @@ const SpeechRecognition = (WrappedComponent) => {
 
   SpeechRecognitionContainer.propTypes = {
     transcribing: PropTypes.bool,
-    clearTranscriptOnListen: PropTypes.bool
+    clearTranscriptOnListen: PropTypes.bool,
+    commands: PropTypes.arrayOf(PropTypes.shape({
+      command: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(RegExp)]).isRequired,
+      callback: PropTypes.func.isRequired
+    }))
   }
 
   SpeechRecognitionContainer.defaultProps = {
     transcribing: true,
-    clearTranscriptOnListen: false
+    clearTranscriptOnListen: false,
+    commands: []
   }
   return SpeechRecognitionContainer
 }

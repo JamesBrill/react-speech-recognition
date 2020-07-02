@@ -18,4 +18,22 @@ const concatTranscripts = (...transcriptParts) => {
   return transcriptParts.map(t => t.trim()).join(' ').trim()
 }
 
-export { debounce, concatTranscripts }
+// The command matching code is a modified version of Backbone.Router by Jeremy Ashkenas, under the MIT license.
+const optionalParam = /\s*\((.*?)\)\s*/g
+const optionalRegex = /(\(\?:[^)]+\))\?/g
+const namedParam = /(\(\?)?:\w+/g
+const splatParam = /\*\w+/g
+const escapeRegExp = /[-{}[\]+?.,\\^$|#]/g
+const commandToRegExp = (command) => {
+  command = command
+    .replace(escapeRegExp, '\\$&')
+    .replace(optionalParam, '(?:$1)?')
+    .replace(namedParam, (match, optional) => {
+      return optional ? match : '([^\\s]+)'
+    })
+    .replace(splatParam, '(.*?)')
+    .replace(optionalRegex, '\\s*$1?\\s*')
+  return new RegExp('^' + command + '$', 'i')
+}
+
+export { debounce, concatTranscripts, commandToRegExp }
