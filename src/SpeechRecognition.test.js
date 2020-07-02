@@ -199,6 +199,17 @@ describe('SpeechRecognition', () => {
     expect(props.finalTranscript).toEqual(speech)
   })
 
+  test('can set language', async () => {
+    mockRecognitionManager()
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent />)
+
+    await SpeechRecognition.startListening({ language: 'zh-CN' })
+
+    const props = component.props()
+    expect(props.recognition.lang).toEqual('zh-CN')
+  })
+
   test('sets interim transcript correctly', async() => {
     mockRecognitionManager()
     const WrappedComponent = SpeechRecognition(() => null)
