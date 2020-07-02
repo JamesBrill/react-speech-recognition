@@ -258,7 +258,7 @@ describe('SpeechRecognition', () => {
     expect(props.finalTranscript).toEqual(speech)
   })
 
-  test('resets transcript on subsequent discontinuous speech', async () => {
+  test('resets transcript on subsequent discontinuous speech when clearTranscriptOnListen set', async () => {
     mockRecognitionManager()
     const WrappedComponent = SpeechRecognition(() => null)
     const component = shallow(<WrappedComponent clearTranscriptOnListen />)
@@ -285,6 +285,35 @@ describe('SpeechRecognition', () => {
     expect(props.transcript).toEqual('')
     expect(props.interimTranscript).toEqual('')
     expect(props.finalTranscript).toEqual('')
+  })
+
+  test('does not reset transcript on subsequent discontinuous speech when clearTranscriptOnListen not set', async () => {
+    mockRecognitionManager()
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent />)
+    const speech = 'This is a test'
+
+    await SpeechRecognition.startListening({ continuous: false })
+    component.props().recognition.say(speech)
+
+    let props = component.props()
+    expect(props.transcript).toEqual(speech)
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual(speech)
+
+    SpeechRecognition.stopListening()
+
+    props = component.props()
+    expect(props.transcript).toEqual(speech)
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual(speech)
+
+    await SpeechRecognition.startListening({ continuous: false })
+
+    props = component.props()
+    expect(props.transcript).toEqual(speech)
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual(speech)
   })
 
   test('props from parent get passed down to wrapped component', async () => {
