@@ -25,7 +25,8 @@
         "jest"
     ],
     "rules": {
-        "space-before-function-paren": 0
+        "space-before-function-paren": 0,
+        "standard/no-callback-literal": 0
     },
     "settings": {
         "react": {
