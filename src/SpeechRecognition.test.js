@@ -275,4 +275,14 @@ describe('SpeechRecognition', () => {
     expect(props.interimTranscript).toEqual('')
     expect(props.finalTranscript).toEqual('')
   })
+
+  test('props from parent get passed down to wrapped component', async () => {
+    mockRecognitionManager()
+    const WrappedComponent = SpeechRecognition(
+      ({ foo }) => <p>{foo}</p>
+    )
+    const component = shallow(<WrappedComponent foo='test' />)
+
+    expect(component.html()).toEqual('<p>test</p>')
+  })
 })
