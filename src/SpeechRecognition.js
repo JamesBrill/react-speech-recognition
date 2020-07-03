@@ -38,11 +38,13 @@ const SpeechRecognition = (WrappedComponent) => {
       this.recognitionManager.unsubscribe(this.id)
     }
 
-    matchCommands(finalTranscript) {
+    matchCommands(interimTranscript, finalTranscript) {
       const { commands } = this.props
-      commands.forEach(({ command, callback }) => {
+      commands.forEach(({ command, callback, matchInterim = false }) => {
         const pattern = commandToRegExp(command)
-        const input = finalTranscript.trim()
+        const input = !finalTranscript && matchInterim
+          ? interimTranscript.trim()
+          : finalTranscript.trim()
         const result = pattern.exec(input)
         if (result) {
           const parameters = result.slice(1)
@@ -57,7 +59,7 @@ const SpeechRecognition = (WrappedComponent) => {
 
     handleTranscriptChange(interimTranscript, finalTranscript) {
       const { transcribing } = this.props
-      this.matchCommands(finalTranscript)
+      this.matchCommands(interimTranscript, finalTranscript)
       if (transcribing) {
         this.setState({
           interimTranscript,
