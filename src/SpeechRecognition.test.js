@@ -364,4 +364,140 @@ describe('SpeechRecognition', () => {
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
+
+  test('matches one splat', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'I want to eat * and fries',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'I want to eat pizza and fries'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('pizza')
+  })
+
+  test('matches two splats', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'I want to eat * and *',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'I want to eat pizza and fries'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries')
+  })
+
+  test('matches optional words when optional word spoken', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'Hello (to) you',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'Hello to you'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+  })
+
+  test('matches optional words when optional word not spoken', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'Hello (to) you',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'Hello you'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+  })
+
+  test('matches named variable', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'I :action with my little eye',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'I spy with my little eye'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('spy')
+  })
+
+  test('matches regex', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: new RegExp('This is a \\s+ test\\.+'),
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'This is a      test.......'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+  })
+
+  test('matches regex case-insensitively', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: new RegExp('This is a \\s+ test\\.+'),
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'this is a      TEST.......'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+  })
 })

@@ -22,9 +22,12 @@ const concatTranscripts = (...transcriptParts) => {
 const optionalParam = /\s*\((.*?)\)\s*/g
 const optionalRegex = /(\(\?:[^)]+\))\?/g
 const namedParam = /(\(\?)?:\w+/g
-const splatParam = /\*\w+/g
+const splatParam = /\*/g
 const escapeRegExp = /[-{}[\]+?.,\\^$|#]/g
 const commandToRegExp = (command) => {
+  if (command instanceof RegExp) {
+    return new RegExp(command.source, 'i')
+  }
   command = command
     .replace(escapeRegExp, '\\$&')
     .replace(optionalParam, '(?:$1)?')
