@@ -553,4 +553,43 @@ describe('SpeechRecognition', () => {
     expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza')
     expect(mockCommandCallback3.mock.calls.length).toBe(0)
   })
+
+  test('does not match interim results by default', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'This is',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'This is a test'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(0)
+  })
+
+  test('matches interim results when configured', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'This is',
+        callback: mockCommandCallback,
+        matchInterim: true
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'This is a test'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+  })
 })
