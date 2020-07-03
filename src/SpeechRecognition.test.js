@@ -385,6 +385,26 @@ describe('SpeechRecognition', () => {
     expect(mockCommandCallback).toBeCalledWith('pizza')
   })
 
+  test('matches one splat at the end of the sentence', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'I want to eat *',
+        callback: mockCommandCallback
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'I want to eat pizza and fries'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('pizza and fries')
+  })
+
   test('matches two splats', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
@@ -499,5 +519,38 @@ describe('SpeechRecognition', () => {
     component.props().recognition.say(speech)
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
+  })
+
+  test('matches multiple commands', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback1 = jest.fn()
+    const mockCommandCallback2 = jest.fn()
+    const mockCommandCallback3 = jest.fn()
+    const commands = [
+      {
+        command: 'I want to eat * and *',
+        callback: mockCommandCallback1
+      },
+      {
+        command: '* and fries are great',
+        callback: mockCommandCallback2
+      },
+      {
+        command: 'flibble',
+        callback: mockCommandCallback3
+      }
+    ]
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent commands={commands} />)
+    const speech = 'I want to eat pizza and fries are great'
+
+    await SpeechRecognition.startListening()
+    component.props().recognition.say(speech)
+
+    expect(mockCommandCallback1.mock.calls.length).toBe(1)
+    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great')
+    expect(mockCommandCallback2.mock.calls.length).toBe(1)
+    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza')
+    expect(mockCommandCallback3.mock.calls.length).toBe(0)
   })
 })
