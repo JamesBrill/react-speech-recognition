@@ -18,6 +18,7 @@ export default class RecognitionManager {
     this.interimTranscript = ''
     this.listening = false
     this.subscribers = {}
+    this.onStopListening = () => {}
 
     if (this.browserSupportsSpeechRecognition) {
       this.recognition.continuous = true
@@ -86,6 +87,7 @@ export default class RecognitionManager {
   }
 
   onRecognitionDisconnect() {
+    this.onStopListening()
     this.listening = false
     if (this.pauseAfterDisconnect) {
       this.emitListeningChange(false)
@@ -138,7 +140,9 @@ export default class RecognitionManager {
     if (isContinuousChanged || isLanguageChanged) {
       if (this.listening) {
         this.stopListening()
-        await new Promise(resolve => setTimeout(() => resolve(), 1000)) // TODO: wait for actual disconnect
+        await new Promise(resolve => {
+          this.onStopListening = resolve
+        })
       }
       this.recognition.continuous =
           continuous !== undefined ? continuous : this.recognition.continuous
