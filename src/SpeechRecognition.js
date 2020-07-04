@@ -106,7 +106,8 @@ const SpeechRecognition = (WrappedComponent) => {
     clearTranscriptOnListen: PropTypes.bool,
     commands: PropTypes.arrayOf(PropTypes.shape({
       command: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(RegExp)]).isRequired,
-      callback: PropTypes.func.isRequired
+      callback: PropTypes.func.isRequired,
+      matchInterim: PropTypes.bool
     }))
   }
 
