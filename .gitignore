@@ -1,6 +1,7 @@
 /node_modules
 /dist
 /lib
+/coverage
 
 npm-debug.log*
 .DS_Store
