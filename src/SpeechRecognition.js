@@ -82,7 +82,6 @@ const SpeechRecognition = (WrappedComponent) => {
     }
 
     render() {
-      const { transcribing, ...otherProps } = this.props
       const { interimTranscript, finalTranscript } = this.state
       const transcript = concatTranscripts(
         finalTranscript,
@@ -95,7 +94,7 @@ const SpeechRecognition = (WrappedComponent) => {
           transcript={transcript}
           recognition={this.recognitionManager.getRecognition()}
           {...this.state}
-          {...otherProps} />
+          {...this.props} />
       )
     }
   }
