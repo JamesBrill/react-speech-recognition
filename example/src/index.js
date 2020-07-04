@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Dictaphone from './Dictaphone';
+import Dictaphones from './Dictaphones';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Dictaphone />
+    <Dictaphones />
   </React.StrictMode>,
   document.getElementById('root')
 );
