@@ -21,21 +21,15 @@ describe('SpeechRecognition', () => {
   test('indicates when SpeechRecognition API is available', () => {
     const recognitionManager = mockRecognitionManager()
     recognitionManager.browserSupportsSpeechRecognition = true
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
-    const props = component.props()
 
-    expect(props.browserSupportsSpeechRecognition).toEqual(true)
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(true)
   })
 
   test('indicates when SpeechRecognition API is not available', () => {
     const recognitionManager = mockRecognitionManager()
     recognitionManager.browserSupportsSpeechRecognition = false
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
-    const props = component.props()
 
-    expect(props.browserSupportsSpeechRecognition).toEqual(false)
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
   })
 
   test('sets default transcripts correctly', () => {

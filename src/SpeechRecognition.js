@@ -94,7 +94,6 @@ const SpeechRecognition = (WrappedComponent) => {
           resetTranscript={this.resetTranscript}
           transcript={transcript}
           recognition={this.recognitionManager.getRecognition()}
-          browserSupportsSpeechRecognition={this.recognitionManager.browserSupportsSpeechRecognition}
           {...this.state}
           {...otherProps} />
       )
@@ -132,6 +131,11 @@ SpeechRecognition.stopListening = () => {
 SpeechRecognition.abortListening = () => {
   const recognitionManager = SpeechRecognition.getRecognitionManager()
   recognitionManager.abortListening()
+}
+
+SpeechRecognition.browserSupportsSpeechRecognition = () => {
+  const recognitionManager = SpeechRecognition.getRecognitionManager()
+  return recognitionManager.browserSupportsSpeechRecognition
 }
 
 let recognitionManager
