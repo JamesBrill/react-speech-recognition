@@ -149,7 +149,7 @@ export default class RecognitionManager {
       this.recognition.lang = language || this.recognition.lang
     }
     if (!this.listening) {
-      if (!this.recognition.continuous) { // TODO: move to component?
+      if (!this.recognition.continuous) {
         this.resetTranscript()
       }
       try {

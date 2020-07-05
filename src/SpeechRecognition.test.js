@@ -204,6 +204,22 @@ describe('SpeechRecognition', () => {
     expect(props.recognition.lang).toEqual('zh-CN')
   })
 
+  test('does not collect transcript after listening is stopped', async () => {
+    mockRecognitionManager()
+    const WrappedComponent = SpeechRecognition(() => null)
+    const component = shallow(<WrappedComponent />)
+    const speech = 'This is a test'
+
+    await SpeechRecognition.startListening()
+    SpeechRecognition.stopListening()
+    component.props().recognition.say(speech)
+
+    const props = component.props()
+    expect(props.transcript).toEqual('')
+    expect(props.interimTranscript).toEqual('')
+    expect(props.finalTranscript).toEqual('')
+  })
+
   test('sets interim transcript correctly', async() => {
     mockRecognitionManager()
     const WrappedComponent = SpeechRecognition(() => null)

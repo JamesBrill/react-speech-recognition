@@ -64,6 +64,14 @@
     "prop-types": "^15.7.2"
   },
   "jest": {
-    "setupFilesAfterEnv": ["./tests/setupTests.js"]
+    "setupFilesAfterEnv": ["./tests/setupTests.js"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    }
   }
 }
