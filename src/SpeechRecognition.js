@@ -1,148 +1,102 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
+import { useState, useEffect } from 'react'
 import { concatTranscripts, commandToRegExp } from './utils'
 import RecognitionManager from './RecognitionManager'
 
-let id = 0
-const SpeechRecognition = (WrappedComponent) => {
-  class SpeechRecognitionContainer extends Component {
-    constructor(props) {
-      super(props)
+const useSpeechRecognition = ({ transcribing, clearTranscriptOnListen, commands }) => {
+  const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
+  const [interimTranscript, setInterimTranscript] = useState(recognitionManager.interimTranscript)
+  const [finalTranscript, setFinalTranscript] = useState('')
+  const [listening, setListening] = useState(recognitionManager.listening)
 
-      this.resetTranscript = this.resetTranscript.bind(this)
-      this.handleListeningChange = this.handleListeningChange.bind(this)
-      this.handleTranscriptChange = this.handleTranscriptChange.bind(this)
-      this.handleClearTranscript = this.handleClearTranscript.bind(this)
-      this.matchCommands = this.matchCommands.bind(this)
+  const clearTranscript = () => {
+    setInterimTranscript('')
+    setFinalTranscript('')
+  }
 
-      this.recognitionManager = SpeechRecognition.getRecognitionManager()
-      this.id = id
-      id += 1
-
-      this.state = {
-        interimTranscript: this.recognitionManager.interimTranscript,
-        finalTranscript: '',
-        listening: this.recognitionManager.listening
+  const matchCommands = (newInterimTranscript, newFinalTranscript) => {
+    commands.forEach(({ command, callback, matchInterim = false }) => {
+      const pattern = commandToRegExp(command)
+      const input = !newFinalTranscript && matchInterim
+        ? newInterimTranscript.trim()
+        : newFinalTranscript.trim()
+      const result = pattern.exec(input)
+      if (result) {
+        const parameters = result.slice(1)
+        callback(...parameters)
       }
-    }
+    })
+  }
 
-    componentDidMount() {
-      this.recognitionManager.subscribe(this.id, {
-        onListeningChange: this.handleListeningChange,
-        onTranscriptChange: this.handleTranscriptChange,
-        onClearTranscript: this.handleClearTranscript
-      })
-    }
-
-    componentWillUnmount() {
-      this.recognitionManager.unsubscribe(this.id)
-    }
-
-    matchCommands(interimTranscript, finalTranscript) {
-      const { commands } = this.props
-      commands.forEach(({ command, callback, matchInterim = false }) => {
-        const pattern = commandToRegExp(command)
-        const input = !finalTranscript && matchInterim
-          ? interimTranscript.trim()
-          : finalTranscript.trim()
-        const result = pattern.exec(input)
-        if (result) {
-          const parameters = result.slice(1)
-          callback(...parameters)
-        }
-      })
-    }
-
-    handleListeningChange(listening) {
-      this.setState({ listening })
-    }
-
-    handleTranscriptChange(interimTranscript, finalTranscript) {
-      const { transcribing } = this.props
-      this.matchCommands(interimTranscript, finalTranscript)
-      if (transcribing) {
-        this.setState({
-          interimTranscript,
-          finalTranscript:
-         concatTranscripts(this.state.finalTranscript, finalTranscript)
-        })
-      }
-    }
-
-    handleClearTranscript() {
-      const { clearTranscriptOnListen } = this.props
-      if (clearTranscriptOnListen) {
-        this.setState({ interimTranscript: '', finalTranscript: '' })
-      }
-    }
-
-    resetTranscript() {
-      this.recognitionManager.resetTranscript()
-      this.setState({ interimTranscript: '', finalTranscript: '' })
-    }
-
-    render() {
-      const { interimTranscript, finalTranscript } = this.state
-      const transcript = concatTranscripts(
-        finalTranscript,
-        interimTranscript
-      )
-
-      return (
-        <WrappedComponent
-          resetTranscript={this.resetTranscript}
-          transcript={transcript}
-          recognition={this.recognitionManager.getRecognition()}
-          {...this.state}
-          {...this.props} />
-      )
+  const handleTranscriptChange = (newInterimTranscript, newFinalTranscript) => {
+    matchCommands(newInterimTranscript, newFinalTranscript)
+    if (transcribing) {
+      setInterimTranscript(newInterimTranscript)
+      setFinalTranscript(concatTranscripts(finalTranscript, newFinalTranscript))
     }
   }
 
-  SpeechRecognitionContainer.propTypes = {
-    transcribing: PropTypes.bool,
-    clearTranscriptOnListen: PropTypes.bool,
-    commands: PropTypes.arrayOf(PropTypes.shape({
-      command: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(RegExp)]).isRequired,
-      callback: PropTypes.func.isRequired,
-      matchInterim: PropTypes.bool
-    }))
+  const handleClearTranscript = () => {
+    if (clearTranscriptOnListen) {
+      clearTranscript()
+    }
   }
 
-  SpeechRecognitionContainer.defaultProps = {
-    transcribing: true,
-    clearTranscriptOnListen: false,
-    commands: []
+  const resetTranscript = () => {
+    recognitionManager.resetTranscript()
+    clearTranscript()
   }
-  return SpeechRecognitionContainer
-}
 
-SpeechRecognition.startListening = async ({ continuous, language } = {}) => {
-  const recognitionManager = SpeechRecognition.getRecognitionManager()
-  await recognitionManager.startListening({ continuous, language })
-}
+  useEffect(() => {
+    const id = SpeechRecognition.counter
+    SpeechRecognition.counter += 1
+    recognitionManager.subscribe(id, {
+      onListeningChange: setListening,
+      onTranscriptChange: handleTranscriptChange,
+      onClearTranscript: handleClearTranscript
+    })
 
-SpeechRecognition.stopListening = () => {
-  const recognitionManager = SpeechRecognition.getRecognitionManager()
-  recognitionManager.stopListening()
-}
+    return () => {
+      recognitionManager.unsubscribe(id)
+    }
+  }, []) // eslint-disable-line
 
-SpeechRecognition.abortListening = () => {
-  const recognitionManager = SpeechRecognition.getRecognitionManager()
-  recognitionManager.abortListening()
-}
-
-SpeechRecognition.browserSupportsSpeechRecognition = () => {
-  const recognitionManager = SpeechRecognition.getRecognitionManager()
-  return recognitionManager.browserSupportsSpeechRecognition
+  const transcript = concatTranscripts(finalTranscript, interimTranscript)
+  return {
+    transcript,
+    interimTranscript,
+    finalTranscript,
+    listening,
+    recognition: recognitionManager.getRecognition(),
+    resetTranscript
+  }
 }
 
 let recognitionManager
-SpeechRecognition.getRecognitionManager = () => {
-  if (!recognitionManager) {
-    recognitionManager = new RecognitionManager()
+const SpeechRecognition = {
+  counter: 0,
+  getRecognitionManager: () => {
+    if (!recognitionManager) {
+      recognitionManager = new RecognitionManager()
+    }
+    return recognitionManager
+  },
+  startListening: async ({ continuous, language } = {}) => {
+    const recognitionManager = SpeechRecognition.getRecognitionManager()
+    await recognitionManager.startListening({ continuous, language })
+  },
+  stopListening: () => {
+    const recognitionManager = SpeechRecognition.getRecognitionManager()
+    recognitionManager.stopListening()
+  },
+  abortListening: () => {
+    const recognitionManager = SpeechRecognition.getRecognitionManager()
+    recognitionManager.abortListening()
+  },
+  browserSupportsSpeechRecognition: () => {
+    const recognitionManager = SpeechRecognition.getRecognitionManager()
+    return recognitionManager.browserSupportsSpeechRecognition
   }
-  return recognitionManager
 }
 
+export { useSpeechRecognition }
 export default SpeechRecognition
