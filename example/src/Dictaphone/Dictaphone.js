@@ -1,25 +1,18 @@
-import React, { useEffect } from 'react'
-import PropTypes from 'prop-types'
-import SpeechRecognition from '../SpeechRecognition'
+import React, { useState, useEffect } from 'react'
+import SpeechRecognition, { useSpeechRecognition } from '../SpeechRecognition'
 
-const propTypes = {
-  // Props injected by SpeechRecognition
-  transcript: PropTypes.string,
-  resetTranscript: PropTypes.func,
-  listening: PropTypes.bool,
-  transcribing: PropTypes.bool,
-  clearTranscriptOnListen: PropTypes.bool
-}
-
-const Dictaphone = ({
-  transcript,
-  resetTranscript,
-  interimTranscript,
-  finalTranscript,
-  listening,
-  transcribing,
-  clearTranscriptOnListen
-}) => {
+export default ({ commands }) => {
+  const [transcribing, setTranscribing] = useState(true)
+  const [clearTranscriptOnListen, setClearTranscriptOnListen] = useState(false)
+  const toggleTranscribing = () => setTranscribing(!transcribing)
+  const toggleClearTranscriptOnListen = () => setClearTranscriptOnListen(!clearTranscriptOnListen)
+  const {
+    transcript,
+    interimTranscript,
+    finalTranscript,
+    resetTranscript,
+    listening,
+  } = useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands })
   useEffect(() => {
     if (interimTranscript !== '') {
       console.log('Got interim result:', interimTranscript)
@@ -39,10 +32,9 @@ const Dictaphone = ({
       <span>transcribing: {transcribing ? 'on' : 'off'}</span>
       <span>clearTranscriptOnListen: {clearTranscriptOnListen ? 'on' : 'off'}</span>
       <button onClick={resetTranscript}>Reset</button>
+      <button onClick={toggleTranscribing}>Toggle transcribing</button>
+      <button onClick={toggleClearTranscriptOnListen}>Toggle clearTranscriptOnListen</button>
       <span>{transcript}</span>
     </div>
   )
 }
-
-Dictaphone.propTypes = propTypes
-export default SpeechRecognition(Dictaphone)
