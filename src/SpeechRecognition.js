@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import { concatTranscripts, commandToRegExp } from './utils'
 import RecognitionManager from './RecognitionManager'
 
-const useSpeechRecognition = ({ transcribing, clearTranscriptOnListen, commands }) => {
+const useSpeechRecognition = ({
+  transcribing = true,
+  clearTranscriptOnListen = false,
+  commands = []
+} = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
   const [interimTranscript, setInterimTranscript] = useState(recognitionManager.interimTranscript)
   const [finalTranscript, setFinalTranscript] = useState('')
