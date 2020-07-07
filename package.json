@@ -43,9 +43,8 @@
     "@babel/core": "^7.10.3",
     "@babel/preset-env": "^7.10.3",
     "@babel/preset-react": "^7.10.1",
+    "@testing-library/react-hooks": "^3.3.0",
     "babel-eslint": "^10.0.2",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^6.0.1",
     "eslint-config-standard": "^13.0.1",
     "eslint-plugin-babel": "^5.3.0",
@@ -58,12 +57,10 @@
     "jest": "^26.1.0",
     "npm-watch": "^0.6.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-test-renderer": "16.13.1"
   },
   "jest": {
-    "setupFilesAfterEnv": [
-      "./tests/setupTests.js"
-    ],
     "coverageThreshold": {
       "global": {
         "branches": 80,

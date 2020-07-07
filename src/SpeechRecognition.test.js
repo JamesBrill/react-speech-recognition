@@ -1,7 +1,6 @@
-import React from 'react'
-import { shallow } from 'enzyme'
+import { renderHook, act } from '@testing-library/react-hooks'
 import '../tests/vendor/corti'
-import SpeechRecognition from './SpeechRecognition'
+import SpeechRecognition, { useSpeechRecognition } from './SpeechRecognition'
 import isAndroid from './isAndroid'
 import RecognitionManager from './RecognitionManager'
 
@@ -33,307 +32,345 @@ describe('SpeechRecognition', () => {
   })
 
   test('sets default transcripts correctly', () => {
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
-    const props = component.props()
+    const { result } = renderHook(() => useSpeechRecognition())
 
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
   })
 
   test('updates transcripts correctly', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual(speech)
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual(speech)
   })
 
   test('resets transcripts correctly', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
-    component.props().resetTranscript()
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+    act(() => {
+      result.current.resetTranscript()
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
   })
 
   test('is listening when Speech Recognition is listening', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
-    await SpeechRecognition.startListening()
+    const { result } = renderHook(() => useSpeechRecognition())
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
 
-    const props = component.props()
-    expect(props.listening).toEqual(true)
+    expect(result.current.listening).toEqual(true)
   })
 
   test('is not listening when Speech Recognition is not listening', () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
 
-    const props = component.props()
-    expect(props.listening).toEqual(false)
+    expect(result.current.listening).toEqual(false)
   })
 
   test('injects Speech Recognition object', () => {
     const recognitionManager = mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
 
-    const props = component.props()
-    expect(props.recognition).toEqual(recognitionManager.recognition)
+    expect(result.current.recognition).toEqual(recognitionManager.recognition)
   })
 
   test('ignores speech when listening is stopped', () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    component.props().recognition.say(speech)
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
   })
 
   test('ignores speech when listening is aborted', () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    SpeechRecognition.abortListening()
-    component.props().recognition.say(speech)
+    act(() => {
+      SpeechRecognition.abortListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
   })
 
   test('transcibes when listening is started', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual(speech)
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual(speech)
   })
 
   test('does not transcibe when listening is started but not transcribing', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent transcribing={false} />)
+    const { result } = renderHook(() => useSpeechRecognition({ transcribing: false }))
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
   })
 
   test('listens continuously by default', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
     const expectedTranscript = [speech, speech].join(' ')
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual(expectedTranscript)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(expectedTranscript)
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual(expectedTranscript)
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual(expectedTranscript)
   })
 
   test('can turn continuous listening off', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening({ continuous: false })
-    component.props().recognition.say(speech)
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: false })
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual(speech)
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual(speech)
   })
 
   test('can set language', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
 
-    await SpeechRecognition.startListening({ language: 'zh-CN' })
+    await act(async () => {
+      await SpeechRecognition.startListening({ language: 'zh-CN' })
+    })
 
-    const props = component.props()
-    expect(props.recognition.lang).toEqual('zh-CN')
+    expect(result.current.recognition.lang).toEqual('zh-CN')
   })
 
   test('does not collect transcript after listening is stopped', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    SpeechRecognition.stopListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.stopListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
   })
 
   test('sets interim transcript correctly', async() => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech, { onlyFirstResult: true })
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech, { onlyFirstResult: true })
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('This')
-    expect(props.interimTranscript).toEqual('This')
-    expect(props.finalTranscript).toEqual('')
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('This')
+    expect(interimTranscript).toEqual('This')
+    expect(finalTranscript).toEqual('')
   })
 
   test('appends interim transcript correctly', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
-    component.props().recognition.say(speech, { onlyFirstResult: true })
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+    act(() => {
+      result.current.recognition.say(speech, { onlyFirstResult: true })
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('This is a test This')
-    expect(props.interimTranscript).toEqual('This')
-    expect(props.finalTranscript).toEqual(speech)
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('This is a test This')
+    expect(interimTranscript).toEqual('This')
+    expect(finalTranscript).toEqual(speech)
   })
 
   test('appends interim transcript correctly on Android', async () => {
     isAndroid.mockReturnValue(true)
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech, { isAndroid: true })
-    component.props().recognition.say(speech, { onlyFirstResult: true, isAndroid: true })
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech, { isAndroid: true })
+    })
+    act(() => {
+      result.current.recognition.say(speech, { onlyFirstResult: true, isAndroid: true })
+    })
 
-    const props = component.props()
-    expect(props.transcript).toEqual('This is a test This')
-    expect(props.interimTranscript).toEqual('This')
-    expect(props.finalTranscript).toEqual(speech)
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('This is a test This')
+    expect(interimTranscript).toEqual('This')
+    expect(finalTranscript).toEqual(speech)
   })
 
   test('resets transcript on subsequent discontinuous speech when clearTranscriptOnListen set', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent clearTranscriptOnListen />)
+    const { result } = renderHook(() => useSpeechRecognition({ clearTranscriptOnListen: true }))
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening({ continuous: false })
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: false })
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
-    let props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    expect(result.current.transcript).toEqual(speech)
+    expect(result.current.interimTranscript).toEqual('')
+    expect(result.current.finalTranscript).toEqual(speech)
 
-    SpeechRecognition.stopListening()
+    act(() => {
+      SpeechRecognition.stopListening()
+    })
 
-    props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    expect(result.current.transcript).toEqual(speech)
+    expect(result.current.interimTranscript).toEqual('')
+    expect(result.current.finalTranscript).toEqual(speech)
 
-    await SpeechRecognition.startListening({ continuous: false })
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: false })
+    })
 
-    props = component.props()
-    expect(props.transcript).toEqual('')
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual('')
+    expect(result.current.transcript).toEqual('')
+    expect(result.current.interimTranscript).toEqual('')
+    expect(result.current.finalTranscript).toEqual('')
   })
 
   test('does not reset transcript on subsequent discontinuous speech when clearTranscriptOnListen not set', async () => {
     mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent />)
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening({ continuous: false })
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: false })
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+    expect(result.current.transcript).toEqual(speech)
+    expect(result.current.interimTranscript).toEqual('')
+    expect(result.current.finalTranscript).toEqual(speech)
 
-    let props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    act(() => {
+      SpeechRecognition.stopListening()
+    })
 
-    SpeechRecognition.stopListening()
+    expect(result.current.transcript).toEqual(speech)
+    expect(result.current.interimTranscript).toEqual('')
+    expect(result.current.finalTranscript).toEqual(speech)
 
-    props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: false })
+    })
 
-    await SpeechRecognition.startListening({ continuous: false })
-
-    props = component.props()
-    expect(props.transcript).toEqual(speech)
-    expect(props.interimTranscript).toEqual('')
-    expect(props.finalTranscript).toEqual(speech)
-  })
-
-  test('props from parent get passed down to wrapped component', async () => {
-    mockRecognitionManager()
-    const WrappedComponent = SpeechRecognition(
-      ({ foo }) => <p>{foo}</p>
-    )
-    const component = shallow(<WrappedComponent foo='test' />)
-
-    expect(component.html()).toEqual('<p>test</p>')
+    expect(result.current.transcript).toEqual(speech)
+    expect(result.current.interimTranscript).toEqual('')
+    expect(result.current.finalTranscript).toEqual(speech)
   })
 
   test('does not call command callback when no command matched', async () => {
@@ -346,12 +383,15 @@ describe('SpeechRecognition', () => {
         matchInterim: false
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(0)
   })
@@ -365,12 +405,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'hello world'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
@@ -384,12 +427,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
     expect(mockCommandCallback).toBeCalledWith('pizza')
@@ -404,12 +450,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
     expect(mockCommandCallback).toBeCalledWith('pizza and fries')
@@ -424,12 +473,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
     expect(mockCommandCallback).toBeCalledWith('pizza', 'fries')
@@ -444,12 +496,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'Hello to you'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
@@ -463,12 +518,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'Hello you'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
@@ -482,12 +540,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I spy with my little eye'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
     expect(mockCommandCallback).toBeCalledWith('spy')
@@ -502,12 +563,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a      test.......'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
@@ -521,12 +585,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'this is a      TEST.......'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
@@ -550,12 +617,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback3
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries are great'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback1.mock.calls.length).toBe(1)
     expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great')
@@ -573,12 +643,15 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(0)
   })
@@ -593,12 +666,15 @@ describe('SpeechRecognition', () => {
         matchInterim: true
       }
     ]
-    const WrappedComponent = SpeechRecognition(() => null)
-    const component = shallow(<WrappedComponent commands={commands} />)
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a test'
 
-    await SpeechRecognition.startListening()
-    component.props().recognition.say(speech)
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
