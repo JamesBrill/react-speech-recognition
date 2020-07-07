@@ -22,7 +22,7 @@ const DictaphoneWidgetB = () => {
 
   return (
     <div>
-      <h3>Dictaphone A</h3>
+      <h3>Dictaphone B</h3>
       <p>{message}</p>
       <Dictaphone commands={commands} />
     </div>

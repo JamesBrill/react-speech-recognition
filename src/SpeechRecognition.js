@@ -1,6 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useReducer } from 'react'
 import { concatTranscripts, commandToRegExp } from './utils'
 import RecognitionManager from './RecognitionManager'
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'clear':
+      return {
+        interimTranscript: '',
+        finalTranscript: ''
+      }
+    case 'append':
+      return {
+        interimTranscript: action.payload.interimTranscript,
+        finalTranscript: concatTranscripts(state.finalTranscript, action.payload.finalTranscript)
+      }
+    default:
+      throw new Error()
+  }
+}
 
 const useSpeechRecognition = ({
   transcribing = true,
@@ -8,13 +25,14 @@ const useSpeechRecognition = ({
   commands = []
 } = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
-  const [interimTranscript, setInterimTranscript] = useState(recognitionManager.interimTranscript)
-  const [finalTranscript, setFinalTranscript] = useState('')
+  const [{ interimTranscript, finalTranscript }, dispatch] = useReducer(reducer, {
+    interimTranscript: recognitionManager.interimTranscript,
+    finalTranscript: ''
+  })
   const [listening, setListening] = useState(recognitionManager.listening)
 
   const clearTranscript = () => {
-    setInterimTranscript('')
-    setFinalTranscript('')
+    dispatch({ type: 'clear' })
   }
 
   const matchCommands = (newInterimTranscript, newFinalTranscript) => {
@@ -34,8 +52,13 @@ const useSpeechRecognition = ({
   const handleTranscriptChange = (newInterimTranscript, newFinalTranscript) => {
     matchCommands(newInterimTranscript, newFinalTranscript)
     if (transcribing) {
-      setInterimTranscript(newInterimTranscript)
-      setFinalTranscript(concatTranscripts(finalTranscript, newFinalTranscript))
+      dispatch({
+        type: 'append',
+        payload: {
+          interimTranscript: newInterimTranscript,
+          finalTranscript: newFinalTranscript
+        }
+      })
     }
   }
 
