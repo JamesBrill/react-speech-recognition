@@ -124,7 +124,6 @@ export default class RecognitionManager {
 
   resetTranscript() {
     this.disconnect('RESET')
-    this.emitClearTranscript()
   }
 
   async startListening({ continuous, language } = {}) {
@@ -149,6 +148,7 @@ export default class RecognitionManager {
     if (!this.listening) {
       if (!this.recognition.continuous) {
         this.resetTranscript()
+        this.emitClearTranscript()
       }
       try {
         this.start()

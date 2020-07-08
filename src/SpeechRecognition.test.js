@@ -678,4 +678,28 @@ describe('SpeechRecognition', () => {
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
+
+  test('transcript resets should be per instance, not global', async () => {
+    mockRecognitionManager()
+    const hook1 = renderHook(() => useSpeechRecognition({ clearTranscriptOnListen: true }))
+    const hook2 = renderHook(() => useSpeechRecognition())
+    const speech = 'This is a test'
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      hook1.result.current.recognition.say(speech)
+    })
+    act(() => {
+      hook2.result.current.resetTranscript()
+    })
+
+    expect(hook2.result.current.transcript).toEqual('')
+    expect(hook2.result.current.interimTranscript).toEqual('')
+    expect(hook2.result.current.finalTranscript).toEqual('')
+    expect(hook1.result.current.transcript).toEqual(speech)
+    expect(hook1.result.current.interimTranscript).toEqual('')
+    expect(hook1.result.current.finalTranscript).toEqual(speech)
+  })
 })
