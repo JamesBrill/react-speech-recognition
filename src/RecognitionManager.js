@@ -17,7 +17,7 @@ export default class RecognitionManager {
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
     this.listening = false
-    this.subscribers = {}
+    this.subscribers = []
     this.onStopListening = () => {}
 
     if (this.browserSupportsSpeechRecognition) {
@@ -37,32 +37,30 @@ export default class RecognitionManager {
     }
   }
 
-  subscribe(id, listeners) {
-    this.subscribers[id] = listeners
+  subscribe(callbacks) {
+    this.subscribers.push(callbacks)
   }
 
-  unsubscribe(id) {
-    delete this.subscribers[id]
+  unsubscribe(callbacks) {
+    const index = this.subscribers.indexOf(callbacks)
+    this.subscribers.splice(index, 1)
   }
 
   emitListeningChange(listening) {
     this.listening = listening
-    Object.keys(this.subscribers).forEach(subscriber => {
-      const { onListeningChange } = this.subscribers[subscriber]
+    this.subscribers.forEach(({ onListeningChange }) => {
       onListeningChange(listening)
     })
   }
 
   emitTranscriptChange(interimTranscript, finalTranscript) {
-    Object.keys(this.subscribers).forEach(subscriber => {
-      const { onTranscriptChange } = this.subscribers[subscriber]
+    this.subscribers.forEach(({ onTranscriptChange }) => {
       onTranscriptChange(interimTranscript, finalTranscript)
     })
   }
 
   emitClearTranscript() {
-    Object.keys(this.subscribers).forEach(subscriber => {
-      const { onClearTranscript } = this.subscribers[subscriber]
+    this.subscribers.forEach(({ onClearTranscript }) => {
       onClearTranscript()
     })
   }

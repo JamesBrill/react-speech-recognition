@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer } from 'react'
+import { useState, useEffect, useReducer, useCallback } from 'react'
 import { concatTranscripts, commandToRegExp } from './utils'
 import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
@@ -20,32 +20,38 @@ const useSpeechRecognition = ({
     dispatch(clearTrancript())
   }
 
-  const matchCommands = (newInterimTranscript, newFinalTranscript) => {
-    commands.forEach(({ command, callback, matchInterim = false }) => {
-      const pattern = commandToRegExp(command)
-      const input = !newFinalTranscript && matchInterim
-        ? newInterimTranscript.trim()
-        : newFinalTranscript.trim()
-      const result = pattern.exec(input)
-      if (result) {
-        const parameters = result.slice(1)
-        callback(...parameters)
+  const matchCommands = useCallback(
+    (newInterimTranscript, newFinalTranscript) => {
+      commands.forEach(({ command, callback, matchInterim = false }) => {
+        const pattern = commandToRegExp(command)
+        const input = !newFinalTranscript && matchInterim
+          ? newInterimTranscript.trim()
+          : newFinalTranscript.trim()
+        const result = pattern.exec(input)
+        if (result) {
+          const parameters = result.slice(1)
+          callback(...parameters)
+        }
+      })
+    }, [commands]
+  )
+
+  const handleTranscriptChange = useCallback(
+    (newInterimTranscript, newFinalTranscript) => {
+      matchCommands(newInterimTranscript, newFinalTranscript)
+      if (transcribing) {
+        dispatch(appendTrancript(newInterimTranscript, newFinalTranscript))
       }
-    })
-  }
+    }, [matchCommands, transcribing]
+  )
 
-  const handleTranscriptChange = (newInterimTranscript, newFinalTranscript) => {
-    matchCommands(newInterimTranscript, newFinalTranscript)
-    if (transcribing) {
-      dispatch(appendTrancript(newInterimTranscript, newFinalTranscript))
-    }
-  }
-
-  const handleClearTranscript = () => {
-    if (clearTranscriptOnListen) {
-      clearTranscript()
-    }
-  }
+  const handleClearTranscript = useCallback(
+    () => {
+      if (clearTranscriptOnListen) {
+        clearTranscript()
+      }
+    }, [clearTranscriptOnListen]
+  )
 
   const resetTranscript = () => {
     recognitionManager.resetTranscript()
@@ -53,18 +59,23 @@ const useSpeechRecognition = ({
   }
 
   useEffect(() => {
-    const id = SpeechRecognition.counter
-    SpeechRecognition.counter += 1
-    recognitionManager.subscribe(id, {
+    const callbacks = {
       onListeningChange: setListening,
       onTranscriptChange: handleTranscriptChange,
       onClearTranscript: handleClearTranscript
-    })
+    }
+    recognitionManager.subscribe(callbacks)
 
     return () => {
-      recognitionManager.unsubscribe(id)
+      recognitionManager.unsubscribe(callbacks)
     }
-  }, [transcribing, clearTranscriptOnListen]) // eslint-disable-line
+  }, [
+    transcribing,
+    clearTranscriptOnListen,
+    recognitionManager,
+    handleTranscriptChange,
+    handleClearTranscript
+  ])
 
   const transcript = concatTranscripts(finalTranscript, interimTranscript)
   return {
@@ -79,7 +90,6 @@ const useSpeechRecognition = ({
 
 let recognitionManager
 const SpeechRecognition = {
-  counter: 0,
   getRecognitionManager: () => {
     if (!recognitionManager) {
       recognitionManager = new RecognitionManager()
