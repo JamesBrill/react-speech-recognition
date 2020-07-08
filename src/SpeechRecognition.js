@@ -64,7 +64,7 @@ const useSpeechRecognition = ({
     return () => {
       recognitionManager.unsubscribe(id)
     }
-  }, []) // eslint-disable-line
+  }, [transcribing, clearTranscriptOnListen]) // eslint-disable-line
 
   const transcript = concatTranscripts(finalTranscript, interimTranscript)
   return {
