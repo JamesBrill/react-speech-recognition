@@ -1,23 +1,8 @@
 import { useState, useEffect, useReducer } from 'react'
 import { concatTranscripts, commandToRegExp } from './utils'
+import { clearTrancript, appendTrancript } from './actions'
+import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
-
-const reducer = (state, action) => {
-  switch (action.type) {
-    case 'clear':
-      return {
-        interimTranscript: '',
-        finalTranscript: ''
-      }
-    case 'append':
-      return {
-        interimTranscript: action.payload.interimTranscript,
-        finalTranscript: concatTranscripts(state.finalTranscript, action.payload.finalTranscript)
-      }
-    default:
-      throw new Error()
-  }
-}
 
 const useSpeechRecognition = ({
   transcribing = true,
@@ -25,14 +10,14 @@ const useSpeechRecognition = ({
   commands = []
 } = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
-  const [{ interimTranscript, finalTranscript }, dispatch] = useReducer(reducer, {
+  const [{ interimTranscript, finalTranscript }, dispatch] = useReducer(transcriptReducer, {
     interimTranscript: recognitionManager.interimTranscript,
     finalTranscript: ''
   })
   const [listening, setListening] = useState(recognitionManager.listening)
 
   const clearTranscript = () => {
-    dispatch({ type: 'clear' })
+    dispatch(clearTrancript())
   }
 
   const matchCommands = (newInterimTranscript, newFinalTranscript) => {
@@ -52,13 +37,7 @@ const useSpeechRecognition = ({
   const handleTranscriptChange = (newInterimTranscript, newFinalTranscript) => {
     matchCommands(newInterimTranscript, newFinalTranscript)
     if (transcribing) {
-      dispatch({
-        type: 'append',
-        payload: {
-          interimTranscript: newInterimTranscript,
-          finalTranscript: newFinalTranscript
-        }
-      })
+      dispatch(appendTrancript(newInterimTranscript, newFinalTranscript))
     }
   }
 
