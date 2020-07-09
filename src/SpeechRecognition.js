@@ -59,15 +59,17 @@ const useSpeechRecognition = ({
   }
 
   useEffect(() => {
+    const id = SpeechRecognition.counter
+    SpeechRecognition.counter += 1
     const callbacks = {
       onListeningChange: setListening,
       onTranscriptChange: handleTranscriptChange,
       onClearTranscript: handleClearTranscript
     }
-    recognitionManager.subscribe(callbacks)
+    recognitionManager.subscribe(id, callbacks)
 
     return () => {
-      recognitionManager.unsubscribe(callbacks)
+      recognitionManager.unsubscribe(id)
     }
   }, [
     transcribing,
@@ -90,6 +92,7 @@ const useSpeechRecognition = ({
 
 let recognitionManager
 const SpeechRecognition = {
+  counter: 0,
   getRecognitionManager: () => {
     if (!recognitionManager) {
       recognitionManager = new RecognitionManager()
