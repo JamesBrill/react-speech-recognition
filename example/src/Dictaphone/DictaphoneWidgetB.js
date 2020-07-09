@@ -17,6 +17,10 @@ const DictaphoneWidgetB = () => {
       command: 'Goodbye',
       callback: () => setMessage('So long!'),
       matchInterim: true
+    },
+    {
+      command: 'Pass the salt (please)',
+      callback: () => setMessage('My pleasure')
     }
   ]
 
