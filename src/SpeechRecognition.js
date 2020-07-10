@@ -6,7 +6,7 @@ import RecognitionManager from './RecognitionManager'
 
 const useSpeechRecognition = ({
   transcribing = true,
-  clearTranscriptOnListen = false,
+  clearTranscriptOnListen = true,
   commands = []
 } = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())

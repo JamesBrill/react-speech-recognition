@@ -305,7 +305,7 @@ describe('SpeechRecognition', () => {
 
   test('resets transcript on subsequent discontinuous speech when clearTranscriptOnListen set', async () => {
     mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition({ clearTranscriptOnListen: true }))
+    const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
     await act(async () => {
@@ -338,7 +338,7 @@ describe('SpeechRecognition', () => {
 
   test('does not reset transcript on subsequent discontinuous speech when clearTranscriptOnListen not set', async () => {
     mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition())
+    const { result } = renderHook(() => useSpeechRecognition({ clearTranscriptOnListen: false }))
     const speech = 'This is a test'
 
     await act(async () => {
@@ -676,7 +676,7 @@ describe('SpeechRecognition', () => {
 
   test('transcript resets should be per instance, not global', async () => {
     mockRecognitionManager()
-    const hook1 = renderHook(() => useSpeechRecognition({ clearTranscriptOnListen: true }))
+    const hook1 = renderHook(() => useSpeechRecognition())
     const hook2 = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 

@@ -3,7 +3,7 @@ import SpeechRecognition, { useSpeechRecognition } from '../SpeechRecognition'
 
 export default ({ commands }) => {
   const [transcribing, setTranscribing] = useState(true)
-  const [clearTranscriptOnListen, setClearTranscriptOnListen] = useState(false)
+  const [clearTranscriptOnListen, setClearTranscriptOnListen] = useState(true)
   const toggleTranscribing = () => setTranscribing(!transcribing)
   const toggleClearTranscriptOnListen = () => setClearTranscriptOnListen(!clearTranscriptOnListen)
   const {
