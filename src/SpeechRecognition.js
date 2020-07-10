@@ -85,7 +85,6 @@ const useSpeechRecognition = ({
     interimTranscript,
     finalTranscript,
     listening,
-    recognition: recognitionManager.getRecognition(),
     resetTranscript
   }
 }
@@ -98,6 +97,10 @@ const SpeechRecognition = {
       recognitionManager = new RecognitionManager()
     }
     return recognitionManager
+  },
+  getRecognition: () => {
+    const recognitionManager = SpeechRecognition.getRecognitionManager()
+    return recognitionManager.getRecognition()
   },
   startListening: async ({ continuous, language } = {}) => {
     const recognitionManager = SpeechRecognition.getRecognitionManager()

@@ -73,11 +73,6 @@ The difference between interim and final transcripts can be illustrated by an ex
 
 Transcription of speech for which transcription has finished.
 
-#### recognition [Object]
-
-The underlying [object](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) used
-by Web Speech API.
-
 ## SpeechRecognition
 
 Object providing functions to manage the global state of the microphone. Import with:
@@ -233,3 +228,7 @@ if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
   // Render some fallback content
 }
 ```
+
+#### getRecognition
+
+This returns the underlying [object](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) used by Web Speech API.

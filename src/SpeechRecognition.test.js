@@ -49,7 +49,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -67,7 +67,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
     act(() => {
       result.current.resetTranscript()
@@ -96,11 +96,10 @@ describe('SpeechRecognition', () => {
     expect(result.current.listening).toEqual(false)
   })
 
-  test('injects Speech Recognition object', () => {
+  test('exposes Speech Recognition object', () => {
     const recognitionManager = mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition())
 
-    expect(result.current.recognition).toEqual(recognitionManager.recognition)
+    expect(SpeechRecognition.getRecognition()).toEqual(recognitionManager.recognition)
   })
 
   test('ignores speech when listening is stopped', () => {
@@ -109,7 +108,7 @@ describe('SpeechRecognition', () => {
     const speech = 'This is a test'
 
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -127,7 +126,7 @@ describe('SpeechRecognition', () => {
       SpeechRecognition.abortListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -145,7 +144,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -163,7 +162,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -174,17 +173,17 @@ describe('SpeechRecognition', () => {
 
   test('listens discontinuously by default', async () => {
     mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition())
+    renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
   })
 
@@ -198,10 +197,10 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -212,13 +211,13 @@ describe('SpeechRecognition', () => {
 
   test('can set language', async () => {
     mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition())
+    renderHook(() => useSpeechRecognition())
 
     await act(async () => {
       await SpeechRecognition.startListening({ language: 'zh-CN' })
     })
 
-    expect(result.current.recognition.lang).toEqual('zh-CN')
+    expect(SpeechRecognition.getRecognition().lang).toEqual('zh-CN')
   })
 
   test('does not collect transcript after listening is stopped', async () => {
@@ -233,7 +232,7 @@ describe('SpeechRecognition', () => {
       SpeechRecognition.stopListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -251,7 +250,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech, { onlyFirstResult: true })
+      SpeechRecognition.getRecognition().say(speech, { onlyFirstResult: true })
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -269,10 +268,10 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
     act(() => {
-      result.current.recognition.say(speech, { onlyFirstResult: true })
+      SpeechRecognition.getRecognition().say(speech, { onlyFirstResult: true })
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -291,10 +290,10 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
-      result.current.recognition.say(speech, { isAndroid: true })
+      SpeechRecognition.getRecognition().say(speech, { isAndroid: true })
     })
     act(() => {
-      result.current.recognition.say(speech, { onlyFirstResult: true, isAndroid: true })
+      SpeechRecognition.getRecognition().say(speech, { onlyFirstResult: true, isAndroid: true })
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -312,7 +311,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(result.current.transcript).toEqual(speech)
@@ -345,7 +344,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
     expect(result.current.transcript).toEqual(speech)
     expect(result.current.interimTranscript).toEqual('')
@@ -378,14 +377,14 @@ describe('SpeechRecognition', () => {
         matchInterim: false
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a test'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(0)
@@ -400,14 +399,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'hello world'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -422,14 +421,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -445,14 +444,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -468,14 +467,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -491,14 +490,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'Hello to you'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -513,14 +512,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'Hello you'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -535,14 +534,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I spy with my little eye'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -558,14 +557,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a      test.......'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -580,14 +579,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'this is a      TEST.......'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -612,14 +611,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback3
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'I want to eat pizza and fries are great'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback1.mock.calls.length).toBe(1)
@@ -638,14 +637,14 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a test'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(0)
@@ -661,14 +660,14 @@ describe('SpeechRecognition', () => {
         matchInterim: true
       }
     ]
-    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    renderHook(() => useSpeechRecognition({ commands }))
     const speech = 'This is a test'
 
     await act(async () => {
       await SpeechRecognition.startListening()
     })
     act(() => {
-      result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
@@ -684,7 +683,7 @@ describe('SpeechRecognition', () => {
       await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
-      hook1.result.current.recognition.say(speech)
+      SpeechRecognition.getRecognition().say(speech)
     })
     act(() => {
       hook2.result.current.resetTranscript()

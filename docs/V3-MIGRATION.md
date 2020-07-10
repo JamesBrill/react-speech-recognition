@@ -141,4 +141,4 @@ This is now state returned by `useSpeechRecognition`. This transcript is local t
 
 ### recognition
 
-This is now state returned by `useSpeechRecognition`. This is the global Speech Recognition object.
+This is now returned by the function `SpeechRecognition.getRecognition`, documented [here](API.md#getRecognition).
