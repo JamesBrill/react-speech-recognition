@@ -681,7 +681,7 @@ describe('SpeechRecognition', () => {
     const speech = 'This is a test'
 
     await act(async () => {
-      await SpeechRecognition.startListening()
+      await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
       hook1.result.current.recognition.say(speech)
