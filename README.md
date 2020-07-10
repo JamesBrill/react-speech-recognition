@@ -16,6 +16,8 @@ Under the hood,
 it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
 Currently, **this component will only work in Chrome**. It fails gracefully on other browsers.
 
+This version requires React 16.8 so that React hooks can be used. If you're used to version 2.x of `react-speech-recognition` or want to use an older version of React, you can see the old README [here](https://github.com/JamesBrill/react-speech-recognition/tree/v2.1.4). If you want to migrate to version 3.x, see the migration guide [here](docs/V3-MIGRATION.md).
+
 
 ## Installation
 
