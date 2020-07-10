@@ -128,13 +128,12 @@ export default class RecognitionManager {
     this.disconnect('RESET')
   }
 
-  async startListening({ continuous, language } = {}) {
+  async startListening({ continuous = false, language } = {}) {
     if (!this.browserSupportsSpeechRecognition) {
       return
     }
 
-    const isContinuousChanged =
-        continuous !== undefined && continuous !== this.recognition.continuous
+    const isContinuousChanged = continuous !== this.recognition.continuous
     const isLanguageChanged = language && language !== this.recognition.lang
     if (isContinuousChanged || isLanguageChanged) {
       if (this.listening) {
@@ -143,9 +142,8 @@ export default class RecognitionManager {
           this.onStopListening = resolve
         })
       }
-      this.recognition.continuous =
-          continuous !== undefined ? continuous : this.recognition.continuous
-      this.recognition.lang = language || this.recognition.lang
+      this.recognition.continuous = isContinuousChanged ? continuous : this.recognition.continuous
+      this.recognition.lang = isLanguageChanged ? language : this.recognition.lang
     }
     if (!this.listening) {
       if (!this.recognition.continuous) {

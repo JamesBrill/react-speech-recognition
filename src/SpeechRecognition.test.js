@@ -172,14 +172,30 @@ describe('SpeechRecognition', () => {
     expect(finalTranscript).toEqual('')
   })
 
-  test('listens continuously by default', async () => {
+  test('listens discontinuously by default', async () => {
+    mockRecognitionManager()
+    const { result } = renderHook(() => useSpeechRecognition())
+    const speech = 'This is a test'
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+    act(() => {
+      result.current.recognition.say(speech)
+    })
+  })
+
+  test('can turn continuous listening on', async () => {
     mockRecognitionManager()
     const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
     const expectedTranscript = [speech, speech].join(' ')
 
     await act(async () => {
-      await SpeechRecognition.startListening()
+      await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
       result.current.recognition.say(speech)
@@ -192,27 +208,6 @@ describe('SpeechRecognition', () => {
     expect(transcript).toEqual(expectedTranscript)
     expect(interimTranscript).toEqual('')
     expect(finalTranscript).toEqual(expectedTranscript)
-  })
-
-  test('can turn continuous listening off', async () => {
-    mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition())
-    const speech = 'This is a test'
-
-    await act(async () => {
-      await SpeechRecognition.startListening({ continuous: false })
-    })
-    act(() => {
-      result.current.recognition.say(speech)
-    })
-    act(() => {
-      result.current.recognition.say(speech)
-    })
-
-    const { transcript, interimTranscript, finalTranscript } = result.current
-    expect(transcript).toEqual(speech)
-    expect(interimTranscript).toEqual('')
-    expect(finalTranscript).toEqual(speech)
   })
 
   test('can set language', async () => {
@@ -271,7 +266,7 @@ describe('SpeechRecognition', () => {
     const speech = 'This is a test'
 
     await act(async () => {
-      await SpeechRecognition.startListening()
+      await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
       result.current.recognition.say(speech)
@@ -293,7 +288,7 @@ describe('SpeechRecognition', () => {
     const speech = 'This is a test'
 
     await act(async () => {
-      await SpeechRecognition.startListening()
+      await SpeechRecognition.startListening({ continuous: true })
     })
     act(() => {
       result.current.recognition.say(speech, { isAndroid: true })
@@ -314,7 +309,7 @@ describe('SpeechRecognition', () => {
     const speech = 'This is a test'
 
     await act(async () => {
-      await SpeechRecognition.startListening({ continuous: false })
+      await SpeechRecognition.startListening()
     })
     act(() => {
       result.current.recognition.say(speech)
@@ -333,7 +328,7 @@ describe('SpeechRecognition', () => {
     expect(result.current.finalTranscript).toEqual(speech)
 
     await act(async () => {
-      await SpeechRecognition.startListening({ continuous: false })
+      await SpeechRecognition.startListening()
     })
 
     expect(result.current.transcript).toEqual('')
@@ -347,7 +342,7 @@ describe('SpeechRecognition', () => {
     const speech = 'This is a test'
 
     await act(async () => {
-      await SpeechRecognition.startListening({ continuous: false })
+      await SpeechRecognition.startListening()
     })
     act(() => {
       result.current.recognition.say(speech)
@@ -365,7 +360,7 @@ describe('SpeechRecognition', () => {
     expect(result.current.finalTranscript).toEqual(speech)
 
     await act(async () => {
-      await SpeechRecognition.startListening({ continuous: false })
+      await SpeechRecognition.startListening()
     })
 
     expect(result.current.transcript).toEqual(speech)
