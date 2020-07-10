@@ -1,5 +1,5 @@
 # react-speech-recognition
-A React component that converts speech from the microphone to text.
+A React hook that converts speech from the microphone to text and makes it available to your React components.
 
 [![npm version](https://img.shields.io/npm/v/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
 [![npm downloads](https://img.shields.io/npm/dm/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
@@ -8,15 +8,13 @@ A React component that converts speech from the microphone to text.
 
 
 ## How it works
-`SpeechRecognition` is a higher order component that wraps one of your React components.
-In doing so, it injects some additional properties into the component that allow it
-to access a transcript of speech picked up from the user's microphone.
+`useSpeechRecognition` is a React hook that gives a component access to a transcript of speech picked up from the user's microphone.
+
+`SpeechRecognition` manages the global state of the Speech Recognition API, exposing functions to turn the microphone on and off.
 
 Under the hood,
 it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
 Currently, **this component will only work in Chrome**. It fails gracefully on other browsers.
-
-It is recommended that you use Webpack to bundle this module with your web code.
 
 
 ## Installation
@@ -27,138 +25,180 @@ To install:
 
 To import in your React code:
 
-`import SpeechRecognition from 'react-speech-recognition'`
+`import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'`
 
-## Example usage
+## Detecting browser support for Speech Recognition API
 
-As only one component can be wrapped by `SpeechRecognition`, it is recommended that you add it to one of your root React components such as `App`. The transcription can then be passed down to child components.
+The Speech Recognition API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import SpeechRecognition from "react-speech-recognition";
+if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+  // Render some fallback content
+}
+```
 
-const propTypes = {
-  // Props injected by SpeechRecognition
-  transcript: PropTypes.string,
-  resetTranscript: PropTypes.func,
-  browserSupportsSpeechRecognition: PropTypes.bool
-};
+## Controlling the microphone
 
-const Dictaphone = ({
-  transcript,
-  resetTranscript,
-  browserSupportsSpeechRecognition
-}) => {
-  if (!browserSupportsSpeechRecognition) {
-    return null;
+Before consuming the transcript, you should be familiar with `SpeechRecognition`, which gives you control over the microphone. The state of the microphone is global, so any functions you call on this object will affect _all_ components using `useSpeechRecognition`.
+
+## Turning the microphone on
+
+To start listening to speech, call the `startListening` function.
+
+```
+SpeechRecognition.startListening()
+```
+
+This is an asynchronous function, so it will need to be awaited if you want to do something after the microphone has been turned on.
+
+## Turning the microphone off
+
+To turn the microphone off, but still finish processing any speech in progress, call `stopListening`.
+
+```
+SpeechRecognition.stopListening()
+```
+
+To turn the microphone off, and cancel the processing of any speech in progress, call `abortListening`.
+
+```
+SpeechRecognition.abortListening()
+```
+
+## Consuming the microphone transcript
+
+To make the microphone transcript available in your component, simply add:
+
+```
+const { transcript } = useSpeechRecognition()
+```
+
+## Resetting the microphone transcript
+
+To set the transcript to an empty string, you can call the `resetTranscript` function provided by `useSpeechRecognition`. Note that this is local to your component and does not affect any other components using Speech Recognition.
+
+```
+const { resetTranscript } = useSpeechRecognition()
+```
+
+## Basic example
+
+The most basic example of a complete component using this hook would be:
+```
+import React from 'react'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+
+const Dictaphone = () => {
+  const { transcript, resetTranscript } = useSpeechRecognition()
+
+  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+    return null
   }
 
   return (
     <div>
+      <button onClick={SpeechRecognition.startListening}>Start</button>
+      <button onClick={SpeechRecognition.stopListening}>Stop</button>
       <button onClick={resetTranscript}>Reset</button>
-      <span>{transcript}</span>
+      <p>{transcript}</p>
     </div>
-  );
-};
-
-Dictaphone.propTypes = propTypes;
-
-export default SpeechRecognition(Dictaphone);
-```
-
-## Global options
-
-You can configure the default initial state of the Speech Recognition API. To change these defaults, you need to pass an options object into the wrapper like so:
-
-```
-const options = {
-  autoStart: false
+  )
 }
-
-export default SpeechRecognition(options)(YourComponent)
+export default Dictaphone
 ```
 
-### autoStart [bool]
+## Continuous listening
 
-By default, the Speech Recognition API will immediately start listening to speech from the microphone. To have the API initially turned off, set this to `false`.
+By default, the microphone will stop listening when the user stops speaking. This reflects the approach taken by "press to talk" buttons on modern devices.
 
-### continuous [bool]
+If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
 
-By default, the Speech Recognition API is continuously listening to speech from the microphone when it is turned on. To have the API stop listening after the user has finished speaking, set this to `false`. For example, if you are building a chat app that only starts listening to the user's speech after a button click, you should set both `continuous` and `autoStart` options to `false`. Call [startListening](https://github.com/JamesBrill/react-speech-recognition#startListening-function) to make the API start listening again.
+```
+SpeechRecognition.startListening({ continuous: true })
+```
 
-## Props added to your component
+## Commands
 
-### transcript [string]
+To respond when the user says a particular command, you can pass in a list of commands to the `useSpeechRecognition` hook. Each command is an object with the following properties:
+- `command`: This is a string or `RegExp` representing the command you want to listen for
+- `callback`: The function that is executed when the command is spoken
+- `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command is detected when it is not spoken. This is `false` by default and should only be set for simple commands.
 
-Transcription of all speech that has been spoken into the microphone. Is equivalent to the final transcript followed by the interim transcript, separated by a space.
+### Command symbols
 
-### resetTranscript [function]
+To make commands easier to write, the following symbols are supported:
+- Splats: this is just a `*` and will match multi-word text
+  - Example: `'I would like to order *'`
+  - The words that match the splat will be passed into the callback, one argument per splat
+- Named variables: this is written `:<name>` and will match a single word
+  - Example: `'I am :height metres tall'`
+  - The one word that matches the named variable will be passed into the callback
+- Optional words: this is a phrase wrapped in parentheses `(` and `)`, and is not required to match the command:
+  - Example: `'Pass the salt (please)'`
+  - The above example would match both `'Pass the salt'` and `'Pass the salt please'`
 
-Sets the transcription to an empty string.
+### Example with commands
 
-### startListening [function]
+```
+import React, { useState } from 'react'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
-Causes the Web Speech API to start listening to speech from the microphone.
+const Dictaphone = () => {
+  const [message, setMessage] = useState('')
+  const commands = [
+    {
+      command: 'I would like to order *',
+      callback: (food) => setMessage(`Your order is for: ${food}`)
+    },
+    {
+      command: 'The weather is :condition today',
+      callback: (condition) => setMessage(`Today, the weather is ${condition}`)
+    },
+    {
+      command: 'My top sports are * and *',
+      callback: (sport1, sport2) => setMessage(`#1: ${sport1}, #2: ${sport2}`)
+    },
+    {
+      command: 'Pass the salt (please)',
+      callback: () => setMessage('My pleasure')
+    },
+    {
+      command: 'Hello',
+      callback: () => setMessage('Hi there!'),
+      matchInterim: true
+    }
+  ]
 
-NOTE: if the `continuous` option is set to `false`, then `startListening` will reset the `transcript` prop.
+  const { transcript } = useSpeechRecognition({ commands })
 
-### stopListening [function]
+  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+    return null
+  }
 
-Causes the Web Speech API to stop listening to speech from the microphone, but will finish processing any remaining speech.
+  return (
+    <div>
+      <p>{message}</p>
+      <p>{transcript}</p>
+    </div>
+  )
+}
+export default Dictaphone
+```
 
-### abortListening [function]
+## Changing language
 
-Causes the Web Speech API to stop listening to speech from the microphone, and also stop processing the current speech.
+To listen for a specific language, you can pass a language tag (e.g. `zh-CN`for Chinese) calling `startListening`. See [here](docs/API.md#language-string) for a list of supported languages.
 
-### browserSupportsSpeechRecognition [bool]
+```
+SpeechRecognition.startListening({ language: 'zh-CN' })
+```
 
-If false, the browser does not support the Speech Recognition API.
-
-### listening [bool]
-
-If true, the Web Speech API is listening to speech from the microphone.
-
-### interimTranscript [string]
-
-Transcription of speech for which transcription hasn't finished yet.
-
-For the current words being spoken, the interim transcript reflects each successive guess made by the transcription algorithm. When the browser’s confidence in its guess is maximized, it is added to the final transcript.
-
-The difference between interim and final transcripts can be illustrated by an example over four iterations of the transcription algorithm:
-
-| Final transcript | Interim transcript |
-|-------------------|--------------------|
-| 'Hello, I am' | 'jam' |
-| 'Hello, I am' | 'jams' |
-| 'Hello, I am' | 'James' |
-| 'Hello, I am James' | '' |
-
-### finalTranscript [string]
-
-Transcription of speech for which transcription has finished.
-
-### recognition [Object]
-
-The underlying [object](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) used
-by Web Speech API. It can be used to change the
-transcription language, which is the browser language if not specified. For example, to set the transcription language to Chinese:
-
-`recognition.lang = 'zh-CN'`
-
-## Troubleshooting
-
-### How to use `react-speech-recognition` offline?
+## How to use `react-speech-recognition` offline?
 
 Unfortunately, speech recognition will not function in Chrome when offline. According to the [Web Speech API docs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API): `On Chrome, using Speech Recognition on a web page involves a server-based recognition engine. Your audio is sent to a web service for recognition processing, so it won't work offline.`
 
 If you are building an offline web app, you can detect when the browser is offline by inspecting the value of `navigator.onLine`. If it is `true`, you can render the transcript generated by React Speech Recognition. If it is `false`, it's advisable to render offline fallback content that signifies that speech recognition is disabled. The online/offline API is simple to use - you can read how to use it [here](https://developer.mozilla.org/en-US/docs/Web/API/NavigatorOnLine/Online_and_offline_events).
 
-### The transcript contains duplicate words!
-
-There is a [bug in Android Chrome](https://stackoverflow.com/questions/35112561/speech-recognition-api-duplicated-phrases-on-android/43458449#43458449) that causes the Web Speech API to generate duplicate words in the speech recognition result. Possible workarounds:
-- Set the `continuous` option to `false`
-- [Detect Android Chrome](https://stackoverflow.com/questions/21741841/detecting-ios-android-operating-system) and render fallback content on that browser
 
 ## Developing
 
