@@ -93,7 +93,7 @@ export default class RecognitionManager {
       this.emitListeningChange(false)
     } else if (this.browserSupportsSpeechRecognition) {
       if (this.recognition.continuous) {
-        this.startListening()
+        this.startListening({ continuous: this.recognition.continuous })
       } else {
         this.emitListeningChange(false)
       }
