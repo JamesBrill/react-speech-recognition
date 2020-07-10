@@ -27,6 +27,34 @@ To import in your React code:
 
 `import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'`
 
+
+## Basic example
+
+The most basic example of a component using this hook would be:
+
+```
+import React from 'react'
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+
+const Dictaphone = () => {
+  const { transcript, resetTranscript } = useSpeechRecognition()
+
+  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+    return null
+  }
+
+  return (
+    <div>
+      <button onClick={SpeechRecognition.startListening}>Start</button>
+      <button onClick={SpeechRecognition.stopListening}>Stop</button>
+      <button onClick={resetTranscript}>Reset</button>
+      <p>{transcript}</p>
+    </div>
+  )
+}
+export default Dictaphone
+```
+
 ## Detecting browser support for Speech Recognition API
 
 The Speech Recognition API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
@@ -79,32 +107,6 @@ To set the transcript to an empty string, you can call the `resetTranscript` fun
 
 ```
 const { resetTranscript } = useSpeechRecognition()
-```
-
-## Basic example
-
-The most basic example of a complete component using this hook would be:
-```
-import React from 'react'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
-
-const Dictaphone = () => {
-  const { transcript, resetTranscript } = useSpeechRecognition()
-
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-    return null
-  }
-
-  return (
-    <div>
-      <button onClick={SpeechRecognition.startListening}>Start</button>
-      <button onClick={SpeechRecognition.stopListening}>Stop</button>
-      <button onClick={resetTranscript}>Reset</button>
-      <p>{transcript}</p>
-    </div>
-  )
-}
-export default Dictaphone
 ```
 
 ## Continuous listening
