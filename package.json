@@ -1,12 +1,15 @@
 {
   "name": "react-speech-recognition",
-  "version": "2.1.4",
+  "version": "3.0.0",
   "description": "A React component that converts speech from the microphone to text.",
   "main": "lib/index.js",
   "scripts": {
-    "build": "babel src -d lib",
+    "build": "babel src -d lib --ignore '**/*.test.js'",
     "lint": "eslint src tests",
-    "test": "jest",
+    "test": "jest --testPathIgnorePatterns=example",
+    "coverage": "npm run coverage:collect && npm run coverage:report",
+    "coverage:collect": "jest --testPathIgnorePatterns=example --collectCoverageFrom=src/**/*.{js,jsx} --coverage",
+    "coverage:report": "open coverage/lcov-report/index.html",
     "prepublishOnly": "npm run build",
     "update-example": "cp -R src/ example/src/SpeechRecognition",
     "run-example": "cd example && npm i && npm start",
@@ -33,16 +36,15 @@
   "author": "James Brill <contact@jamesbrill.co.uk>",
   "license": "MIT",
   "peerDependencies": {
-    "react": ">=16"
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.10.3",
     "@babel/core": "^7.10.3",
     "@babel/preset-env": "^7.10.3",
     "@babel/preset-react": "^7.10.1",
+    "@testing-library/react-hooks": "^3.3.0",
     "babel-eslint": "^10.0.2",
-    "enzyme": "^3.11.0",
-    "enzyme-adapter-react-16": "^1.15.2",
     "eslint": "^6.0.1",
     "eslint-config-standard": "^13.0.1",
     "eslint-plugin-babel": "^5.3.0",
@@ -55,6 +57,17 @@
     "jest": "^26.1.0",
     "npm-watch": "^0.6.0",
     "react": "^16.13.1",
-    "react-dom": "^16.13.1"
+    "react-dom": "^16.13.1",
+    "react-test-renderer": "16.13.1"
+  },
+  "jest": {
+    "coverageThreshold": {
+      "global": {
+        "branches": 75,
+        "functions": 75,
+        "lines": 75,
+        "statements": 75
+      }
+    }
   }
 }
