@@ -6,11 +6,6 @@ export default () => {
   const [showFirstWidget, setShowFirstWidget] = useState(true)
   const toggleShowFirstWidget = () => setShowFirstWidget(!showFirstWidget)
 
-  const [transcribing, setTranscribing] = useState(true)
-  const toggleTranscribing = () => {
-    setTranscribing(!transcribing)
-  }
-
   const listenContinuously = () => SpeechRecognition.startListening({
     continuous: true,
     language: 'en-GB'
@@ -29,7 +24,6 @@ export default () => {
     <div>
       {showFirstWidget && <DictaphoneWidgetA />}
       <DictaphoneWidgetB />
-      <button onClick={toggleTranscribing}>Toggle transcribing</button>
       <button onClick={listenOnce}>Listen once</button>
       <button onClick={listenContinuously}>Listen continuously</button>
       <button onClick={listenContinuouslyInChinese}>Listen continuously (Chinese)</button>

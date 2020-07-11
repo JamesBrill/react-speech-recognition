@@ -60,6 +60,8 @@ const Dictaphone = () => {
 export default Dictaphone
 ```
 
+You can see more examples in the example React app attached to this repo. See [Developing](#developing).
+
 ## Detecting browser support for Speech Recognition API
 
 Currently, this package is not supported in all browsers, with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
