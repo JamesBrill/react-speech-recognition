@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from '../SpeechRecognition'
 
-export default ({ commands }) => {
+const Dictaphone = ({ commands }) => {
   const [transcribing, setTranscribing] = useState(true)
   const [clearTranscriptOnListen, setClearTranscriptOnListen] = useState(true)
   const toggleTranscribing = () => setTranscribing(!transcribing)
@@ -38,3 +38,5 @@ export default ({ commands }) => {
     </div>
   )
 }
+
+export default Dictaphone
