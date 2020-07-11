@@ -122,7 +122,7 @@ To listen for a specific language, you can pass a language tag (e.g. `zh-CN`for 
 SpeechRecognition.startListening({ language: 'zh-CN' })
 ```
 
-Some known supported languages:
+Some known supported languages (based on [this Stack Overflow post](http://stackoverflow.com/a/14302134/338039)):
 
 * Afrikaans `af`
 * Basque `eu`

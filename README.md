@@ -12,12 +12,16 @@ A React hook that converts speech from the microphone to text and makes it avail
 `SpeechRecognition` manages the global state of the Speech Recognition API, exposing functions to turn the microphone on and off.
 
 Under the hood,
-it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition).
-Currently, **this package will only work in Chrome**. It fails gracefully on other browsers.
+it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition). Note that browser support for this API is currently limited, with Chrome having the best experience - see [supported browsers](#supported-browsers) for more information.
 
 This version requires React 16.8 so that React hooks can be used. If you're used to version 2.x of `react-speech-recognition` or want to use an older version of React, you can see the old README [here](https://github.com/JamesBrill/react-speech-recognition/tree/v2.1.4). If you want to migrate to version 3.x, see the migration guide [here](docs/V3-MIGRATION.md).
 
-[API docs](docs/API.md)
+## Useful links
+
+* [Basic example](#basic-example)
+* [Supported browsers](#supported-browsers)
+* [API docs](docs/API.md)
+* [Version 3 migration guide](docs/V3-MIGRATION.md)
 
 ## Installation
 
@@ -58,13 +62,25 @@ export default Dictaphone
 
 ## Detecting browser support for Speech Recognition API
 
-The Speech Recognition API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
+Currently, this package is not supported in all browsers, with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
   // Render some fallback content
 }
 ```
+
+### Supported browsers
+
+As of June 2020, the following browsers support the Speech Recognition API:
+
+* Chrome (desktop): this is by far the smoothest experience
+* Microsoft Edge
+* Chrome (Android): a word of warning about this platform, which is that there can be an annoying beeping sound when turning the microphone on. This is part of the Android OS and cannot be controlled from the browser
+* Android webview
+* Samsung Internet
+
+For all other browsers, you can render fallback content using the `SpeechRecognition.browserSupportsSpeechRecognition` function described above.
 
 ## Controlling the microphone
 
