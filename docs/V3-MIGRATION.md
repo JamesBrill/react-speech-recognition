@@ -85,7 +85,7 @@ useEffect(() => {
 
 This was another global option in v2 that would by default have the microphone permanently listen to the user, even when they finished speaking. This default behaviour did not match the most common usage pattern, which is to use `react-speech-recognition` for "press to talk" buttons that stop listening once a command has been spoken.
 
-`continuous` is now an option that can be passed to `SpeechRecognition.startListening`. By default, it is `false`, but can be overridden like so:
+`continuous` is now an option that can be passed to `SpeechRecognition.startListening`. It is `false` by default, but can be overridden like so:
 
 ```
 SpeechRecognition.startListening({ continuous: true })
@@ -109,7 +109,7 @@ This is now state returned by `useSpeechRecognition`. This transcript is local t
 
 ### resetTranscript
 
-This is now state returned by `useSpeechRecognition`. This only resets the component's transcript, no global state.
+This is now state returned by `useSpeechRecognition`. This only resets the component's transcript, not any global state.
 
 ### startListening
 

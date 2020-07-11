@@ -9,7 +9,7 @@ A React hook that converts speech from the microphone to text and makes it avail
 ## How it works
 `useSpeechRecognition` is a React hook that gives a component access to a transcript of speech picked up from the user's microphone.
 
-`SpeechRecognition` manages the global state of the Speech Recognition API, exposing functions to turn the microphone on and off.
+`SpeechRecognition` manages the global state of the Web Speech API, exposing functions to turn the microphone on and off.
 
 Under the hood,
 it uses [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition). Note that browser support for this API is currently limited, with Chrome having the best experience - see [supported browsers](#supported-browsers) for more information.
@@ -62,9 +62,9 @@ export default Dictaphone
 
 You can see more examples in the example React app attached to this repo. See [Developing](#developing).
 
-## Detecting browser support for Speech Recognition API
+## Detecting browser support for Web Speech API
 
-Currently, this package is not supported in all browsers, with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
+Currently, this feature is not supported in all browsers, with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
@@ -74,7 +74,7 @@ if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
 
 ### Supported browsers
 
-As of June 2020, the following browsers support the Speech Recognition API:
+As of June 2020, the following browsers support the Web Speech API:
 
 * Chrome (desktop): this is by far the smoothest experience
 * Microsoft Edge
@@ -88,7 +88,7 @@ For all other browsers, you can render fallback content using the `SpeechRecogni
 
 Before consuming the transcript, you should be familiar with `SpeechRecognition`, which gives you control over the microphone. The state of the microphone is global, so any functions you call on this object will affect _all_ components using `useSpeechRecognition`.
 
-## Turning the microphone on
+### Turning the microphone on
 
 To start listening to speech, call the `startListening` function.
 
@@ -98,7 +98,7 @@ SpeechRecognition.startListening()
 
 This is an asynchronous function, so it will need to be awaited if you want to do something after the microphone has been turned on.
 
-## Turning the microphone off
+### Turning the microphone off
 
 To turn the microphone off, but still finish processing any speech in progress, call `stopListening`.
 
@@ -130,18 +130,18 @@ const { resetTranscript } = useSpeechRecognition()
 
 ## Commands
 
-To respond when the user says a particular command, you can pass in a list of commands to the `useSpeechRecognition` hook. Each command is an object with the following properties:
-- `command`: This is a string or `RegExp` representing the command you want to listen for
+To respond when the user says a particular phrase, you can pass in a list of commands to the `useSpeechRecognition` hook. Each command is an object with the following properties:
+- `command`: This is a string or `RegExp` representing the phrase you want to listen for
 - `callback`: The function that is executed when the command is spoken
-- `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command is detected when it is not spoken. This is `false` by default and should only be set for simple commands.
+- `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
 
 ### Command symbols
 
 To make commands easier to write, the following symbols are supported:
-- Splats: this is just a `*` and will match multi-word text
+- Splats: this is just a `*` and will match multi-word text:
   - Example: `'I would like to order *'`
   - The words that match the splat will be passed into the callback, one argument per splat
-- Named variables: this is written `:<name>` and will match a single word
+- Named variables: this is written `:<name>` and will match a single word:
   - Example: `'I am :height metres tall'`
   - The one word that matches the named variable will be passed into the callback
 - Optional words: this is a phrase wrapped in parentheses `(` and `)`, and is not required to match the command:
@@ -208,7 +208,7 @@ SpeechRecognition.startListening({ continuous: true })
 
 ## Changing language
 
-To listen for a specific language, you can pass a language tag (e.g. `zh-CN`for Chinese) calling `startListening`. See [here](docs/API.md#language-string) for a list of supported languages.
+To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`. See [here](docs/API.md#language-string) for a list of supported languages.
 
 ```
 SpeechRecognition.startListening({ language: 'zh-CN' })

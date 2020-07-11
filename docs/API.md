@@ -1,8 +1,13 @@
 # API docs
 
+## Interface
+
+* [useSpeechRecognition](#useSpeechRecognition)
+* [SpeechRecognition](#SpeechRecognition)
+
 ## useSpeechRecognition
 
-React hook for consuming transcripts taken from speech recorded by the microphone. Import with:
+React hook for consuming speech recorded by the microphone. Import with:
 
 ```
 import { useSpeechRecognition } from 'react-speech-recognition'
@@ -22,9 +27,9 @@ Is this component collecting a transcript or not? This is independent of the glo
 
 #### clearTranscriptOnListen [bool]
 
-Does this component clear its transcript when the microphone is turned on? Has no effect when continuous listening is turned on. `true` by default.
+Does this component clear its transcript when the microphone is turned on? Has no effect when continuous listening is enabled. `true` by default.
 
-### commands [list]
+#### commands [list]
 
 See [Commands](../README.md#Commands).
 
@@ -71,7 +76,7 @@ The difference between interim and final transcripts can be illustrated by an ex
 
 #### finalTranscript [string]
 
-Transcription of speech for which transcription has finished.
+Transcription of speech that the Web Speech API has finished processing.
 
 ## SpeechRecognition
 
@@ -116,7 +121,7 @@ SpeechRecognition.startListening({ continuous: true })
 
 ##### language [string]
 
-To listen for a specific language, you can pass a language tag (e.g. `zh-CN`for Chinese) calling `startListening`.
+To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`.
 
 ```
 SpeechRecognition.startListening({ language: 'zh-CN' })
@@ -166,9 +171,8 @@ Some known supported languages (based on [this Stack Overflow post](http://stack
 * Korean `ko`
 * Latin `la`
 * Mandarin Chinese `zh-CN`
-* Traditional Taiwan `zh-TW`
-* Simplified Hong Kong Chinese `zh-HK`
-* Yue Chinese (Traditional Hong Kong) `zh-yue`
+* Taiwanese `zh-TW`
+* Cantonese `zh-HK`
 * Malaysian `ms-MY`
 * Norwegian `no-NO`
 * Polish `pl`
@@ -221,7 +225,7 @@ SpeechRecognition.abortListening()
 
 #### browserSupportsSpeechRecognition
 
-The Speech Recognition API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
+The Web Speech API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
