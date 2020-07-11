@@ -22,7 +22,7 @@ export default class RecognitionManager {
     this.onStopListening = () => {}
 
     if (this.browserSupportsSpeechRecognition) {
-      this.recognition.continuous = true
+      this.recognition.continuous = false
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
       this.recognition.onend = this.onRecognitionDisconnect.bind(this)
