@@ -16,6 +16,7 @@ export default class RecognitionManager {
     this.browserSupportsSpeechRecognition = this.recognition !== null
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
+    this.finalTranscript = ''
     this.listening = false
     this.subscribers = {}
     this.onStopListening = () => {}
