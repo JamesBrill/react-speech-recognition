@@ -128,16 +128,6 @@ To set the transcript to an empty string, you can call the `resetTranscript` fun
 const { resetTranscript } = useSpeechRecognition()
 ```
 
-## Continuous listening
-
-By default, the microphone will stop listening when the user stops speaking. This reflects the approach taken by "press to talk" buttons on modern devices.
-
-If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
-
-```
-SpeechRecognition.startListening({ continuous: true })
-```
-
 ## Commands
 
 To respond when the user says a particular command, you can pass in a list of commands to the `useSpeechRecognition` hook. Each command is an object with the following properties:
@@ -204,6 +194,16 @@ const Dictaphone = () => {
   )
 }
 export default Dictaphone
+```
+
+## Continuous listening
+
+By default, the microphone will stop listening when the user stops speaking. This reflects the approach taken by "press to talk" buttons on modern devices.
+
+If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
+
+```
+SpeechRecognition.startListening({ continuous: true })
 ```
 
 ## Changing language
