@@ -1,6 +1,6 @@
 {
   "name": "react-speech-recognition",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "💬Speech recognition for your React app",
   "main": "lib/index.js",
   "scripts": {
