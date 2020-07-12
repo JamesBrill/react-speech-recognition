@@ -1,7 +1,7 @@
 {
   "name": "react-speech-recognition",
   "version": "3.0.0",
-  "description": "A React component that converts speech from the microphone to text.",
+  "description": "💬Speech recognition for your React app",
   "main": "lib/index.js",
   "scripts": {
     "build": "babel src -d lib --ignore '**/*.test.js'",
