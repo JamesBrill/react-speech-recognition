@@ -1,6 +1,6 @@
 {
   "name": "react-speech-recognition",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "💬Speech recognition for your React app",
   "main": "lib/index.js",
   "scripts": {
@@ -63,10 +63,10 @@
   "jest": {
     "coverageThreshold": {
       "global": {
-        "branches": 75,
-        "functions": 75,
-        "lines": 75,
-        "statements": 75
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
       }
     }
   }
