@@ -99,7 +99,9 @@ describe('SpeechRecognition', () => {
   test('exposes Speech Recognition object', () => {
     const recognitionManager = mockRecognitionManager()
 
-    expect(SpeechRecognition.getRecognition()).toEqual(recognitionManager.recognition)
+    expect(SpeechRecognition.getRecognition()).toEqual(
+      recognitionManager.recognition
+    )
   })
 
   test('ignores speech when listening is stopped', () => {
@@ -155,7 +157,9 @@ describe('SpeechRecognition', () => {
 
   test('does not transcibe when listening is started but not transcribing', async () => {
     mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition({ transcribing: false }))
+    const { result } = renderHook(() =>
+      useSpeechRecognition({ transcribing: false })
+    )
     const speech = 'This is a test'
 
     await act(async () => {
@@ -241,7 +245,7 @@ describe('SpeechRecognition', () => {
     expect(finalTranscript).toEqual('')
   })
 
-  test('sets interim transcript correctly', async() => {
+  test('sets interim transcript correctly', async () => {
     mockRecognitionManager()
     const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
@@ -293,7 +297,10 @@ describe('SpeechRecognition', () => {
       SpeechRecognition.getRecognition().say(speech, { isAndroid: true })
     })
     act(() => {
-      SpeechRecognition.getRecognition().say(speech, { onlyFirstResult: true, isAndroid: true })
+      SpeechRecognition.getRecognition().say(speech, {
+        onlyFirstResult: true,
+        isAndroid: true
+      })
     })
 
     const { transcript, interimTranscript, finalTranscript } = result.current
@@ -337,7 +344,9 @@ describe('SpeechRecognition', () => {
 
   test('does not reset transcript on subsequent discontinuous speech when clearTranscriptOnListen not set', async () => {
     mockRecognitionManager()
-    const { result } = renderHook(() => useSpeechRecognition({ clearTranscriptOnListen: false }))
+    const { result } = renderHook(() =>
+      useSpeechRecognition({ clearTranscriptOnListen: false })
+    )
     const speech = 'This is a test'
 
     await act(async () => {
@@ -696,4 +705,77 @@ describe('SpeechRecognition', () => {
     expect(hook1.result.current.interimTranscript).toEqual('')
     expect(hook1.result.current.finalTranscript).toEqual(speech)
   })
+})
+
+test('we are getting correct trancript match precentege for every element of stringsYouExpectToListen array', async () => {
+  mockRecognitionManager()
+  const { result } = renderHook(() =>
+    useSpeechRecognition({ stringsYouExpectToListen })
+  )
+  const stringsYouExpectToListen = ['Mary', 'Mario', 'Bro', 'Maria']
+  const speech = 'Maria'
+
+  await act(async () => {
+    await SpeechRecognition.startListening()
+  })
+  act(() => {
+    SpeechRecognition.getRecognition().say(speech)
+  })
+  const { stringsSimilarToTranscript } = result.current
+  expect(stringsSimilarToTranscript).toEqual([
+    { stringToCheck: 'Mary', similarityWithTranscript: 0.5714285714285714 },
+    { stringToCheck: 'Mario', similarityWithTranscript: 0.75 },
+    { stringToCheck: 'Maria', similarityWithTranscript: 1 }
+  ])
+})
+
+test('we are getting correct similarString array if matchAboveSimilarityRatio is changed', async () => {
+  mockRecognitionManager()
+  const { result } = renderHook(() =>
+    useSpeechRecognition({
+      stringsYouExpectToListen,
+      matchAboveSimilarityRatio
+    })
+  )
+  const stringsYouExpectToListen = ['Mary', 'Mario', 'Bro', 'Maria']
+  const matchAboveSimilarityRatio = 0.7
+  const speech = 'Maria'
+
+  await act(async () => {
+    await SpeechRecognition.startListening()
+  })
+  act(() => {
+    SpeechRecognition.getRecognition().say(speech)
+  })
+  const { stringsSimilarToTranscript } = result.current
+  expect(stringsSimilarToTranscript).toEqual([
+    { stringToCheck: 'Mario', similarityWithTranscript: 0.75 },
+    { stringToCheck: 'Maria', similarityWithTranscript: 1 }
+  ])
+})
+
+test('we are getting correct similarString array if stringSimilarityRatioFunc is changed', async () => {
+  mockRecognitionManager()
+  const { result } = renderHook(() =>
+    useSpeechRecognition({
+      stringsYouExpectToListen,
+      matchAboveSimilarityRatio,
+      stringSimilarityRatioFunc
+    })
+  )
+  const stringsYouExpectToListen = ['Mary', 'Mario', 'Bro', 'Maria']
+  const matchAboveSimilarityRatio = 0.7
+  const stringSimilarityRatioFunc = (s1, s2) => (s1 === s2 ? 1 : 0)
+  const speech = 'Maria'
+
+  await act(async () => {
+    await SpeechRecognition.startListening()
+  })
+  act(() => {
+    SpeechRecognition.getRecognition().say(speech)
+  })
+  const { stringsSimilarToTranscript } = result.current
+  expect(stringsSimilarToTranscript).toEqual([
+    { stringToCheck: 'Maria', similarityWithTranscript: 1 }
+  ])
 })
