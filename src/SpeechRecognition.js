@@ -1,5 +1,5 @@
 import { useState, useEffect, useReducer, useCallback } from 'react'
-import { concatTranscripts, commandToRegExp } from './utils'
+import { concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient } from './utils'
 import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
@@ -22,15 +22,27 @@ const useSpeechRecognition = ({
 
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
-      commands.forEach(({ command, callback, matchInterim = false }) => {
-        const pattern = commandToRegExp(command)
+      commands.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
         const input = !newFinalTranscript && matchInterim
           ? newInterimTranscript.trim()
           : newFinalTranscript.trim()
-        const result = pattern.exec(input)
-        if (result) {
-          const parameters = result.slice(1)
-          callback(...parameters)
+        if (isFuzzyMatch) {
+          const commandToString = (typeof command === 'object') ? command.toString() : command
+          const commandWithoutSpecials = commandToString
+            .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, '')
+            .replace(/  +/g, ' ')
+            .trim()
+          const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
+          if (howSimilar >= fuzzyMatchingThreshold) {
+            callback(commandWithoutSpecials, input, howSimilar)
+          }
+        } else {
+          const pattern = commandToRegExp(command)
+          const result = pattern.exec(input)
+          if (result) {
+            const parameters = result.slice(1)
+            callback(...parameters)
+          }
         }
       })
     }, [commands]
