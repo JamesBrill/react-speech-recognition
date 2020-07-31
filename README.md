@@ -134,6 +134,8 @@ To respond when the user says a particular phrase, you can pass in a list of com
 - `command`: This is a string or `RegExp` representing the phrase you want to listen for
 - `callback`: The function that is executed when the command is spoken
 - `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
+- `isFuzzyMatch`: Boolean that determines whether the spoken phrase should be fuzzy matched against the `command`. This will let you know the similarity ratio between the phrase spoken by the user and the `command`. Fuzzy matching is intended to work only for commands that are string literals without special characters. If the `command` is a string with special characters or a `RegExp` it will be converted to a string without special characters at all. You could use this for phrases that are expected to be spoken by the user but are potentially easy to mispronounce or be misinterpreted by the Speech Recognition engine (e.g. names of places, sport teams, restaurant menu items). This is `false` by default.
+- `fuzzyMatchingThreshold`: This is a number ratio. If this number is smaller than the fuzzy matching similarity ratio the `callback` will be invoked. You should set this only if `isFuzzyMatch` is `true`. It takes values between `0` and `1`. The default value is `0.8`.
 
 ### Command symbols
 
@@ -177,6 +179,13 @@ const Dictaphone = () => {
       command: 'Hello',
       callback: () => setMessage('Hi there!'),
       matchInterim: true
+    },
+    {
+      command: 'Beijing',
+      callback: (command, spokenPhrase, similarityRatio) => setMessage(`${command} and ${spokenPhrase} are ${similarityRatio * 100}% similar`),
+      // If the spokenPhrase is Benji, the message would be ' Beijing and Benji are 40% similar
+      isFuzzyMatch: true,
+      fuzzyMatchingThreshold: 0.2
     }
   ]
 
