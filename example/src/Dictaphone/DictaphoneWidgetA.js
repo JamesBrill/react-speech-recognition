@@ -17,6 +17,13 @@ const DictaphoneWidgetA = () => {
       command: 'Hello',
       callback: () => setMessage('Hi there'),
       matchInterim: true
+    },
+    {
+      command: 'Beijing',
+      callback: (command, spokenPhrase, similarityRatio) => setMessage(`${command} and ${spokenPhrase} are ${similarityRatio * 100}% similar`),
+      // If the spokenPhrase is "Benji", the message would be "Beijing and Benji are 40% similar"
+      isFuzzyMatch: true,
+      fuzzyMatchingThreshold: 0.2
     }
   ]
 
