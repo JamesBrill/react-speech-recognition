@@ -5,7 +5,7 @@ import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 import { StartListeningParameter, CustomHookParameter } from './types'
 
-const useSpeechRecognition = (param: CustomHookParameter = {}) => {
+const useSpeechRecognition = (param: CustomHookParameter = {}): any => {
   const { transcribing, clearTranscriptOnListen, commands} = param
   const [recognitionManager] = useState(
     SpeechRecognition.getRecognitionManager()
@@ -40,7 +40,7 @@ const useSpeechRecognition = (param: CustomHookParameter = {}) => {
           if (isFuzzyMatch) {
             const commandToString =
               typeof command === "object"
-                ? (command as Object).toString()
+                ? (command as any).toString()
                 : command;
             const commandWithoutSpecials = commandToString
               .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, "")
@@ -122,29 +122,29 @@ const useSpeechRecognition = (param: CustomHookParameter = {}) => {
 let recognitionManager: RecognitionManager
 const SpeechRecognition = {
   counter: 0,
-  getRecognitionManager: () => {
+  getRecognitionManager: (): RecognitionManager => {
     if (!recognitionManager) {
       recognitionManager = new RecognitionManager();
     }
     return recognitionManager;
   },
-  getRecognition: () => {
+  getRecognition: (): any => {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     return recognitionManager.getRecognition();
   },
-  startListening: async (startListeningParam: StartListeningParameter = {}) => {
+  startListening: async (startListeningParam: StartListeningParameter = {}): Promise<void> => {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     await recognitionManager.startListening(startListeningParam);
   },
-  stopListening: () => {
+  stopListening: (): void => {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     recognitionManager.stopListening();
   },
-  abortListening: () => {
+  abortListening: (): void => {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     recognitionManager.abortListening();
   },
-  browserSupportsSpeechRecognition: () => {
+  browserSupportsSpeechRecognition: (): boolean => {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     return recognitionManager.browserSupportsSpeechRecognition;
   },

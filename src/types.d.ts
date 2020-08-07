@@ -4,9 +4,9 @@ export interface CustomHookParameter {
   commands?: {
     command: any,
     callback: any,
-    matchInterim: boolean
-    isFuzzyMatch: boolean
-    fuzzyMatchingThreshold: number
+    matchInterim?: boolean
+    isFuzzyMatch?: boolean
+    fuzzyMatchingThreshold?: number
   }[]
 }
 export interface StartListeningParameter {

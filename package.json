@@ -6,7 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint src tests",
+    "lint": "eslint src/**/*.{js,ts,tsx} tests/**/*.{js,ts,tsx} --quiet --fix",
     "test": "jest --testPathIgnorePatterns=example",
     "coverage": "npm run coverage:collect && npm run coverage:report",
     "coverage:collect": "jest --testPathIgnorePatterns=example --collectCoverageFrom=src/**/*.{js,jsx} --coverage",
@@ -25,6 +25,7 @@
     "type": "git",
     "url": "https://github.com/JamesBrill/react-speech-recognition.git"
   },
+  "homepage": "https://github.com/JamesBrill/react-speech-recognition#readme",
   "keywords": [
     "react",
     "reactjs",
@@ -40,14 +41,11 @@
     "react": ">=16.8.0"
   },
   "devDependencies": {
-    "@babel/cli": "^7.10.3",
-    "@babel/core": "^7.10.3",
-    "@babel/preset-env": "^7.10.3",
-    "@babel/preset-react": "^7.10.1",
     "@testing-library/react-hooks": "^3.3.0",
     "@types/jest": "^26.0.9",
-    "babel-eslint": "^10.0.2",
-    "eslint": "^6.0.1",
+    "@typescript-eslint/eslint-plugin": "^3.8.0",
+    "@typescript-eslint/parser": "^3.8.0",
+    "eslint": "^6.8.0",
     "eslint-config-standard": "^13.0.1",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.18.0",
@@ -72,5 +70,6 @@
         "statements": 80
       }
     }
-  }
+  },
+  "dependencies": {}
 }

@@ -5,14 +5,14 @@
         "jest/globals": true
     },
     "extends": [
-        "standard",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "globals": {
         "Atomics": "readonly",
         "SharedArrayBuffer": "readonly"
     },
-    "parser": "babel-eslint",
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true
@@ -26,7 +26,11 @@
     ],
     "rules": {
         "space-before-function-paren": 0,
-        "standard/no-callback-literal": 0
+        "standard/no-callback-literal": 0,
+        "prefer-rest-params": 1,
+        "@typescript-eslint/no-this-alias": 1,
+        "@typescript-eslint/ban-types": 0,
+        "@typescript-eslint/no-empty-function": 0
     },
     "settings": {
         "react": {

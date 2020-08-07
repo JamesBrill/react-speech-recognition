@@ -6,7 +6,7 @@ interface ReducerState {
   finalTranscript: string
 }
 
-interface ReducerAction {
+export interface ReducerAction {
   type: string
   payload?: {
     interimTranscript: string
@@ -14,21 +14,27 @@ interface ReducerAction {
   }
 }
 
-const transcriptReducer = (state: ReducerState, action: ReducerAction) => {
+const transcriptReducer = (
+  state: ReducerState,
+  action: ReducerAction
+): ReducerState => {
   switch (action.type) {
     case CLEAR_TRANSCRIPT:
       return {
-        interimTranscript: '',
-        finalTranscript: ''
-      }
+        interimTranscript: "",
+        finalTranscript: "",
+      };
     case APPEND_TRANSCRIPT:
       return {
-        interimTranscript: action?.payload?.interimTranscript ?? '',
-        finalTranscript: concatTranscripts(state.finalTranscript, action.payload?.finalTranscript ?? '')
-      }
+        interimTranscript: action?.payload?.interimTranscript ?? "",
+        finalTranscript: concatTranscripts(
+          state.finalTranscript,
+          action.payload?.finalTranscript ?? ""
+        ),
+      };
     default:
-      throw new Error()
+      throw new Error();
   }
-}
+};
 
 export { transcriptReducer }
