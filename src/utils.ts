@@ -1,20 +1,20 @@
-const debounce = (func, wait, immediate) => {
-  let timeout
+const debounce = (func: Function, wait: number, immediate: boolean) => {
+  let timeout: number | undefined
   return function() {
     const context = this
     const args = arguments
     const later = function() {
-      timeout = null
+      timeout = undefined
       if (!immediate) func.apply(context, args)
     }
     const callNow = immediate && !timeout
     clearTimeout(timeout)
-    timeout = setTimeout(later, wait)
+    timeout = window.setTimeout(later, wait)
     if (callNow) func.apply(context, args)
   }
 }
 
-const concatTranscripts = (...transcriptParts) => {
+const concatTranscripts = (...transcriptParts: string[]) => {
   return transcriptParts.map(t => t.trim()).join(' ').trim()
 }
 
@@ -24,7 +24,7 @@ const optionalRegex = /(\(\?:[^)]+\))\?/g
 const namedParam = /(\(\?)?:\w+/g
 const splatParam = /\*/g
 const escapeRegExp = /[-{}[\]+?.,\\^$|#]/g
-const commandToRegExp = (command) => {
+const commandToRegExp = (command: RegExp | string) => {
   if (command instanceof RegExp) {
     return new RegExp(command.source, 'i')
   }
@@ -40,7 +40,7 @@ const commandToRegExp = (command) => {
 }
 
 // this is from https://github.com/aceakash/string-similarity
-const compareTwoStringsUsingDiceCoefficient = (first, second) => {
+const compareTwoStringsUsingDiceCoefficient = (first: string, second: string) => {
   first = first.replace(/\s+/g, '').toLowerCase()
   second = second.replace(/\s+/g, '').toLowerCase()
 

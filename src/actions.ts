@@ -4,7 +4,7 @@ export const clearTrancript = () => {
   return { type: CLEAR_TRANSCRIPT }
 }
 
-export const appendTrancript = (interimTranscript, finalTranscript) => {
+export const appendTrancript = (interimTranscript: string, finalTranscript: string) => {
   return {
     type: APPEND_TRANSCRIPT,
     payload: {

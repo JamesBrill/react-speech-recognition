@@ -1,15 +1,27 @@
 import isAndroid from './isAndroid'
 import { debounce, concatTranscripts } from './utils'
+import { StartListeningParameter, DisconnectType, CallbacksType } from './types'
 
 export default class RecognitionManager {
+  recognition: any
+  browserSupportsSpeechRecognition: boolean
+  pauseAfterDisconnect: boolean
+  interimTranscript: string
+  finalTranscript: string
+  listening: boolean
+  subscribers: {
+    id: CallbacksType | undefined
+  }
+  onStopListening: Function
+
   constructor() {
     const BrowserSpeechRecognition =
-      typeof window !== 'undefined' &&
+      typeof window !== "undefined" &&
       (window.SpeechRecognition ||
-        window.webkitSpeechRecognition ||
-        window.mozSpeechRecognition ||
-        window.msSpeechRecognition ||
-        window.oSpeechRecognition)
+        (window as any).webkitSpeechRecognition ||
+        (window as any).mozSpeechRecognition ||
+        (window as any).msSpeechRecognition ||
+        (window as any).oSpeechRecognition);
     this.recognition = BrowserSpeechRecognition
       ? new BrowserSpeechRecognition()
       : null
@@ -18,7 +30,9 @@ export default class RecognitionManager {
     this.interimTranscript = ''
     this.finalTranscript = ''
     this.listening = false
-    this.subscribers = {}
+    this.subscribers = {
+      id: undefined
+    }
     this.onStopListening = () => {}
 
     if (this.browserSupportsSpeechRecognition) {
@@ -38,37 +52,37 @@ export default class RecognitionManager {
     }
   }
 
-  subscribe(id, callbacks) {
-    this.subscribers[id] = callbacks
+  subscribe(id: number, callbacks: CallbacksType) {
+    this.subscribers.id = callbacks
   }
 
-  unsubscribe(id) {
-    delete this.subscribers[id]
+  unsubscribe(id: number) {
+    delete this.subscribers.id
   }
 
-  emitListeningChange(listening) {
+  emitListeningChange(listening: boolean) {
     this.listening = listening
     Object.keys(this.subscribers).forEach((id) => {
-      const { onListeningChange } = this.subscribers[id]
+      const { onListeningChange } = this.subscribers.id as CallbacksType
       onListeningChange(listening)
     })
   }
 
-  emitTranscriptChange(interimTranscript, finalTranscript) {
+  emitTranscriptChange(interimTranscript: string, finalTranscript: string) {
     Object.keys(this.subscribers).forEach((id) => {
-      const { onTranscriptChange } = this.subscribers[id]
+      const { onTranscriptChange } = this.subscribers.id as CallbacksType
       onTranscriptChange(interimTranscript, finalTranscript)
     })
   }
 
   emitClearTranscript() {
     Object.keys(this.subscribers).forEach((id) => {
-      const { onClearTranscript } = this.subscribers[id]
+      const { onClearTranscript } = this.subscribers.id as CallbacksType
       onClearTranscript()
     })
   }
 
-  disconnect(disconnectType) {
+  disconnect(disconnectType: DisconnectType) {
     if (this.browserSupportsSpeechRecognition) {
       switch (disconnectType) {
         case 'ABORT':
@@ -102,7 +116,7 @@ export default class RecognitionManager {
     this.pauseAfterDisconnect = false
   }
 
-  updateTranscript(event) {
+  updateTranscript(event: SpeechRecognitionEvent) {
     this.interimTranscript = ''
     this.finalTranscript = ''
     for (let i = event.resultIndex; i < event.results.length; ++i) {
@@ -118,7 +132,7 @@ export default class RecognitionManager {
     this.emitTranscriptChange(this.interimTranscript, this.finalTranscript)
   }
 
-  updateFinalTranscript(newFinalTranscript) {
+  updateFinalTranscript(newFinalTranscript: string) {
     this.finalTranscript = concatTranscripts(
       this.finalTranscript,
       newFinalTranscript
@@ -129,7 +143,7 @@ export default class RecognitionManager {
     this.disconnect('RESET')
   }
 
-  async startListening({ continuous = false, language } = {}) {
+  async startListening({ continuous = false, language }: StartListeningParameter = {}) {
     if (!this.browserSupportsSpeechRecognition) {
       return
     }

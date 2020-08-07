@@ -1,4 +1,5 @@
 # react-speech-recognition
+
 A React hook that converts speech from the microphone to text and makes it available to your React components.
 
 [![npm version](https://img.shields.io/npm/v/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
@@ -7,6 +8,7 @@ A React hook that converts speech from the microphone to text and makes it avail
 [![Coverage Status](https://coveralls.io/repos/github/JamesBrill/react-speech-recognition/badge.svg?branch=commands)](https://coveralls.io/github/JamesBrill/react-speech-recognition?branch=commands)
 
 ## How it works
+
 `useSpeechRecognition` is a React hook that gives a component access to a transcript of speech picked up from the user's microphone.
 
 `SpeechRecognition` manages the global state of the Web Speech API, exposing functions to turn the microphone on and off.
@@ -37,7 +39,7 @@ To import in your React code:
 
 The most basic example of a component using this hook would be:
 
-```
+```js
 import React from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
@@ -66,7 +68,7 @@ You can see more examples in the example React app attached to this repo. See [D
 
 Currently, this feature is not supported in all browsers, with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
-```
+```js
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
   // Render some fallback content
 }
@@ -92,7 +94,7 @@ Before consuming the transcript, you should be familiar with `SpeechRecognition`
 
 To start listening to speech, call the `startListening` function.
 
-```
+```js
 SpeechRecognition.startListening()
 ```
 
@@ -102,13 +104,13 @@ This is an asynchronous function, so it will need to be awaited if you want to d
 
 To turn the microphone off, but still finish processing any speech in progress, call `stopListening`.
 
-```
+```js
 SpeechRecognition.stopListening()
 ```
 
 To turn the microphone off, and cancel the processing of any speech in progress, call `abortListening`.
 
-```
+```js
 SpeechRecognition.abortListening()
 ```
 
@@ -116,7 +118,7 @@ SpeechRecognition.abortListening()
 
 To make the microphone transcript available in your component, simply add:
 
-```
+```js
 const { transcript } = useSpeechRecognition()
 ```
 
@@ -124,38 +126,55 @@ const { transcript } = useSpeechRecognition()
 
 To set the transcript to an empty string, you can call the `resetTranscript` function provided by `useSpeechRecognition`. Note that this is local to your component and does not affect any other components using Speech Recognition.
 
-```
+```js
 const { resetTranscript } = useSpeechRecognition()
 ```
 
 ## Commands
 
 To respond when the user says a particular phrase, you can pass in a list of commands to the `useSpeechRecognition` hook. Each command is an object with the following properties:
-- `command`: This is a string or `RegExp` representing the phrase you want to listen for
-- `callback`: The function that is executed when the command is spoken
-- `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
-- `isFuzzyMatch`: Boolean that determines whether the comparison between speech and `command` is based on similarity rather than an exact match. Fuzzy matching is useful for commands that are easy to mispronounce or be misinterpreted by the Speech Recognition engine (e.g. names of places, sports teams, restaurant menu items). It is intended for commands that are string literals without special characters. If `command` is a string with special characters or a `RegExp`, it will be converted to a string without special characters when fuzzy matching. The similarity that is needed to match the command can be configured with `fuzzyMatchingThreshold`. `isFuzzyMatch` is `false` by default. When it is set to `true`, it will pass three arguments to `callback`:
-  - The value of `command`
-  - The speech that matched `command`
-  - The similarity between `command` and the speech
-- `fuzzyMatchingThreshold`: If the similarity of speech to `command` is higher than this value when `isFuzzyMatch` is turned on, the `callback` will be invoked. You should set this only if `isFuzzyMatch` is `true`. It takes values between `0` (will match anything) and `1` (needs an exact match). The default value is `0.8`.
+
+* `command`: This is a string or `RegExp` representing the phrase you want to listen for
+
+* `callback`: The function that is executed when the command is spoken
+
+* `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
+
+* `isFuzzyMatch`: Boolean that determines whether the comparison between speech and `command` is based on similarity rather than an exact match. Fuzzy matching is useful for commands that are easy to mispronounce or be misinterpreted by the Speech Recognition engine (e.g. names of places, sports teams, restaurant menu items). It is intended for commands that are string literals without special characters. If `command` is a string with special characters or a `RegExp`, it will be converted to a string without special characters when fuzzy matching. The similarity that is needed to match the command can be configured with `fuzzyMatchingThreshold`. `isFuzzyMatch` is `false` by default. When it is set to `true`, it will pass three arguments to `callback`:
+
+  * The value of `command`
+
+  * The speech that matched `command`
+
+  * The similarity between `command` and the speech
+
+* `fuzzyMatchingThreshold`: If the similarity of speech to `command` is higher than this value when `isFuzzyMatch` is turned on, the `callback` will be invoked. You should set this only if `isFuzzyMatch` is `true`. It takes values between `0` (will match anything) and `1` (needs an exact match). The default value is `0.8`.
 
 ### Command symbols
 
 To make commands easier to write, the following symbols are supported:
-- Splats: this is just a `*` and will match multi-word text:
-  - Example: `'I would like to order *'`
-  - The words that match the splat will be passed into the callback, one argument per splat
-- Named variables: this is written `:<name>` and will match a single word:
-  - Example: `'I am :height metres tall'`
-  - The one word that matches the named variable will be passed into the callback
-- Optional words: this is a phrase wrapped in parentheses `(` and `)`, and is not required to match the command:
-  - Example: `'Pass the salt (please)'`
-  - The above example would match both `'Pass the salt'` and `'Pass the salt please'`
+
+* Splats: this is just a `*` and will match multi-word text:
+
+  * Example: `'I would like to order *'`
+
+  * The words that match the splat will be passed into the callback, one argument per splat
+
+* Named variables: this is written `:<name>` and will match a single word:
+
+  * Example: `'I am :height metres tall'`
+
+  * The one word that matches the named variable will be passed into the callback
+
+* Optional words: this is a phrase wrapped in parentheses `(` and `)`, and is not required to match the command:
+
+  * Example: `'Pass the salt (please)'`
+
+  * The above example would match both `'Pass the salt'` and `'Pass the salt please'`
 
 ### Example with commands
 
-```
+```js
 import React, { useState } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
@@ -214,7 +233,7 @@ By default, the microphone will stop listening when the user stops speaking. Thi
 
 If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
 
-```
+```js
 SpeechRecognition.startListening({ continuous: true })
 ```
 
@@ -222,7 +241,7 @@ SpeechRecognition.startListening({ continuous: true })
 
 To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`. See [here](docs/API.md#language-string) for a list of supported languages.
 
-```
+```js
 SpeechRecognition.startListening({ language: 'zh-CN' })
 ```
 
@@ -235,7 +254,8 @@ If you are building an offline web app, you can detect when the browser is offli
 ## Developing
 
 You can run an example React app that uses `react-speech-recognition` with:
-```
+
+```sh
 npm i
 npm run dev
 ```

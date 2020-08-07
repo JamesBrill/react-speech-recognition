@@ -9,7 +9,7 @@
 
 React hook for consuming speech recorded by the microphone. Import with:
 
-```
+```js
 import { useSpeechRecognition } from 'react-speech-recognition'
 ```
 
@@ -17,7 +17,7 @@ import { useSpeechRecognition } from 'react-speech-recognition'
 
 These are passed as an object argument to `useSpeechRecognition`:
 
-```
+```js
 useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands })
 ```
 
@@ -37,7 +37,7 @@ See [Commands](../README.md#Commands).
 
 These are returned from `useSpeechRecognition`:
 
-```
+```js
   const {
     transcript,
     interimTranscript,
@@ -82,7 +82,7 @@ Transcription of speech that the Web Speech API has finished processing.
 
 Object providing functions to manage the global state of the microphone. Import with:
 
-```
+```js
 import SpeechRecognition from 'react-speech-recognition'
 ```
 
@@ -92,7 +92,7 @@ import SpeechRecognition from 'react-speech-recognition'
 
 Start listening to speech.
 
-```
+```js
 SpeechRecognition.startListening()
 ```
 
@@ -100,7 +100,7 @@ This is an asynchronous function, so it will need to be awaited if you want to d
 
 It can be called with an options argument. For example:
 
-```
+```js
 SpeechRecognition.startListening({
   continuous: true,
   language: 'zh-CN'
@@ -115,7 +115,7 @@ By default, the microphone will stop listening when the user stops speaking (`co
 
 If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
 
-```
+```js
 SpeechRecognition.startListening({ continuous: true })
 ```
 
@@ -123,7 +123,7 @@ SpeechRecognition.startListening({ continuous: true })
 
 To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`.
 
-```
+```js
 SpeechRecognition.startListening({ language: 'zh-CN' })
 ```
 
@@ -211,7 +211,7 @@ Some known supported languages (based on [this Stack Overflow post](http://stack
 
 Turn the microphone off, but still finish processing any speech in progress.
 
-```
+```js
 SpeechRecognition.stopListening()
 ```
 
@@ -219,7 +219,7 @@ SpeechRecognition.stopListening()
 
 Turn the microphone off, and cancel the processing of any speech in progress.
 
-```
+```js
 SpeechRecognition.abortListening()
 ```
 
@@ -227,7 +227,7 @@ SpeechRecognition.abortListening()
 
 The Web Speech API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
 
-```
+```js
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
   // Render some fallback content
 }

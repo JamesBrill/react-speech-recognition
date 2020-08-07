@@ -1,8 +1,8 @@
 import { renderHook, act } from '@testing-library/react-hooks'
-import '../tests/vendor/corti'
-import SpeechRecognition, { useSpeechRecognition } from './SpeechRecognition'
-import isAndroid from './isAndroid'
-import RecognitionManager from './RecognitionManager'
+import '../../tests/vendor/corti'
+import SpeechRecognition, { useSpeechRecognition } from '../SpeechRecognition'
+import isAndroid from '../isAndroid'
+import RecognitionManager from '../RecognitionManager'
 
 jest.mock('./isAndroid')
 

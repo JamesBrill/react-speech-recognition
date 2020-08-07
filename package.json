@@ -3,8 +3,9 @@
   "version": "3.1.0",
   "description": "💬Speech recognition for your React app",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
-    "build": "babel src -d lib --ignore '**/*.test.js'",
+    "build": "tsc",
     "lint": "eslint src tests",
     "test": "jest --testPathIgnorePatterns=example",
     "coverage": "npm run coverage:collect && npm run coverage:report",
@@ -18,7 +19,7 @@
     "bump": "npm version patch -m \"v%s\" && git push --tags"
   },
   "watch": {
-    "update-example": "src/*.js"
+    "update-example": "src/*.ts"
   },
   "repository": {
     "type": "git",
@@ -44,6 +45,7 @@
     "@babel/preset-env": "^7.10.3",
     "@babel/preset-react": "^7.10.1",
     "@testing-library/react-hooks": "^3.3.0",
+    "@types/jest": "^26.0.9",
     "babel-eslint": "^10.0.2",
     "eslint": "^6.0.1",
     "eslint-config-standard": "^13.0.1",
@@ -58,7 +60,8 @@
     "npm-watch": "^0.6.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-test-renderer": "16.13.1"
+    "react-test-renderer": "16.13.1",
+    "typescript": "^3.9.7"
   },
   "jest": {
     "coverageThreshold": {
