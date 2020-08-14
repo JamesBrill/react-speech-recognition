@@ -24,7 +24,12 @@ const DictaphoneWidgetA = () => {
       // If the spokenPhrase is "Benji", the message would be "Beijing and Benji are 40% similar"
       isFuzzyMatch: true,
       fuzzyMatchingThreshold: 0.2
-    }
+    },
+    {
+      command: 'clear',
+      callback: ({ resetTranscript }) => resetTranscript(),
+      matchInterim: true
+    },
   ]
 
   return (
