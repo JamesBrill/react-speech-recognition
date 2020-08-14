@@ -39,7 +39,7 @@ const useSpeechRecognition = ({
             .trim()
           const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
           if (howSimilar >= fuzzyMatchingThreshold) {
-            callback(commandWithoutSpecials, input, howSimilar)
+            callback(commandWithoutSpecials, input, howSimilar, { resetTranscript })
           }
         } else {
           const pattern = commandToRegExp(command)
