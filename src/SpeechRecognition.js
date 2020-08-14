@@ -20,6 +20,11 @@ const useSpeechRecognition = ({
     dispatch(clearTrancript())
   }
 
+  const resetTranscript = () => {
+    recognitionManager.resetTranscript()
+    clearTranscript()
+  }
+
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
       commands.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
@@ -41,7 +46,7 @@ const useSpeechRecognition = ({
           const result = pattern.exec(input)
           if (result) {
             const parameters = result.slice(1)
-            callback(...parameters)
+            callback(...parameters, { resetTranscript })
           }
         }
       })
@@ -64,11 +69,6 @@ const useSpeechRecognition = ({
       }
     }, [clearTranscriptOnListen]
   )
-
-  const resetTranscript = () => {
-    recognitionManager.resetTranscript()
-    clearTranscript()
-  }
 
   useEffect(() => {
     const id = SpeechRecognition.counter
