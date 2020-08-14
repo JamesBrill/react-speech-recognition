@@ -209,6 +209,35 @@ describe('SpeechRecognition', () => {
     expect(finalTranscript).toEqual(expectedTranscript)
   })
 
+  test('can reset transcript from command callback', async () => {
+    mockRecognitionManager()
+    const commands = [
+      {
+        command: 'clear',
+        callback: ({ resetTranscript }) => resetTranscript()
+      }
+    ]
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: true })
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say('test')
+    })
+
+    expect(result.current.transcript).toBe('test')
+
+    act(() => {
+      SpeechRecognition.getRecognition().say('clear')
+    })
+
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
+  })
+
   test('can set language', async () => {
     mockRecognitionManager()
     renderHook(() => useSpeechRecognition())
@@ -421,7 +450,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
@@ -432,7 +462,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza')
+    expect(mockCommandCallback).toBeCalledWith('pizza', { resetTranscript })
   })
 
   test('matches one splat at the end of the sentence', async () => {
@@ -444,7 +474,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
@@ -455,7 +486,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza and fries')
+    expect(mockCommandCallback).toBeCalledWith('pizza and fries', { resetTranscript })
   })
 
   test('matches two splats', async () => {
@@ -467,7 +498,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
@@ -478,7 +510,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries')
+    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries', { resetTranscript })
   })
 
   test('matches optional words when optional word spoken', async () => {
@@ -534,7 +566,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I spy with my little eye'
 
     await act(async () => {
@@ -545,7 +578,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('spy')
+    expect(mockCommandCallback).toBeCalledWith('spy', { resetTranscript })
   })
 
   test('matches regex', async () => {
@@ -611,7 +644,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback3
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries are great'
 
     await act(async () => {
@@ -622,9 +656,9 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback1.mock.calls.length).toBe(1)
-    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great')
+    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great', { resetTranscript })
     expect(mockCommandCallback2.mock.calls.length).toBe(1)
-    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza')
+    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', { resetTranscript })
     expect(mockCommandCallback3.mock.calls.length).toBe(0)
   })
 
@@ -779,7 +813,8 @@ test('callback is called with command, transcript and similarity ratio between t
       fuzzyMatchingThreshold: 0.5
     }
   ]
-  renderHook(() => useSpeechRecognition({ commands }))
+  const { result } = renderHook(() => useSpeechRecognition({ commands }))
+  const { resetTranscript } = result.current
   const speech = 'I want to drink'
 
   await act(async () => {
@@ -790,7 +825,7 @@ test('callback is called with command, transcript and similarity ratio between t
   })
 
   expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6)
+  expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6, { resetTranscript })
 })
 
 test('different callbacks can be called for the same speech and with fuzzyMatchingThreshold', async () => {
@@ -835,7 +870,8 @@ test('when command is regex with fuzzy match true runs similarity check with reg
       isFuzzyMatch: true
     }
   ]
-  renderHook(() => useSpeechRecognition({ commands }))
+  const { result } = renderHook(() => useSpeechRecognition({ commands }))
+  const { resetTranscript } = result.current
   const speech = 'This is a test'
 
   await act(async () => {
@@ -846,7 +882,7 @@ test('when command is regex with fuzzy match true runs similarity check with reg
   })
 
   expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571)
+  expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571, { resetTranscript })
 })
 
 test('when command is string special characters with fuzzy match true, special characters are removed from string and then we test similarity', async () => {
@@ -859,7 +895,8 @@ test('when command is string special characters with fuzzy match true, special c
       isFuzzyMatch: true
     }
   ]
-  renderHook(() => useSpeechRecognition({ commands }))
+  const { result } = renderHook(() => useSpeechRecognition({ commands }))
+  const { resetTranscript } = result.current
   const speech = 'I would like a pizza'
 
   await act(async () => {
@@ -870,5 +907,5 @@ test('when command is string special characters with fuzzy match true, special c
   })
 
   expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1)
+  expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { resetTranscript })
 })

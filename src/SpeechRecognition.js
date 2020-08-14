@@ -20,6 +20,11 @@ const useSpeechRecognition = ({
     dispatch(clearTrancript())
   }
 
+  const resetTranscript = useCallback(() => {
+    recognitionManager.resetTranscript()
+    clearTranscript()
+  }, [recognitionManager])
+
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
       commands.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
@@ -34,26 +39,26 @@ const useSpeechRecognition = ({
             .trim()
           const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
           if (howSimilar >= fuzzyMatchingThreshold) {
-            callback(commandWithoutSpecials, input, howSimilar)
+            callback(commandWithoutSpecials, input, howSimilar, { resetTranscript })
           }
         } else {
           const pattern = commandToRegExp(command)
           const result = pattern.exec(input)
           if (result) {
             const parameters = result.slice(1)
-            callback(...parameters)
+            callback(...parameters, { resetTranscript })
           }
         }
       })
-    }, [commands]
+    }, [commands, resetTranscript]
   )
 
   const handleTranscriptChange = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
-      matchCommands(newInterimTranscript, newFinalTranscript)
       if (transcribing) {
         dispatch(appendTrancript(newInterimTranscript, newFinalTranscript))
       }
+      matchCommands(newInterimTranscript, newFinalTranscript)
     }, [matchCommands, transcribing]
   )
 
@@ -64,11 +69,6 @@ const useSpeechRecognition = ({
       }
     }, [clearTranscriptOnListen]
   )
-
-  const resetTranscript = () => {
-    recognitionManager.resetTranscript()
-    clearTranscript()
-  }
 
   useEffect(() => {
     const id = SpeechRecognition.counter
