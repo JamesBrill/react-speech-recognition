@@ -784,7 +784,8 @@ test('callback is called with command, transcript and similarity ratio between t
       fuzzyMatchingThreshold: 0.5
     }
   ]
-  renderHook(() => useSpeechRecognition({ commands }))
+  const { result } = renderHook(() => useSpeechRecognition({ commands }))
+  const { resetTranscript } = result.current
   const speech = 'I want to drink'
 
   await act(async () => {
@@ -795,7 +796,7 @@ test('callback is called with command, transcript and similarity ratio between t
   })
 
   expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6)
+  expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6, { resetTranscript })
 })
 
 test('different callbacks can be called for the same speech and with fuzzyMatchingThreshold', async () => {
@@ -840,7 +841,8 @@ test('when command is regex with fuzzy match true runs similarity check with reg
       isFuzzyMatch: true
     }
   ]
-  renderHook(() => useSpeechRecognition({ commands }))
+  const { result } = renderHook(() => useSpeechRecognition({ commands }))
+  const { resetTranscript } = result.current
   const speech = 'This is a test'
 
   await act(async () => {
@@ -851,7 +853,7 @@ test('when command is regex with fuzzy match true runs similarity check with reg
   })
 
   expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571)
+  expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571, { resetTranscript })
 })
 
 test('when command is string special characters with fuzzy match true, special characters are removed from string and then we test similarity', async () => {
@@ -864,7 +866,8 @@ test('when command is string special characters with fuzzy match true, special c
       isFuzzyMatch: true
     }
   ]
-  renderHook(() => useSpeechRecognition({ commands }))
+  const { result } = renderHook(() => useSpeechRecognition({ commands }))
+  const { resetTranscript } = result.current
   const speech = 'I would like a pizza'
 
   await act(async () => {
@@ -875,5 +878,5 @@ test('when command is string special characters with fuzzy match true, special c
   })
 
   expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1)
+  expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { resetTranscript })
 })
