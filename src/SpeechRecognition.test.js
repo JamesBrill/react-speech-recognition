@@ -209,6 +209,35 @@ describe('SpeechRecognition', () => {
     expect(finalTranscript).toEqual(expectedTranscript)
   })
 
+  test('can reset transcript from command callback', async () => {
+    mockRecognitionManager()
+    const commands = [
+      {
+        command: 'clear',
+        callback: ({ resetTranscript }) => resetTranscript()
+      }
+    ]
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+
+    await act(async () => {
+      await SpeechRecognition.startListening({ continuous: true })
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say('test')
+    })
+
+    expect(result.current.transcript).toBe('test')
+
+    act(() => {
+      SpeechRecognition.getRecognition().say('clear')
+    })
+
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
+  })
+
   test('can set language', async () => {
     mockRecognitionManager()
     renderHook(() => useSpeechRecognition())
