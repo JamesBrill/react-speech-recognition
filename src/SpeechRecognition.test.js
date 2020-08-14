@@ -421,7 +421,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
@@ -432,7 +433,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza')
+    expect(mockCommandCallback).toBeCalledWith('pizza', { resetTranscript })
   })
 
   test('matches one splat at the end of the sentence', async () => {
@@ -444,7 +445,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
@@ -455,7 +457,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza and fries')
+    expect(mockCommandCallback).toBeCalledWith('pizza and fries', { resetTranscript })
   })
 
   test('matches two splats', async () => {
@@ -467,7 +469,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries'
 
     await act(async () => {
@@ -478,7 +481,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries')
+    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries', { resetTranscript })
   })
 
   test('matches optional words when optional word spoken', async () => {
@@ -534,7 +537,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I spy with my little eye'
 
     await act(async () => {
@@ -545,7 +549,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('spy')
+    expect(mockCommandCallback).toBeCalledWith('spy', { resetTranscript })
   })
 
   test('matches regex', async () => {
@@ -611,7 +615,8 @@ describe('SpeechRecognition', () => {
         callback: mockCommandCallback3
       }
     ]
-    renderHook(() => useSpeechRecognition({ commands }))
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
     const speech = 'I want to eat pizza and fries are great'
 
     await act(async () => {
@@ -622,9 +627,9 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback1.mock.calls.length).toBe(1)
-    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great')
+    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great', { resetTranscript })
     expect(mockCommandCallback2.mock.calls.length).toBe(1)
-    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza')
+    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', { resetTranscript })
     expect(mockCommandCallback3.mock.calls.length).toBe(0)
   })
 
