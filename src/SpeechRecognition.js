@@ -20,10 +20,10 @@ const useSpeechRecognition = ({
     dispatch(clearTrancript())
   }
 
-  const resetTranscript = () => {
+  const resetTranscript = useCallback(() => {
     recognitionManager.resetTranscript()
     clearTranscript()
-  }
+  }, [recognitionManager])
 
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
@@ -50,15 +50,15 @@ const useSpeechRecognition = ({
           }
         }
       })
-    }, [commands]
+    }, [commands, resetTranscript]
   )
 
   const handleTranscriptChange = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
-      matchCommands(newInterimTranscript, newFinalTranscript)
       if (transcribing) {
         dispatch(appendTrancript(newInterimTranscript, newFinalTranscript))
       }
+      matchCommands(newInterimTranscript, newFinalTranscript)
     }, [matchCommands, transcribing]
   )
 
