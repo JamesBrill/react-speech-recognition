@@ -69,7 +69,7 @@ export default class RecognitionManager {
   }
 
   disconnect(disconnectType) {
-    if (this.browserSupportsSpeechRecognition) {
+    if (this.browserSupportsSpeechRecognition && this.listening) {
       switch (disconnectType) {
         case 'ABORT':
           this.pauseAfterDisconnect = true
