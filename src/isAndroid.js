@@ -1,1 +1,3 @@
-export default () => /(android)/i.test(typeof navigator !== 'undefined' ? navigator.userAgent : "")
+const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : ''
+
+export default () => /(android)/i.test(userAgent)
