@@ -1,4 +1,4 @@
-import { useState, useEffect, useReducer, useCallback } from 'react'
+import { useState, useEffect, useReducer, useCallback, useRef } from 'react'
 import { concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient } from './utils'
 import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
@@ -15,6 +15,8 @@ const useSpeechRecognition = ({
     finalTranscript: ''
   })
   const [listening, setListening] = useState(recognitionManager.listening)
+  const commandsRef = useRef(commands)
+  commandsRef.current = commands
 
   const clearTranscript = () => {
     dispatch(clearTrancript())
@@ -27,7 +29,7 @@ const useSpeechRecognition = ({
 
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
-      commands.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
+      commandsRef.current.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
         const input = !newFinalTranscript && matchInterim
           ? newInterimTranscript.trim()
           : newFinalTranscript.trim()
@@ -50,7 +52,7 @@ const useSpeechRecognition = ({
           }
         }
       })
-    }, [commands, resetTranscript]
+    }, [resetTranscript]
   )
 
   const handleTranscriptChange = useCallback(
