@@ -207,7 +207,7 @@ Some known supported languages (based on [this Stack Overflow post](http://stack
 * Turkish `tr`
 * Zulu `zu`
 
-#### stopListening
+#### stopListening (async)
 
 Turn the microphone off, but still finish processing any speech in progress.
 
@@ -215,13 +215,17 @@ Turn the microphone off, but still finish processing any speech in progress.
 SpeechRecognition.stopListening()
 ```
 
-#### abortListening
+This is an asynchronous function, so it will need to be awaited if you want to do something after the microphone has been turned off.
+
+#### abortListening (async)
 
 Turn the microphone off, and cancel the processing of any speech in progress.
 
 ```
 SpeechRecognition.abortListening()
 ```
+
+This is an asynchronous function, so it will need to be awaited if you want to do something after the microphone has been turned off.
 
 #### browserSupportsSpeechRecognition
 
