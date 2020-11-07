@@ -120,13 +120,13 @@ const SpeechRecognition = {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
     await recognitionManager.startListening({ continuous, language })
   },
-  stopListening: () => {
+  stopListening: async () => {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
-    recognitionManager.stopListening()
+    await recognitionManager.stopListening()
   },
-  abortListening: () => {
+  abortListening: async () => {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
-    recognitionManager.abortListening()
+    await recognitionManager.abortListening()
   },
   browserSupportsSpeechRecognition: () => {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
