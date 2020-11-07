@@ -138,10 +138,7 @@ export default class RecognitionManager {
     const isLanguageChanged = language && language !== this.recognition.lang
     if (isContinuousChanged || isLanguageChanged) {
       if (this.listening) {
-        this.stopListening()
-        await new Promise(resolve => {
-          this.onStopListening = resolve
-        })
+        await this.stopListening()
       }
       this.recognition.continuous = isContinuousChanged ? continuous : this.recognition.continuous
       this.recognition.lang = isLanguageChanged ? language : this.recognition.lang
@@ -160,14 +157,20 @@ export default class RecognitionManager {
     }
   }
 
-  abortListening() {
+  async abortListening() {
     this.disconnect('ABORT')
     this.emitListeningChange(false)
+    await new Promise(resolve => {
+      this.onStopListening = resolve
+    })
   }
 
-  stopListening() {
+  async stopListening() {
     this.disconnect('STOP')
     this.emitListeningChange(false)
+    await new Promise(resolve => {
+      this.onStopListening = resolve
+    })
   }
 
   getRecognition() {
