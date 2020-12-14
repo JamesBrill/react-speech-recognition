@@ -730,182 +730,182 @@ describe('SpeechRecognition', () => {
     expect(hook1.result.current.interimTranscript).toEqual('')
     expect(hook1.result.current.finalTranscript).toEqual(speech)
   })
-})
 
-test('does not call command callback when isFuzzyMatch is not true', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback = jest.fn()
-  const commands = [
-    {
-      command: 'hello world',
-      callback: mockCommandCallback
-    }
-  ]
-  renderHook(() => useSpeechRecognition({ commands }))
-  const speech = 'This is a test'
+  test('does not call command callback when isFuzzyMatch is not true', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'hello world',
+        callback: mockCommandCallback
+      }
+    ]
+    renderHook(() => useSpeechRecognition({ commands }))
+    const speech = 'This is a test'
 
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
-  })
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
 
-  expect(mockCommandCallback.mock.calls.length).toBe(0)
-})
-
-test('does not call command callback when isFuzzyMatch is true and similarity is less than fuzzyMatchingThreshold', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback = jest.fn()
-  const commands = [
-    {
-      command: 'hello world',
-      callback: mockCommandCallback,
-      isFuzzyMatch: true,
-      fuzzyMatchingThreshold: 0.7
-    }
-  ]
-  renderHook(() => useSpeechRecognition({ commands }))
-  const speech = 'Hello'
-
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
+    expect(mockCommandCallback.mock.calls.length).toBe(0)
   })
 
-  expect(mockCommandCallback.mock.calls.length).toBe(0)
-})
+  test('does not call command callback when isFuzzyMatch is true and similarity is less than fuzzyMatchingThreshold', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'hello world',
+        callback: mockCommandCallback,
+        isFuzzyMatch: true,
+        fuzzyMatchingThreshold: 0.7
+      }
+    ]
+    renderHook(() => useSpeechRecognition({ commands }))
+    const speech = 'Hello'
 
-test('does call command callback when isFuzzyMatch is true and similarity is equal or greater than fuzzyMatchingThreshold', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback = jest.fn()
-  const commands = [
-    {
-      command: 'hello world',
-      callback: mockCommandCallback,
-      isFuzzyMatch: true,
-      fuzzyMatchingThreshold: 0.5
-    }
-  ]
-  renderHook(() => useSpeechRecognition({ commands }))
-  const speech = 'Hello'
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
 
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
-  })
-
-  expect(mockCommandCallback.mock.calls.length).toBe(1)
-})
-
-test('callback is called with command, transcript and similarity ratio between those', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback = jest.fn()
-  const commands = [
-    {
-      command: 'I want to eat',
-      callback: mockCommandCallback,
-      isFuzzyMatch: true,
-      fuzzyMatchingThreshold: 0.5
-    }
-  ]
-  const { result } = renderHook(() => useSpeechRecognition({ commands }))
-  const { resetTranscript } = result.current
-  const speech = 'I want to drink'
-
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
+    expect(mockCommandCallback.mock.calls.length).toBe(0)
   })
 
-  expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6, { resetTranscript })
-})
+  test('does call command callback when isFuzzyMatch is true and similarity is equal or greater than fuzzyMatchingThreshold', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'hello world',
+        callback: mockCommandCallback,
+        isFuzzyMatch: true,
+        fuzzyMatchingThreshold: 0.5
+      }
+    ]
+    renderHook(() => useSpeechRecognition({ commands }))
+    const speech = 'Hello'
 
-test('different callbacks can be called for the same speech and with fuzzyMatchingThreshold', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback1 = jest.fn()
-  const mockCommandCallback2 = jest.fn()
-  const commands = [
-    {
-      command: 'I want to eat',
-      callback: mockCommandCallback1,
-      isFuzzyMatch: true,
-      fuzzyMatchingThreshold: 1
-    },
-    {
-      command: 'I want to sleep',
-      callback: mockCommandCallback2,
-      isFuzzyMatch: true,
-      fuzzyMatchingThreshold: 0.2
-    }
-  ]
-  renderHook(() => useSpeechRecognition({ commands }))
-  const speech = 'I want to eat'
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
 
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
   })
 
-  expect(mockCommandCallback1.mock.calls.length).toBe(1)
-  expect(mockCommandCallback2.mock.calls.length).toBe(1)
-})
+  test('callback is called with command, transcript and similarity ratio between those', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: 'I want to eat',
+        callback: mockCommandCallback,
+        isFuzzyMatch: true,
+        fuzzyMatchingThreshold: 0.5
+      }
+    ]
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
+    const speech = 'I want to drink'
 
-test('when command is regex with fuzzy match true runs similarity check with regex converted to string', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback = jest.fn()
-  const commands = [
-    {
-      command: new RegExp('This is a \\s+ test\\.+'),
-      callback: mockCommandCallback,
-      isFuzzyMatch: true
-    }
-  ]
-  const { result } = renderHook(() => useSpeechRecognition({ commands }))
-  const { resetTranscript } = result.current
-  const speech = 'This is a test'
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
 
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
-  })
-
-  expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571, { resetTranscript })
-})
-
-test('when command is string special characters with fuzzy match true, special characters are removed from string and then we test similarity', async () => {
-  mockRecognitionManager()
-  const mockCommandCallback = jest.fn()
-  const commands = [
-    {
-      command: '! (I would :like) : * a :pizza ',
-      callback: mockCommandCallback,
-      isFuzzyMatch: true
-    }
-  ]
-  const { result } = renderHook(() => useSpeechRecognition({ commands }))
-  const { resetTranscript } = result.current
-  const speech = 'I would like a pizza'
-
-  await act(async () => {
-    await SpeechRecognition.startListening()
-  })
-  act(() => {
-    SpeechRecognition.getRecognition().say(speech)
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6, { resetTranscript })
   })
 
-  expect(mockCommandCallback.mock.calls.length).toBe(1)
-  expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { resetTranscript })
+  test('different callbacks can be called for the same speech and with fuzzyMatchingThreshold', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback1 = jest.fn()
+    const mockCommandCallback2 = jest.fn()
+    const commands = [
+      {
+        command: 'I want to eat',
+        callback: mockCommandCallback1,
+        isFuzzyMatch: true,
+        fuzzyMatchingThreshold: 1
+      },
+      {
+        command: 'I want to sleep',
+        callback: mockCommandCallback2,
+        isFuzzyMatch: true,
+        fuzzyMatchingThreshold: 0.2
+      }
+    ]
+    renderHook(() => useSpeechRecognition({ commands }))
+    const speech = 'I want to eat'
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
+
+    expect(mockCommandCallback1.mock.calls.length).toBe(1)
+    expect(mockCommandCallback2.mock.calls.length).toBe(1)
+  })
+
+  test('when command is regex with fuzzy match true runs similarity check with regex converted to string', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: new RegExp('This is a \\s+ test\\.+'),
+        callback: mockCommandCallback,
+        isFuzzyMatch: true
+      }
+    ]
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
+    const speech = 'This is a test'
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571, { resetTranscript })
+  })
+
+  test('when command is string special characters with fuzzy match true, special characters are removed from string and then we test similarity', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback = jest.fn()
+    const commands = [
+      {
+        command: '! (I would :like) : * a :pizza ',
+        callback: mockCommandCallback,
+        isFuzzyMatch: true
+      }
+    ]
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
+    const speech = 'I would like a pizza'
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
+
+    expect(mockCommandCallback.mock.calls.length).toBe(1)
+    expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { resetTranscript })
+  })
 })
