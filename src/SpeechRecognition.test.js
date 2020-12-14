@@ -662,6 +662,38 @@ describe('SpeechRecognition', () => {
     expect(mockCommandCallback3.mock.calls.length).toBe(0)
   })
 
+  test('matches arrays of commands', async () => {
+    mockRecognitionManager()
+    const mockCommandCallback1 = jest.fn()
+    const mockCommandCallback2 = jest.fn()
+    const commands = [
+      {
+        command: ['I want to eat * and *', '* and fries are great'],
+        callback: mockCommandCallback1
+      },
+      {
+        command: '* and * are great',
+        callback: mockCommandCallback2
+      }
+    ]
+    const { result } = renderHook(() => useSpeechRecognition({ commands }))
+    const { resetTranscript } = result.current
+    const speech = 'I want to eat pizza and fries are great'
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.getRecognition().say(speech)
+    })
+
+    expect(mockCommandCallback1.mock.calls.length).toBe(2)
+    expect(mockCommandCallback1).nthCalledWith(1, 'pizza', 'fries are great', { resetTranscript })
+    expect(mockCommandCallback1).nthCalledWith(2, 'I want to eat pizza', { resetTranscript })
+    expect(mockCommandCallback2.mock.calls.length).toBe(1)
+    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', 'fries', { resetTranscript })
+  })
+
   test('does not match interim results by default', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
