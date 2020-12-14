@@ -132,7 +132,7 @@ const { resetTranscript } = useSpeechRecognition()
 ## Commands
 
 To respond when the user says a particular phrase, you can pass in a list of commands to the `useSpeechRecognition` hook. Each command is an object with the following properties:
-- `command`: This is a string or `RegExp` representing the phrase you want to listen for
+- `command`: This is a string or `RegExp` representing the phrase you want to listen for. If you want to use the same callback for multiple commands, you can also pass in an array here, with each value being a string or `RegExp`
 - `callback`: The function that is executed when the command is spoken. The last argument that this function receives will always be an object containing the following properties:
   - `resetTranscript`: A function that sets the transcript to an empty string
 - `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
@@ -182,7 +182,7 @@ const Dictaphone = () => {
       callback: () => setMessage('My pleasure')
     },
     {
-      command: 'Hello',
+      command: ['Hello', 'Hi'],
       callback: () => setMessage('Hi there!'),
       matchInterim: true
     },

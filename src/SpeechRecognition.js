@@ -30,27 +30,30 @@ const useSpeechRecognition = ({
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
       commandsRef.current.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
-        const input = !newFinalTranscript && matchInterim
-          ? newInterimTranscript.trim()
-          : newFinalTranscript.trim()
-        if (isFuzzyMatch) {
-          const commandToString = (typeof command === 'object') ? command.toString() : command
-          const commandWithoutSpecials = commandToString
-            .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, '')
-            .replace(/  +/g, ' ')
-            .trim()
-          const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
-          if (howSimilar >= fuzzyMatchingThreshold) {
-            callback(commandWithoutSpecials, input, howSimilar, { resetTranscript })
+        const subcommands = Array.isArray(command) ? command : [command]
+        subcommands.forEach(subcommand => {
+          const input = !newFinalTranscript && matchInterim
+            ? newInterimTranscript.trim()
+            : newFinalTranscript.trim()
+          if (isFuzzyMatch) {
+            const commandToString = (typeof subcommand === 'object') ? subcommand.toString() : subcommand
+            const commandWithoutSpecials = commandToString
+              .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, '')
+              .replace(/  +/g, ' ')
+              .trim()
+            const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
+            if (howSimilar >= fuzzyMatchingThreshold) {
+              callback(commandWithoutSpecials, input, howSimilar, { resetTranscript })
+            }
+          } else {
+            const pattern = commandToRegExp(subcommand)
+            const result = pattern.exec(input)
+            if (result) {
+              const parameters = result.slice(1)
+              callback(...parameters, { resetTranscript })
+            }
           }
-        } else {
-          const pattern = commandToRegExp(command)
-          const result = pattern.exec(input)
-          if (result) {
-            const parameters = result.slice(1)
-            callback(...parameters, { resetTranscript })
-          }
-        }
+        })
       })
     }, [resetTranscript]
   )

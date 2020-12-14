@@ -14,7 +14,7 @@ const DictaphoneWidgetA = () => {
       callback: (condition) => setMessage(`Today, the weather is ${condition}`)
     },
     {
-      command: 'Hello',
+      command: ['Hello', 'Hi'],
       callback: () => setMessage('Hi there'),
       matchInterim: true
     },
