@@ -444,9 +444,10 @@ describe('SpeechRecognition', () => {
   test('matches one splat', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = 'I want to eat * and fries'
     const commands = [
       {
-        command: 'I want to eat * and fries',
+        command,
         callback: mockCommandCallback
       }
     ]
@@ -462,15 +463,16 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza', { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('pizza', { command, resetTranscript })
   })
 
   test('matches one splat at the end of the sentence', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = 'I want to eat *'
     const commands = [
       {
-        command: 'I want to eat *',
+        command,
         callback: mockCommandCallback
       }
     ]
@@ -486,15 +488,16 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza and fries', { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('pizza and fries', { command, resetTranscript })
   })
 
   test('matches two splats', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = 'I want to eat * and *'
     const commands = [
       {
-        command: 'I want to eat * and *',
+        command,
         callback: mockCommandCallback
       }
     ]
@@ -510,7 +513,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries', { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('pizza', 'fries', { command, resetTranscript })
   })
 
   test('matches optional words when optional word spoken', async () => {
@@ -560,9 +563,10 @@ describe('SpeechRecognition', () => {
   test('matches named variable', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = 'I :action with my little eye'
     const commands = [
       {
-        command: 'I :action with my little eye',
+        command,
         callback: mockCommandCallback
       }
     ]
@@ -578,7 +582,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('spy', { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('spy', { command, resetTranscript })
   })
 
   test('matches regex', async () => {
@@ -630,13 +634,15 @@ describe('SpeechRecognition', () => {
     const mockCommandCallback1 = jest.fn()
     const mockCommandCallback2 = jest.fn()
     const mockCommandCallback3 = jest.fn()
+    const command1 = 'I want to eat * and *'
+    const command2 = '* and fries are great'
     const commands = [
       {
-        command: 'I want to eat * and *',
+        command: command1,
         callback: mockCommandCallback1
       },
       {
-        command: '* and fries are great',
+        command: command2,
         callback: mockCommandCallback2
       },
       {
@@ -656,9 +662,9 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback1.mock.calls.length).toBe(1)
-    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great', { resetTranscript })
+    expect(mockCommandCallback1).toBeCalledWith('pizza', 'fries are great', { command: command1, resetTranscript })
     expect(mockCommandCallback2.mock.calls.length).toBe(1)
-    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', { resetTranscript })
+    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', { command: command2, resetTranscript })
     expect(mockCommandCallback3.mock.calls.length).toBe(0)
   })
 
@@ -666,13 +672,16 @@ describe('SpeechRecognition', () => {
     mockRecognitionManager()
     const mockCommandCallback1 = jest.fn()
     const mockCommandCallback2 = jest.fn()
+    const command1 = 'I want to eat * and *'
+    const command2 = '* and fries are great'
+    const command3 = '* and * are great'
     const commands = [
       {
-        command: ['I want to eat * and *', '* and fries are great'],
+        command: [command1, command2],
         callback: mockCommandCallback1
       },
       {
-        command: '* and * are great',
+        command: command3,
         callback: mockCommandCallback2
       }
     ]
@@ -688,10 +697,10 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback1.mock.calls.length).toBe(2)
-    expect(mockCommandCallback1).nthCalledWith(1, 'pizza', 'fries are great', { resetTranscript })
-    expect(mockCommandCallback1).nthCalledWith(2, 'I want to eat pizza', { resetTranscript })
+    expect(mockCommandCallback1).nthCalledWith(1, 'pizza', 'fries are great', { command: command1, resetTranscript })
+    expect(mockCommandCallback1).nthCalledWith(2, 'I want to eat pizza', { command: command2, resetTranscript })
     expect(mockCommandCallback2.mock.calls.length).toBe(1)
-    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', 'fries', { resetTranscript })
+    expect(mockCommandCallback2).toBeCalledWith('I want to eat pizza', 'fries', { command: command3, resetTranscript })
   })
 
   test('does not match interim results by default', async () => {
@@ -836,9 +845,10 @@ describe('SpeechRecognition', () => {
   test('callback is called with command, transcript and similarity ratio between those', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = 'I want to eat'
     const commands = [
       {
-        command: 'I want to eat',
+        command,
         callback: mockCommandCallback,
         isFuzzyMatch: true,
         fuzzyMatchingThreshold: 0.5
@@ -856,7 +866,7 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6, { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('I want to eat', 'I want to drink', 0.6, { command, resetTranscript })
   })
 
   test('different callbacks can be called for the same speech and with fuzzyMatchingThreshold', async () => {
@@ -894,9 +904,10 @@ describe('SpeechRecognition', () => {
   test('when command is regex with fuzzy match true runs similarity check with regex converted to string', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = new RegExp('This is a \\s+ test\\.+')
     const commands = [
       {
-        command: new RegExp('This is a \\s+ test\\.+'),
+        command,
         callback: mockCommandCallback,
         isFuzzyMatch: true
       }
@@ -913,15 +924,16 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571, { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('This is a s test', 'This is a test', 0.8571428571428571, { command, resetTranscript })
   })
 
   test('when command is string special characters with fuzzy match true, special characters are removed from string and then we test similarity', async () => {
     mockRecognitionManager()
     const mockCommandCallback = jest.fn()
+    const command = '! (I would :like) : * a :pizza '
     const commands = [
       {
-        command: '! (I would :like) : * a :pizza ',
+        command,
         callback: mockCommandCallback,
         isFuzzyMatch: true
       }
@@ -938,6 +950,6 @@ describe('SpeechRecognition', () => {
     })
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
-    expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { resetTranscript })
+    expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { command, resetTranscript })
   })
 })
