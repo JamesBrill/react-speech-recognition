@@ -143,6 +143,7 @@ To respond when the user says a particular phrase, you can pass in a list of com
   - The similarity between `command` and the speech
   - The object mentioned in the `callback` description above
 - `fuzzyMatchingThreshold`: If the similarity of speech to `command` is higher than this value when `isFuzzyMatch` is turned on, the `callback` will be invoked. You should set this only if `isFuzzyMatch` is `true`. It takes values between `0` (will match anything) and `1` (needs an exact match). The default value is `0.8`.
+- `bestMatchOnly`: Boolean that, when `isFuzzyMatch` is `true`, determines whether the callback should only be triggered by the command phrase that _best_ matches the speech, rather than being triggered by all matching fuzzy command phrases. This is useful for fuzzy commands with multiple command phrases assigned to the same callback function - you may only want the callback to be triggered once for each spoken command. You should set this only if `isFuzzyMatch` is `true`. The default value is `false`.
 
 ### Command symbols
 
@@ -193,6 +194,13 @@ const Dictaphone = () => {
       // If the spokenPhrase is "Benji", the message would be "Beijing and Benji are 40% similar"
       isFuzzyMatch: true,
       fuzzyMatchingThreshold: 0.2
+    },
+    {
+      command: ['eat', 'sleep', 'leave'],
+      callback: (command) => setMessage(`Best matching command: ${command}`),
+      isFuzzyMatch: true,
+      fuzzyMatchingThreshold: 0.2,
+      bestMatchOnly: true
     },
     {
       command: 'clear',
