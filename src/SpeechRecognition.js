@@ -27,33 +27,71 @@ const useSpeechRecognition = ({
     clearTranscript()
   }, [recognitionManager])
 
+  const testFuzzyMatch = (command, input, fuzzyMatchingThreshold) => {
+    const commandToString = (typeof command === 'object') ? command.toString() : command
+    const commandWithoutSpecials = commandToString
+      .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, '')
+      .replace(/  +/g, ' ')
+      .trim()
+    const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
+    if (howSimilar >= fuzzyMatchingThreshold) {
+      return {
+        command,
+        commandWithoutSpecials,
+        howSimilar,
+        isFuzzyMatch: true
+      }
+    }
+    return null
+  }
+
+  const testMatch = (command, input) => {
+    const pattern = commandToRegExp(command)
+    const result = pattern.exec(input)
+    if (result) {
+      return {
+        command,
+        parameters: result.slice(1)
+      }
+    }
+    return null
+  }
+
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
-      commandsRef.current.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
+      commandsRef.current.forEach(({
+        command,
+        callback,
+        matchInterim = false,
+        isFuzzyMatch = false,
+        fuzzyMatchingThreshold = 0.8,
+        bestMatchOnly = false
+      }) => {
+        const input = !newFinalTranscript && matchInterim
+          ? newInterimTranscript.trim()
+          : newFinalTranscript.trim()
         const subcommands = Array.isArray(command) ? command : [command]
-        subcommands.forEach(subcommand => {
-          const input = !newFinalTranscript && matchInterim
-            ? newInterimTranscript.trim()
-            : newFinalTranscript.trim()
+        const results = subcommands.map(subcommand => {
           if (isFuzzyMatch) {
-            const commandToString = (typeof subcommand === 'object') ? subcommand.toString() : subcommand
-            const commandWithoutSpecials = commandToString
-              .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, '')
-              .replace(/  +/g, ' ')
-              .trim()
-            const howSimilar = compareTwoStringsUsingDiceCoefficient(commandWithoutSpecials, input)
-            if (howSimilar >= fuzzyMatchingThreshold) {
-              callback(commandWithoutSpecials, input, howSimilar, { command: subcommand, resetTranscript })
-            }
-          } else {
-            const pattern = commandToRegExp(subcommand)
-            const result = pattern.exec(input)
-            if (result) {
-              const parameters = result.slice(1)
-              callback(...parameters, { command: subcommand, resetTranscript })
-            }
+            return testFuzzyMatch(subcommand, input, fuzzyMatchingThreshold)
           }
-        })
+          return testMatch(subcommand, input)
+        }).filter(x => x)
+        if (isFuzzyMatch && bestMatchOnly && results.length >= 2) {
+          results.sort((a, b) => b.howSimilar - a.howSimilar)
+          const { command, commandWithoutSpecials, howSimilar } = results[0]
+          callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
+        } else {
+          results.forEach(result => {
+            if (result.isFuzzyMatch) {
+              const { command, commandWithoutSpecials, howSimilar } = result
+              callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
+            } else {
+              const { command, parameters } = result
+              callback(...parameters, { command, resetTranscript })
+            }
+          })
+        }
       })
     }, [resetTranscript]
   )

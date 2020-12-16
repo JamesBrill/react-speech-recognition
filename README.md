@@ -138,11 +138,12 @@ To respond when the user says a particular phrase, you can pass in a list of com
   - `resetTranscript`: A function that sets the transcript to an empty string
 - `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
 - `isFuzzyMatch`: Boolean that determines whether the comparison between speech and `command` is based on similarity rather than an exact match. Fuzzy matching is useful for commands that are easy to mispronounce or be misinterpreted by the Speech Recognition engine (e.g. names of places, sports teams, restaurant menu items). It is intended for commands that are string literals without special characters. If `command` is a string with special characters or a `RegExp`, it will be converted to a string without special characters when fuzzy matching. The similarity that is needed to match the command can be configured with `fuzzyMatchingThreshold`. `isFuzzyMatch` is `false` by default. When it is set to `true`, it will pass four arguments to `callback`:
-  - The value of `command`
+  - The value of `command` (with any special characters removed)
   - The speech that matched `command`
   - The similarity between `command` and the speech
   - The object mentioned in the `callback` description above
 - `fuzzyMatchingThreshold`: If the similarity of speech to `command` is higher than this value when `isFuzzyMatch` is turned on, the `callback` will be invoked. You should set this only if `isFuzzyMatch` is `true`. It takes values between `0` (will match anything) and `1` (needs an exact match). The default value is `0.8`.
+- `bestMatchOnly`: Boolean that, when `isFuzzyMatch` is `true`, determines whether the callback should only be triggered by the command phrase that _best_ matches the speech, rather than being triggered by all matching fuzzy command phrases. This is useful for fuzzy commands with multiple command phrases assigned to the same callback function - you may only want the callback to be triggered once for each spoken command. You should set this only if `isFuzzyMatch` is `true`. The default value is `false`.
 
 ### Command symbols
 
@@ -184,7 +185,7 @@ const Dictaphone = () => {
     },
     {
       command: ['Hello', 'Hi'],
-      callback: () => setMessage('Hi there!'),
+      callback: ({ command }) => setMessage(`Hi there! You said: "${command}"`),
       matchInterim: true
     },
     {
@@ -193,6 +194,13 @@ const Dictaphone = () => {
       // If the spokenPhrase is "Benji", the message would be "Beijing and Benji are 40% similar"
       isFuzzyMatch: true,
       fuzzyMatchingThreshold: 0.2
+    },
+    {
+      command: ['eat', 'sleep', 'leave'],
+      callback: (command) => setMessage(`Best matching command: ${command}`),
+      isFuzzyMatch: true,
+      fuzzyMatchingThreshold: 0.2,
+      bestMatchOnly: true
     },
     {
       command: 'clear',
