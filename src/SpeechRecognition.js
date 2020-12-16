@@ -59,7 +59,14 @@ const useSpeechRecognition = ({
 
   const matchCommands = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
-      commandsRef.current.forEach(({ command, callback, matchInterim = false, isFuzzyMatch = false, fuzzyMatchingThreshold = 0.8 }) => {
+      commandsRef.current.forEach(({
+        command,
+        callback,
+        matchInterim = false,
+        isFuzzyMatch = false,
+        fuzzyMatchingThreshold = 0.8,
+        bestMatchOnly = false
+      }) => {
         const input = !newFinalTranscript && matchInterim
           ? newInterimTranscript.trim()
           : newFinalTranscript.trim()
@@ -69,16 +76,22 @@ const useSpeechRecognition = ({
             return testFuzzyMatch(subcommand, input, fuzzyMatchingThreshold)
           }
           return testMatch(subcommand, input)
-        })
-        results.filter(x => x).forEach(result => {
-          if (result.isFuzzyMatch) {
-            const { command, commandWithoutSpecials, howSimilar } = result
-            callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
-          } else {
-            const { command, parameters } = result
-            callback(...parameters, { command, resetTranscript })
-          }
-        })
+        }).filter(x => x)
+        if (isFuzzyMatch && bestMatchOnly && results.length >= 2) {
+          results.sort((a, b) => b.howSimilar - a.howSimilar)
+          const { command, commandWithoutSpecials, howSimilar } = results[0]
+          callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
+        } else {
+          results.forEach(result => {
+            if (result.isFuzzyMatch) {
+              const { command, commandWithoutSpecials, howSimilar } = result
+              callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
+            } else {
+              const { command, parameters } = result
+              callback(...parameters, { command, resetTranscript })
+            }
+          })
+        }
       })
     }, [resetTranscript]
   )
