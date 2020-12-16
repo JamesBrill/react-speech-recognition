@@ -185,7 +185,7 @@ const Dictaphone = () => {
     },
     {
       command: ['Hello', 'Hi'],
-      callback: () => setMessage('Hi there!'),
+      callback: ({ command }) => setMessage(`Hi there! You said: "${command}"`),
       matchInterim: true
     },
     {
