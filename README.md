@@ -138,7 +138,7 @@ To respond when the user says a particular phrase, you can pass in a list of com
   - `resetTranscript`: A function that sets the transcript to an empty string
 - `matchInterim`: Boolean that determines whether "interim" results should be matched against the command. This will make your component respond faster to commands, but also makes false positives more likely - i.e. the command may be detected when it is not spoken. This is `false` by default and should only be set for simple commands.
 - `isFuzzyMatch`: Boolean that determines whether the comparison between speech and `command` is based on similarity rather than an exact match. Fuzzy matching is useful for commands that are easy to mispronounce or be misinterpreted by the Speech Recognition engine (e.g. names of places, sports teams, restaurant menu items). It is intended for commands that are string literals without special characters. If `command` is a string with special characters or a `RegExp`, it will be converted to a string without special characters when fuzzy matching. The similarity that is needed to match the command can be configured with `fuzzyMatchingThreshold`. `isFuzzyMatch` is `false` by default. When it is set to `true`, it will pass four arguments to `callback`:
-  - The value of `command`
+  - The value of `command` (with any special characters removed)
   - The speech that matched `command`
   - The similarity between `command` and the speech
   - The object mentioned in the `callback` description above
