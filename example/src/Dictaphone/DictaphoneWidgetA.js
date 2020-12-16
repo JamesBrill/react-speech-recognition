@@ -26,6 +26,13 @@ const DictaphoneWidgetA = () => {
       fuzzyMatchingThreshold: 0.2
     },
     {
+      command: ['eat', 'sleep', 'leave'],
+      callback: (command) => setMessage(`Best matching command: ${command}`),
+      isFuzzyMatch: true,
+      fuzzyMatchingThreshold: 0.2,
+      bestMatchOnly: true
+    },
+    {
       command: 'clear',
       callback: ({ resetTranscript }) => resetTranscript(),
       matchInterim: true
