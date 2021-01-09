@@ -75,13 +75,15 @@ if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
 
 ### Supported browsers
 
-As of June 2020, the following browsers support the Web Speech API:
+As of January 2021, the following browsers support the Web Speech API:
 
 * Chrome (desktop): this is by far the smoothest experience
 * Microsoft Edge
 * Chrome (Android): a word of warning about this platform, which is that there can be an annoying beeping sound when turning the microphone on. This is part of the Android OS and cannot be controlled from the browser
 * Android webview
 * Samsung Internet
+
+iOS does not support the API on any browser.
 
 For all other browsers, you can render fallback content using the `SpeechRecognition.browserSupportsSpeechRecognition` function described above.
 
