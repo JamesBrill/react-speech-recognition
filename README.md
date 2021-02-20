@@ -20,6 +20,7 @@ This version requires React 16.8 so that React hooks can be used. If you're used
 
 * [Basic example](#basic-example)
 * [Supported browsers](#supported-browsers)
+* [Polyfills](docs/POLYFILLS.md)
 * [API docs](docs/API.md)
 * [Version 3 migration guide](docs/V3-MIGRATION.md)
 * [TypeScript declaration file in DefinitelyTyped](https://github.com/OleksandrYehorov/DefinitelyTyped/blob/master/types/react-speech-recognition/index.d.ts)
@@ -65,7 +66,7 @@ You can see more examples in the example React app attached to this repo. See [D
 
 ## Detecting browser support for Web Speech API
 
-Currently, this feature is not supported in all browsers, with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
+Currently, this feature is not supported in all browsers (unless you integrate a [polyfill](docs/POLYFILLS.md)), with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
@@ -74,6 +75,8 @@ if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
 ```
 
 ### Supported browsers
+
+The Web Speech API is largely only supported by Google browsers - if you want it to work on other browsers, this library does support polyfills to enable speech recognition outside of Chrome (see [here](docs/POLYFILLS.md) for more details).
 
 As of January 2021, the following browsers support the Web Speech API:
 
@@ -85,7 +88,7 @@ As of January 2021, the following browsers support the Web Speech API:
 
 iOS does not support the API on any browser.
 
-For all other browsers, you can render fallback content using the `SpeechRecognition.browserSupportsSpeechRecognition` function described above.
+For all other browsers, you can render fallback content using the `SpeechRecognition.browserSupportsSpeechRecognition` function described above. Alternatively, as mentioned before, you can integrate a [polyfill](docs/POLYFILLS.md).
 
 ## Controlling the microphone
 
