@@ -94,10 +94,11 @@ export default class RecognitionManager {
     this.pauseAfterDisconnect = false
   }
 
-  updateTranscript({ results, resultIndex = 0 }) {
+  updateTranscript({ results, resultIndex }) {
+    const currentIndex = resultIndex === undefined ? results.length - 1 : resultIndex
     this.interimTranscript = ''
     this.finalTranscript = ''
-    for (let i = resultIndex; i < results.length; ++i) {
+    for (let i = currentIndex; i < results.length; ++i) {
       if (results[i].isFinal && (!isAndroid() || results[i][0].confidence > 0)) {
         this.updateFinalTranscript(results[i][0].transcript)
       } else {
