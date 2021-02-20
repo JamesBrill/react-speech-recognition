@@ -168,7 +168,7 @@ const SpeechRecognition = {
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {
-      recognitionManager = new RecognitionManager()
+      recognitionManager = new RecognitionManager(DefaultSpeechRecognitionClient)
     }
     return recognitionManager
   },
