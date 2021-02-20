@@ -12,6 +12,7 @@ export default class RecognitionManager {
     this.listening = false
     this.subscribers = {}
     this.onStopListening = () => {}
+    this.previousResultWasFinalOnly = false
 
     if (this.recognition) {
       this.recognition.continuous = false
@@ -108,7 +109,18 @@ export default class RecognitionManager {
         )
       }
     }
-    this.emitTranscriptChange(this.interimTranscript, this.finalTranscript)
+    let isDuplicateResult = false
+    if (this.interimTranscript === '') {
+      if (this.previousResultWasFinalOnly) {
+        isDuplicateResult = true
+      }
+      this.previousResultWasFinalOnly = true
+    } else {
+      this.previousResultWasFinalOnly = false
+    }
+    if (!isDuplicateResult) {
+      this.emitTranscriptChange(this.interimTranscript, this.finalTranscript)
+    }
   }
 
   updateFinalTranscript(newFinalTranscript) {
