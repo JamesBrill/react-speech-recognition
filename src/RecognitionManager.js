@@ -3,9 +3,7 @@ import { debounce, concatTranscripts } from './utils'
 
 export default class RecognitionManager {
   constructor(SpeechRecognitionClient) {
-    this.recognition = SpeechRecognitionClient
-      ? new SpeechRecognitionClient()
-      : null
+    this.recognition = null
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
     this.finalTranscript = ''
@@ -14,20 +12,27 @@ export default class RecognitionManager {
     this.onStopListening = () => {}
     this.previousResultWasFinalOnly = false
 
-    if (this.recognition) {
-      this.recognition.continuous = false
-      this.recognition.interimResults = true
-      this.recognition.onresult = this.updateTranscript.bind(this)
-      this.recognition.onend = this.onRecognitionDisconnect.bind(this)
-    }
-
     this.resetTranscript = this.resetTranscript.bind(this)
     this.startListening = this.startListening.bind(this)
     this.stopListening = this.stopListening.bind(this)
     this.abortListening = this.abortListening.bind(this)
+    this.setSpeechRecognitionClient = this.setSpeechRecognitionClient.bind(this)
+
+    this.setSpeechRecognitionClient(SpeechRecognitionClient)
 
     if (isAndroid()) {
       this.updateFinalTranscript = debounce(this.updateFinalTranscript, 250, true)
+    }
+  }
+
+  setSpeechRecognitionClient(SpeechRecognitionClient) {
+    if (SpeechRecognitionClient) {
+      this.recognition = new SpeechRecognitionClient()
+      this.recognition.continuous = false
+      this.recognition.interimResults = true
+      this.recognition.onresult = this.updateTranscript.bind(this)
+      this.recognition.onend = this.onRecognitionDisconnect.bind(this)
+      this.emitBrowserSupportsSpeechRecognitionChange(true)
     }
   }
 
@@ -58,6 +63,13 @@ export default class RecognitionManager {
     Object.keys(this.subscribers).forEach((id) => {
       const { onClearTranscript } = this.subscribers[id]
       onClearTranscript()
+    })
+  }
+
+  emitBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange) {
+    Object.keys(this.subscribers).forEach((id) => {
+      const { onBrowserSupportsSpeechRecognitionChange } = this.subscribers[id]
+      onBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange)
     })
   }
 
