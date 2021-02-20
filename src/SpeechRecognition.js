@@ -144,9 +144,21 @@ const useSpeechRecognition = ({
   }
 }
 
+const DefaultSpeechRecognitionClient =
+  typeof window !== 'undefined' &&
+  (window.SpeechRecognition ||
+    window.webkitSpeechRecognition ||
+    window.mozSpeechRecognition ||
+    window.msSpeechRecognition ||
+    window.oSpeechRecognition)
+let browserSupportsSpeechRecognition = !!DefaultSpeechRecognitionClient
 let recognitionManager
 const SpeechRecognition = {
   counter: 0,
+  setSpeechRecognitionClient: (SpeechRecognitionClient) => {
+    recognitionManager = new RecognitionManager(SpeechRecognitionClient)
+    browserSupportsSpeechRecognition = true
+  },
   getRecognitionManager: () => {
     if (!recognitionManager) {
       recognitionManager = new RecognitionManager()
@@ -169,10 +181,7 @@ const SpeechRecognition = {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
     await recognitionManager.abortListening()
   },
-  browserSupportsSpeechRecognition: () => {
-    const recognitionManager = SpeechRecognition.getRecognitionManager()
-    return recognitionManager.browserSupportsSpeechRecognition
-  }
+  browserSupportsSpeechRecognition: () => browserSupportsSpeechRecognition
 }
 
 export { useSpeechRecognition }

@@ -2,18 +2,10 @@ import isAndroid from './isAndroid'
 import { debounce, concatTranscripts } from './utils'
 
 export default class RecognitionManager {
-  constructor() {
-    const BrowserSpeechRecognition =
-      typeof window !== 'undefined' &&
-      (window.SpeechRecognition ||
-        window.webkitSpeechRecognition ||
-        window.mozSpeechRecognition ||
-        window.msSpeechRecognition ||
-        window.oSpeechRecognition)
-    this.recognition = BrowserSpeechRecognition
-      ? new BrowserSpeechRecognition()
+  constructor(SpeechRecognitionClient) {
+    this.recognition = SpeechRecognitionClient
+      ? new SpeechRecognitionClient()
       : null
-    this.browserSupportsSpeechRecognition = this.recognition !== null
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
     this.finalTranscript = ''
@@ -21,7 +13,7 @@ export default class RecognitionManager {
     this.subscribers = {}
     this.onStopListening = () => {}
 
-    if (this.browserSupportsSpeechRecognition) {
+    if (this.recognition) {
       this.recognition.continuous = false
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
@@ -69,7 +61,7 @@ export default class RecognitionManager {
   }
 
   disconnect(disconnectType) {
-    if (this.browserSupportsSpeechRecognition && this.listening) {
+    if (this.recognition && this.listening) {
       switch (disconnectType) {
         case 'ABORT':
           this.pauseAfterDisconnect = true
@@ -92,7 +84,7 @@ export default class RecognitionManager {
     this.listening = false
     if (this.pauseAfterDisconnect) {
       this.emitListeningChange(false)
-    } else if (this.browserSupportsSpeechRecognition) {
+    } else if (this.recognition) {
       if (this.recognition.continuous) {
         this.startListening({ continuous: this.recognition.continuous })
       } else {
@@ -102,16 +94,16 @@ export default class RecognitionManager {
     this.pauseAfterDisconnect = false
   }
 
-  updateTranscript(event) {
+  updateTranscript({ results, resultIndex = 0 }) {
     this.interimTranscript = ''
     this.finalTranscript = ''
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal && (!isAndroid() || event.results[i][0].confidence > 0)) {
-        this.updateFinalTranscript(event.results[i][0].transcript)
+    for (let i = resultIndex; i < results.length; ++i) {
+      if (results[i].isFinal && (!isAndroid() || results[i][0].confidence > 0)) {
+        this.updateFinalTranscript(results[i][0].transcript)
       } else {
         this.interimTranscript = concatTranscripts(
           this.interimTranscript,
-          event.results[i][0].transcript
+          results[i][0].transcript
         )
       }
     }
@@ -130,7 +122,7 @@ export default class RecognitionManager {
   }
 
   async startListening({ continuous = false, language } = {}) {
-    if (!this.browserSupportsSpeechRecognition) {
+    if (!this.recognition) {
       return
     }
 
@@ -178,21 +170,21 @@ export default class RecognitionManager {
   }
 
   start() {
-    if (this.browserSupportsSpeechRecognition && !this.listening) {
+    if (this.recognition && !this.listening) {
       this.recognition.start()
       this.listening = true
     }
   }
 
   stop() {
-    if (this.browserSupportsSpeechRecognition && this.listening) {
+    if (this.recognition && this.listening) {
       this.recognition.stop()
       this.listening = false
     }
   }
 
   abort() {
-    if (this.browserSupportsSpeechRecognition && this.listening) {
+    if (this.recognition && this.listening) {
       this.recognition.abort()
       this.listening = false
     }
