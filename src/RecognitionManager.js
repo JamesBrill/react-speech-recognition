@@ -122,7 +122,7 @@ export default class RecognitionManager {
       }
     }
     let isDuplicateResult = false
-    if (this.interimTranscript === '') {
+    if (this.interimTranscript === '' && this.finalTranscript !== '') {
       if (this.previousResultWasFinalOnly) {
         isDuplicateResult = true
       }
