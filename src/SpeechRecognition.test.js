@@ -114,11 +114,14 @@ describe('SpeechRecognition', () => {
     expect(finalTranscript).toEqual('')
   })
 
-  test('ignores speech when listening is aborted', () => {
+  test('ignores speech when listening is aborted', async () => {
     mockRecognitionManager()
     const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
     act(() => {
       SpeechRecognition.abortListening()
     })
