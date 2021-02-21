@@ -92,14 +92,14 @@ export default Dictaphone;
 ```
 
 ### Caveats
-* On Safari and Firefox, an error will be thrown if calling `startListening` with a different language without first calling `stopListening`. It's recommended that you stick to one langauge and, if you do need to change languages, call `stopListening` first. Works fine on Chrome
-* The default language will result in Azure returning a 400. You will need to explicitly define one of the language codes defined [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support). For English, use `en-GB` or `en-US`
-* Safari will throw an error on `localhost` as it requires HTTPS. [ngrok](https://ngrok.com/) is a nice tool for serving a local web app over HTTPS (also good for testing your web app on mobile devices as well).
+* On Safari and Firefox, an error will be thrown if calling `startListening` to switch to a different language without first calling `stopListening`. It's recommended that you stick to one language and, if you do need to change languages, call `stopListening` first
+* If you don't specify a language, Azure will return a 400 response. When calling `startListening`, you will need to explicitly provide one of the language codes defined [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support). For English, use `en-GB` or `en-US`
+* Safari will throw an error on `localhost` as it requires HTTPS. [ngrok](https://ngrok.com/) is a nice tool for serving a local web app over HTTPS (also good for testing your web app on mobile devices as well)
 * Currently untested on iOS (let me know if it works!)
 
 ## AWS Transcribe
 
-There is no polyfill for this in the ecosystem yet, though a promising project can be found [here](https://github.com/ceuk/speech-recognition-aws-polyfill).
+There is no polyfill for [AWS Transcribe](https://aws.amazon.com/transcribe/) in the ecosystem yet, though a promising project can be found [here](https://github.com/ceuk/speech-recognition-aws-polyfill).
 
 # Providing your own polyfill
 
