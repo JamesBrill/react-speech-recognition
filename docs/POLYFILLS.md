@@ -37,7 +37,7 @@ This is Microsoft's offering for speech recognition (among many other features).
 Here is a basic example combining `web-speech-cognitive-services` and `react-speech-recognition` to get you started. This code worked with version 7.1.0 of the polyfill in February 2021 - if it has become outdated due to changes in the polyfill or in Azure Cognitive Services, please raise a GitHub issue or PR to get this updated.
 
 ```
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
@@ -87,7 +87,7 @@ const Dictaphone = () => {
       <p>{transcript}</p>
     </div>
   );
-}
+};
 export default Dictaphone;
 ```
 
