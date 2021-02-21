@@ -6,10 +6,10 @@ Under the hood, Web Speech API in Chrome uses Google's speech recognition server
 
 # Basic usage
 
-The `SpeechRecognition` class exported by `react-speech-recognition` has the method `setSpeechRecognitionClient`. This can take an implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). From then on, that implementation will used by `react-speech-recognition` to transcribe speech picked up by the microphone.
+The `SpeechRecognition` class exported by `react-speech-recognition` has the method `applyPolyfill`. This can take an implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). From then on, that implementation will used by `react-speech-recognition` to transcribe speech picked up by the microphone.
 
 ```
-SpeechRecognition.setSpeechRecognitionClient(SpeechRecognitionPolyfill)
+SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
 ```
 
 Note that this type of polyfill that does not pollute the global scope is known as a "ponyfill" - the distinction is explained [here](https://ponyfoo.com/articles/polyfills-or-ponyfills). `react-speech-recognition` will also pick up traditional polyfills - just make sure you import them before `react-speech-recognition`.
@@ -17,7 +17,7 @@ Note that this type of polyfill that does not pollute the global scope is known 
 ## Usage recommendations
 * Call this as early as possible to minimise periods where fallback content, which you should render while the polyfill is loading, is rendered
 * Use your own `loadingSpeechRecognition` state rather than `browserSupportsSpeechRecognition` to decide when to render fallback content when Speech Recognition is not available. This is because on Chrome, `browserSupportsSpeechRecognition` will return `true` - as a result, your speech recognition component will appear briefly with the Google Speech Recognition engine and then with the polyfill engine, potentially causing a janky user experience. Some example code using the loading state approach can be found below
-* After `setSpeechRecognitionClient` has been called, `browserSupportsSpeechRecognition` will always be `true`. The polyfill itself may not work on all browsers - it's worth having a further fallback to cover that case. Polyfills will usually require WebRTC support in the browser, so it's worth checking that `window.navigator.mediaDevices.getUserMedia` is present
+* After `applyPolyfill` has been called, `browserSupportsSpeechRecognition` will always be `true`. The polyfill itself may not work on all browsers - it's worth having a further fallback to cover that case. Polyfills will usually require WebRTC support in the browser, so it's worth checking that `window.navigator.mediaDevices.getUserMedia` is present
 * Do not rely on polyfills being perfect implementations of the Speech Recognition specification - make sure you have tested them in different browsers and are aware of their individual limitations
 
 # Polyfill libraries
@@ -69,7 +69,7 @@ const Dictaphone = () => {
           authorizationToken,
         }
       });
-      SpeechRecognition.setSpeechRecognitionClient(AzureSpeechRecognition);
+      SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
       setLoadingSpeechRecognition(false);
     }
     loadSpeechRecognition();

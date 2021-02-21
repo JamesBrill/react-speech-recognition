@@ -4,14 +4,14 @@ import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 
-const DefaultSpeechRecognitionClient =
+const DefaultSpeechRecognition =
   typeof window !== 'undefined' &&
   (window.SpeechRecognition ||
     window.webkitSpeechRecognition ||
     window.mozSpeechRecognition ||
     window.msSpeechRecognition ||
     window.oSpeechRecognition)
-let _browserSupportsSpeechRecognition = !!DefaultSpeechRecognitionClient
+let _browserSupportsSpeechRecognition = !!DefaultSpeechRecognition
 let recognitionManager
 
 const useSpeechRecognition = ({
@@ -158,17 +158,17 @@ const useSpeechRecognition = ({
 }
 const SpeechRecognition = {
   counter: 0,
-  setSpeechRecognitionClient: (SpeechRecognitionClient) => {
+  applyPolyfill: (PolyfillSpeechRecognition) => {
     if (recognitionManager) {
-      recognitionManager.setSpeechRecognitionClient(SpeechRecognitionClient)
+      recognitionManager.setSpeechRecognition(PolyfillSpeechRecognition)
     } else {
-      recognitionManager = new RecognitionManager(SpeechRecognitionClient)
+      recognitionManager = new RecognitionManager(PolyfillSpeechRecognition)
     }
     _browserSupportsSpeechRecognition = true
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {
-      recognitionManager = new RecognitionManager(DefaultSpeechRecognitionClient)
+      recognitionManager = new RecognitionManager(DefaultSpeechRecognition)
     }
     return recognitionManager
   },

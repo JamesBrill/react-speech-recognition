@@ -17,12 +17,12 @@ describe('SpeechRecognition', () => {
     isAndroid.mockClear()
   })
 
-  test('sets SpeechRecognitionClient correctly', () => {
+  test('sets applyPolyfill correctly', () => {
     const MockSpeechRecognition = class {}
 
     expect(SpeechRecognition.getRecognition() instanceof CortiSpeechRecognition).toEqual(true)
 
-    SpeechRecognition.setSpeechRecognitionClient(MockSpeechRecognition)
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
 
     expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(true)
     expect(SpeechRecognition.getRecognition() instanceof MockSpeechRecognition).toEqual(true)

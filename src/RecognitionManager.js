@@ -2,7 +2,7 @@ import isAndroid from './isAndroid'
 import { debounce, concatTranscripts } from './utils'
 
 export default class RecognitionManager {
-  constructor(SpeechRecognitionClient) {
+  constructor(SpeechRecognition) {
     this.recognition = null
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
@@ -16,18 +16,18 @@ export default class RecognitionManager {
     this.startListening = this.startListening.bind(this)
     this.stopListening = this.stopListening.bind(this)
     this.abortListening = this.abortListening.bind(this)
-    this.setSpeechRecognitionClient = this.setSpeechRecognitionClient.bind(this)
+    this.setSpeechRecognition = this.setSpeechRecognition.bind(this)
 
-    this.setSpeechRecognitionClient(SpeechRecognitionClient)
+    this.setSpeechRecognition(SpeechRecognition)
 
     if (isAndroid()) {
       this.updateFinalTranscript = debounce(this.updateFinalTranscript, 250, true)
     }
   }
 
-  setSpeechRecognitionClient(SpeechRecognitionClient) {
-    if (SpeechRecognitionClient) {
-      this.recognition = new SpeechRecognitionClient()
+  setSpeechRecognition(SpeechRecognition) {
+    if (SpeechRecognition) {
+      this.recognition = new SpeechRecognition()
       this.recognition.continuous = false
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
