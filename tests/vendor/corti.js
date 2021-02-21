@@ -196,13 +196,14 @@ const Corti = (_root) => {
       }
       _root.SpeechRecognition = newSpeechRecognition
     },
-
     unpatch: function() {
       _root.SpeechRecognition = _productionVersion
-    }
+    },
+    newSpeechRecognition
   }
 }
 
 const mockSpeechRecognition = Corti(global)
 mockSpeechRecognition.patch()
+export const CortiSpeechRecognition = mockSpeechRecognition.newSpeechRecognition
 export default mockSpeechRecognition

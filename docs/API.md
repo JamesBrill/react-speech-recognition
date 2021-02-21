@@ -44,6 +44,7 @@ These are returned from `useSpeechRecognition`:
     finalTranscript,
     resetTranscript,
     listening,
+    browserSupportsSpeechRecognition,
   } = useSpeechRecognition()
 ```
 
@@ -77,6 +78,18 @@ The difference between interim and final transcripts can be illustrated by an ex
 #### finalTranscript [string]
 
 Transcription of speech that the Web Speech API has finished processing.
+
+#### browserSupportsSpeechRecognition [bool]
+
+The Web Speech API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
+
+```
+if (!browserSupportsSpeechRecognition) {
+  // Render some fallback content
+}
+```
+
+It is recommended that you use this state to decide when to render fallback content rather than `SpeechRecognition.browserSupportsSpeechRecognition()` as this will correctly re-render your component if the browser support changes at run-time (e.g. due to a polyfill being applied).
 
 ## SpeechRecognition
 
@@ -237,6 +250,16 @@ if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
 }
 ```
 
+It is recommended that you instead use the `browserSupportsSpeechRecognition` state from `useSpeechRecognition` to decide when to render fallback content - that will correctly re-render your component if the browser support changes at run-time (e.g. due to a polyfill being applied).
+
 #### getRecognition
 
 This returns the underlying [object](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) used by Web Speech API.
+
+#### applyPolyfill
+
+Replace the default Speech Recognition engine (if there is one) with a custom implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). See [Polyfills](./POLYFILLS.md) for more information on how to use this.
+
+```
+SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
+```

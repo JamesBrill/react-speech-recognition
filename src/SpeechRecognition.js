@@ -4,12 +4,23 @@ import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 
+const DefaultSpeechRecognition =
+  typeof window !== 'undefined' &&
+  (window.SpeechRecognition ||
+    window.webkitSpeechRecognition ||
+    window.mozSpeechRecognition ||
+    window.msSpeechRecognition ||
+    window.oSpeechRecognition)
+let _browserSupportsSpeechRecognition = !!DefaultSpeechRecognition
+let recognitionManager
+
 const useSpeechRecognition = ({
   transcribing = true,
   clearTranscriptOnListen = true,
   commands = []
 } = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
+  const [browserSupportsSpeechRecognition, setBrowserSupportsSpeechRecognition] = useState(_browserSupportsSpeechRecognition)
   const [{ interimTranscript, finalTranscript }, dispatch] = useReducer(transcriptReducer, {
     interimTranscript: recognitionManager.interimTranscript,
     finalTranscript: ''
@@ -119,7 +130,8 @@ const useSpeechRecognition = ({
     const callbacks = {
       onListeningChange: setListening,
       onTranscriptChange: handleTranscriptChange,
-      onClearTranscript: handleClearTranscript
+      onClearTranscript: handleClearTranscript,
+      onBrowserSupportsSpeechRecognitionChange: setBrowserSupportsSpeechRecognition
     }
     recognitionManager.subscribe(id, callbacks)
 
@@ -140,16 +152,23 @@ const useSpeechRecognition = ({
     interimTranscript,
     finalTranscript,
     listening,
-    resetTranscript
+    resetTranscript,
+    browserSupportsSpeechRecognition
   }
 }
-
-let recognitionManager
 const SpeechRecognition = {
   counter: 0,
+  applyPolyfill: (PolyfillSpeechRecognition) => {
+    if (recognitionManager) {
+      recognitionManager.setSpeechRecognition(PolyfillSpeechRecognition)
+    } else {
+      recognitionManager = new RecognitionManager(PolyfillSpeechRecognition)
+    }
+    _browserSupportsSpeechRecognition = true
+  },
   getRecognitionManager: () => {
     if (!recognitionManager) {
-      recognitionManager = new RecognitionManager()
+      recognitionManager = new RecognitionManager(DefaultSpeechRecognition)
     }
     return recognitionManager
   },
@@ -169,10 +188,7 @@ const SpeechRecognition = {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
     await recognitionManager.abortListening()
   },
-  browserSupportsSpeechRecognition: () => {
-    const recognitionManager = SpeechRecognition.getRecognitionManager()
-    return recognitionManager.browserSupportsSpeechRecognition
-  }
+  browserSupportsSpeechRecognition: () => _browserSupportsSpeechRecognition
 }
 
 export { useSpeechRecognition }

@@ -2,39 +2,37 @@ import isAndroid from './isAndroid'
 import { debounce, concatTranscripts } from './utils'
 
 export default class RecognitionManager {
-  constructor() {
-    const BrowserSpeechRecognition =
-      typeof window !== 'undefined' &&
-      (window.SpeechRecognition ||
-        window.webkitSpeechRecognition ||
-        window.mozSpeechRecognition ||
-        window.msSpeechRecognition ||
-        window.oSpeechRecognition)
-    this.recognition = BrowserSpeechRecognition
-      ? new BrowserSpeechRecognition()
-      : null
-    this.browserSupportsSpeechRecognition = this.recognition !== null
+  constructor(SpeechRecognition) {
+    this.recognition = null
     this.pauseAfterDisconnect = false
     this.interimTranscript = ''
     this.finalTranscript = ''
     this.listening = false
     this.subscribers = {}
     this.onStopListening = () => {}
-
-    if (this.browserSupportsSpeechRecognition) {
-      this.recognition.continuous = false
-      this.recognition.interimResults = true
-      this.recognition.onresult = this.updateTranscript.bind(this)
-      this.recognition.onend = this.onRecognitionDisconnect.bind(this)
-    }
+    this.previousResultWasFinalOnly = false
 
     this.resetTranscript = this.resetTranscript.bind(this)
     this.startListening = this.startListening.bind(this)
     this.stopListening = this.stopListening.bind(this)
     this.abortListening = this.abortListening.bind(this)
+    this.setSpeechRecognition = this.setSpeechRecognition.bind(this)
+
+    this.setSpeechRecognition(SpeechRecognition)
 
     if (isAndroid()) {
       this.updateFinalTranscript = debounce(this.updateFinalTranscript, 250, true)
+    }
+  }
+
+  setSpeechRecognition(SpeechRecognition) {
+    if (SpeechRecognition) {
+      this.recognition = new SpeechRecognition()
+      this.recognition.continuous = false
+      this.recognition.interimResults = true
+      this.recognition.onresult = this.updateTranscript.bind(this)
+      this.recognition.onend = this.onRecognitionDisconnect.bind(this)
+      this.emitBrowserSupportsSpeechRecognitionChange(true)
     }
   }
 
@@ -68,8 +66,15 @@ export default class RecognitionManager {
     })
   }
 
+  emitBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange) {
+    Object.keys(this.subscribers).forEach((id) => {
+      const { onBrowserSupportsSpeechRecognitionChange } = this.subscribers[id]
+      onBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange)
+    })
+  }
+
   disconnect(disconnectType) {
-    if (this.browserSupportsSpeechRecognition && this.listening) {
+    if (this.recognition && this.listening) {
       switch (disconnectType) {
         case 'ABORT':
           this.pauseAfterDisconnect = true
@@ -92,7 +97,7 @@ export default class RecognitionManager {
     this.listening = false
     if (this.pauseAfterDisconnect) {
       this.emitListeningChange(false)
-    } else if (this.browserSupportsSpeechRecognition) {
+    } else if (this.recognition) {
       if (this.recognition.continuous) {
         this.startListening({ continuous: this.recognition.continuous })
       } else {
@@ -102,20 +107,32 @@ export default class RecognitionManager {
     this.pauseAfterDisconnect = false
   }
 
-  updateTranscript(event) {
+  updateTranscript({ results, resultIndex }) {
+    const currentIndex = resultIndex === undefined ? results.length - 1 : resultIndex
     this.interimTranscript = ''
     this.finalTranscript = ''
-    for (let i = event.resultIndex; i < event.results.length; ++i) {
-      if (event.results[i].isFinal && (!isAndroid() || event.results[i][0].confidence > 0)) {
-        this.updateFinalTranscript(event.results[i][0].transcript)
+    for (let i = currentIndex; i < results.length; ++i) {
+      if (results[i].isFinal && (!isAndroid() || results[i][0].confidence > 0)) {
+        this.updateFinalTranscript(results[i][0].transcript)
       } else {
         this.interimTranscript = concatTranscripts(
           this.interimTranscript,
-          event.results[i][0].transcript
+          results[i][0].transcript
         )
       }
     }
-    this.emitTranscriptChange(this.interimTranscript, this.finalTranscript)
+    let isDuplicateResult = false
+    if (this.interimTranscript === '' && this.finalTranscript !== '') {
+      if (this.previousResultWasFinalOnly) {
+        isDuplicateResult = true
+      }
+      this.previousResultWasFinalOnly = true
+    } else {
+      this.previousResultWasFinalOnly = false
+    }
+    if (!isDuplicateResult) {
+      this.emitTranscriptChange(this.interimTranscript, this.finalTranscript)
+    }
   }
 
   updateFinalTranscript(newFinalTranscript) {
@@ -130,7 +147,7 @@ export default class RecognitionManager {
   }
 
   async startListening({ continuous = false, language } = {}) {
-    if (!this.browserSupportsSpeechRecognition) {
+    if (!this.recognition) {
       return
     }
 
@@ -178,21 +195,21 @@ export default class RecognitionManager {
   }
 
   start() {
-    if (this.browserSupportsSpeechRecognition && !this.listening) {
+    if (this.recognition && !this.listening) {
       this.recognition.start()
       this.listening = true
     }
   }
 
   stop() {
-    if (this.browserSupportsSpeechRecognition && this.listening) {
+    if (this.recognition && this.listening) {
       this.recognition.stop()
       this.listening = false
     }
   }
 
   abort() {
-    if (this.browserSupportsSpeechRecognition && this.listening) {
+    if (this.recognition && this.listening) {
       this.recognition.abort()
       this.listening = false
     }

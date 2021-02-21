@@ -16,10 +16,6 @@ export default () => {
   })
   const listenOnce = () => SpeechRecognition.startListening({ continuous: false })
 
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-    return null
-  }
-
   return (
     <div>
       {showFirstWidget && <DictaphoneWidgetA />}

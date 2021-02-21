@@ -1,5 +1,5 @@
 import { renderHook, act } from '@testing-library/react-hooks'
-import '../tests/vendor/corti'
+import { CortiSpeechRecognition } from '../tests/vendor/corti'
 import SpeechRecognition, { useSpeechRecognition } from './SpeechRecognition'
 import isAndroid from './isAndroid'
 import RecognitionManager from './RecognitionManager'
@@ -7,7 +7,7 @@ import RecognitionManager from './RecognitionManager'
 jest.mock('./isAndroid')
 
 const mockRecognitionManager = () => {
-  const recognitionManager = new RecognitionManager()
+  const recognitionManager = new RecognitionManager(window.SpeechRecognition)
   SpeechRecognition.getRecognitionManager = () => recognitionManager
   return recognitionManager
 }
@@ -17,18 +17,15 @@ describe('SpeechRecognition', () => {
     isAndroid.mockClear()
   })
 
-  test('indicates when SpeechRecognition API is available', () => {
-    const recognitionManager = mockRecognitionManager()
-    recognitionManager.browserSupportsSpeechRecognition = true
+  test('sets applyPolyfill correctly', () => {
+    const MockSpeechRecognition = class {}
+
+    expect(SpeechRecognition.getRecognition() instanceof CortiSpeechRecognition).toEqual(true)
+
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
 
     expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(true)
-  })
-
-  test('indicates when SpeechRecognition API is not available', () => {
-    const recognitionManager = mockRecognitionManager()
-    recognitionManager.browserSupportsSpeechRecognition = false
-
-    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
+    expect(SpeechRecognition.getRecognition() instanceof MockSpeechRecognition).toEqual(true)
   })
 
   test('sets default transcripts correctly', () => {
@@ -117,11 +114,14 @@ describe('SpeechRecognition', () => {
     expect(finalTranscript).toEqual('')
   })
 
-  test('ignores speech when listening is aborted', () => {
+  test('ignores speech when listening is aborted', async () => {
     mockRecognitionManager()
     const { result } = renderHook(() => useSpeechRecognition())
     const speech = 'This is a test'
 
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
     act(() => {
       SpeechRecognition.abortListening()
     })

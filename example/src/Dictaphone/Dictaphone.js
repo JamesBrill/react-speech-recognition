@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import SpeechRecognition, { useSpeechRecognition } from '../SpeechRecognition'
+import { useSpeechRecognition } from '../SpeechRecognition'
 
 const Dictaphone = ({ commands }) => {
   const [transcribing, setTranscribing] = useState(true)
@@ -12,6 +12,7 @@ const Dictaphone = ({ commands }) => {
     finalTranscript,
     resetTranscript,
     listening,
+    browserSupportsSpeechRecognition
   } = useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands })
   useEffect(() => {
     if (interimTranscript !== '') {
@@ -22,8 +23,8 @@ const Dictaphone = ({ commands }) => {
     }
   }, [interimTranscript, finalTranscript]);
 
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-    return null
+  if (!browserSupportsSpeechRecognition) {
+    return <span>No browser support</span>
   }
 
   return (
