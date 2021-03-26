@@ -1,4 +1,4 @@
-import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT } from './constants'
+import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT, BACKSPACE_TRANSCRIPT } from './constants'
 import { concatTranscripts } from './utils'
 
 const transcriptReducer = (state, action) => {
@@ -12,6 +12,20 @@ const transcriptReducer = (state, action) => {
       return {
         interimTranscript: action.payload.interimTranscript,
         finalTranscript: concatTranscripts(state.finalTranscript, action.payload.finalTranscript)
+      }
+    case BACKSPACE_TRANSCRIPT:
+      if (state.finalTranscript && state.finalTranscript.length) {
+        const lastIndex = state.finalTranscript.lastIndexOf(' ')
+        const finalStr = state.finalTranscript.substring(0, lastIndex)
+        return {
+          interimTranscript: '',
+          finalTranscript: finalStr
+        }
+      } else {
+        return {
+          interimTranscript: state.interimTranscript,
+          finalTranscript: state.finalTranscript
+        }
       }
     default:
       throw new Error()

@@ -18,7 +18,7 @@ import { useSpeechRecognition } from 'react-speech-recognition'
 These are passed as an object argument to `useSpeechRecognition`:
 
 ```
-useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands })
+useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands, backspaceCommand })
 ```
 
 #### transcribing [bool]
@@ -32,6 +32,10 @@ Does this component clear its transcript when the microphone is turned on? Has n
 #### commands [list]
 
 See [Commands](../README.md#Commands).
+
+## backspaceCommand [string]
+
+The command you'd like to be used to backspace (delete the last word) of `transcript`. This command should be included in `commands` array, the callback doesn't matter, you can use `()=>{}`
 
 ### Output state
 

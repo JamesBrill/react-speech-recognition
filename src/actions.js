@@ -1,4 +1,4 @@
-import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT } from './constants'
+import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT, BACKSPACE_TRANSCRIPT } from './constants'
 
 export const clearTrancript = () => {
   return { type: CLEAR_TRANSCRIPT }
@@ -11,5 +11,11 @@ export const appendTrancript = (interimTranscript, finalTranscript) => {
       interimTranscript,
       finalTranscript
     }
+  }
+}
+
+export const backspaceTrancript = () => {
+  return {
+    type: BACKSPACE_TRANSCRIPT
   }
 }

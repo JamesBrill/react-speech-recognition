@@ -1,6 +1,6 @@
 import { useState, useEffect, useReducer, useCallback, useRef } from 'react'
 import { concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient } from './utils'
-import { clearTrancript, appendTrancript } from './actions'
+import { clearTrancript, appendTrancript, backspaceTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 
@@ -17,7 +17,7 @@ let recognitionManager
 const useSpeechRecognition = ({
   transcribing = true,
   clearTranscriptOnListen = true,
-  commands = []
+  commands = [], backspaceCommand = null
 } = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
   const [browserSupportsSpeechRecognition, setBrowserSupportsSpeechRecognition] = useState(_browserSupportsSpeechRecognition)
@@ -29,8 +29,15 @@ const useSpeechRecognition = ({
   const commandsRef = useRef(commands)
   commandsRef.current = commands
 
+  const backspaceCommandRef = useRef(backspaceCommand)
+  backspaceCommandRef.current = backspaceCommand
+
   const clearTranscript = () => {
     dispatch(clearTrancript())
+  }
+
+  const backspaceTranscript = () => {
+    dispatch(backspaceTrancript())
   }
 
   const resetTranscript = useCallback(() => {
@@ -99,6 +106,11 @@ const useSpeechRecognition = ({
               callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
             } else {
               const { command, parameters } = result
+              if (backspaceCommandRef.current) {
+                if (command === backspaceCommandRef.current) {
+                  return backspaceTranscript()
+                }
+              }
               callback(...parameters, { command, resetTranscript })
             }
           })
