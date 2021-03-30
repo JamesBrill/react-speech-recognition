@@ -14,8 +14,11 @@ export const appendTrancript = (interimTranscript, finalTranscript) => {
   }
 }
 
-export const backspaceTrancript = () => {
+export const backspaceTrancript = (command) => {
   return {
-    type: BACKSPACE_TRANSCRIPT
+    type: BACKSPACE_TRANSCRIPT,
+    payload: {
+      command: command
+    }
   }
 }

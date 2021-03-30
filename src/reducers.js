@@ -1,5 +1,5 @@
 import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT, BACKSPACE_TRANSCRIPT } from './constants'
-import { concatTranscripts } from './utils'
+import { concatTranscripts, removeWords } from './utils'
 
 const transcriptReducer = (state, action) => {
   switch (action.type) {
@@ -15,8 +15,9 @@ const transcriptReducer = (state, action) => {
       }
     case BACKSPACE_TRANSCRIPT:
       if (state.finalTranscript && state.finalTranscript.length) {
-        const lastIndex = state.finalTranscript.lastIndexOf(' ')
-        const finalStr = state.finalTranscript.substring(0, lastIndex)
+        const cmdArr = action.payload.command.split(' ')
+        const transcript = state.finalTranscript
+        const finalStr = removeWords(transcript, cmdArr.length + 1)
         return {
           interimTranscript: '',
           finalTranscript: finalStr

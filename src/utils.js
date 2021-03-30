@@ -14,6 +14,11 @@ const debounce = (func, wait, immediate) => {
   }
 }
 
+const removeWords = (words, length) => {
+  const limit = +length * -1
+  return words.split(' ').slice(0, limit).join(' ')
+}
+
 const concatTranscripts = (...transcriptParts) => {
   return transcriptParts.map(t => t.trim()).join(' ').trim()
 }
@@ -72,4 +77,4 @@ const compareTwoStringsUsingDiceCoefficient = (first, second) => {
   return (2.0 * intersectionSize) / (first.length + second.length - 2)
 }
 
-export { debounce, concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient }
+export { debounce, concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient, removeWords }

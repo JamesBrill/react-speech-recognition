@@ -36,8 +36,8 @@ const useSpeechRecognition = ({
     dispatch(clearTrancript())
   }
 
-  const backspaceTranscript = () => {
-    dispatch(backspaceTrancript())
+  const backspaceTranscript = (command) => {
+    dispatch(backspaceTrancript(command))
   }
 
   const resetTranscript = useCallback(() => {
@@ -108,7 +108,7 @@ const useSpeechRecognition = ({
               const { command, parameters } = result
               if (backspaceCommandRef.current) {
                 if (command === backspaceCommandRef.current) {
-                  return backspaceTranscript()
+                  return backspaceTranscript(command)
                 }
               }
               callback(...parameters, { command, resetTranscript })
