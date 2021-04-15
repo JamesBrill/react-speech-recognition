@@ -239,6 +239,18 @@ If you want to listen continuously, set the `continuous` property to `true` when
 SpeechRecognition.startListening({ continuous: true })
 ```
 
+Be warned that not all browsers have good support for continuous listening. Chrome on Android in particular constantly restarts the microphone, leading to a frustrating and noisy (from the beeping) experience. To avoid enabling continuous listening on these browsers, you can make use of the `browserSupportsContinuousListening` state from `useSpeechRecognition` to detect support for this feature.
+
+```
+if (browserSupportsContinuousListening) {
+  SpeechRecognition.startListening({ continuous: true })
+} else {
+  // Fallback behaviour
+}
+```
+
+Alternatively, you can try one of the [polyfills](docs/POLYFILLS.md) to enable continuous listening on these browsers.
+
 ## Changing language
 
 To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`. See [here](docs/API.md#language-string) for a list of supported languages.
