@@ -137,7 +137,7 @@ const useSpeechRecognition = ({
       onTranscriptChange: handleTranscriptChange,
       onClearTranscript: handleClearTranscript,
       onBrowserSupportsSpeechRecognitionChange: setBrowserSupportsSpeechRecognition,
-      onBrowserSupportsContinuousListening: setBrowserSupportsContinuousListening
+      onBrowserSupportsContinuousListeningChange: setBrowserSupportsContinuousListening
     }
     recognitionManager.subscribe(id, callbacks)
 
