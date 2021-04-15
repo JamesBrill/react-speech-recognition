@@ -3,6 +3,7 @@ import { concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficie
 import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
+import isAndroid from './isAndroid'
 
 const DefaultSpeechRecognition =
   typeof window !== 'undefined' &&
@@ -12,6 +13,7 @@ const DefaultSpeechRecognition =
     window.msSpeechRecognition ||
     window.oSpeechRecognition)
 let _browserSupportsSpeechRecognition = !!DefaultSpeechRecognition
+let _browserSupportsContinuousListening = _browserSupportsSpeechRecognition && !isAndroid()
 let recognitionManager
 
 const useSpeechRecognition = ({
@@ -20,7 +22,10 @@ const useSpeechRecognition = ({
   commands = []
 } = {}) => {
   const [recognitionManager] = useState(SpeechRecognition.getRecognitionManager())
-  const [browserSupportsSpeechRecognition, setBrowserSupportsSpeechRecognition] = useState(_browserSupportsSpeechRecognition)
+  const [browserSupportsSpeechRecognition, setBrowserSupportsSpeechRecognition] =
+    useState(_browserSupportsSpeechRecognition)
+  const [browserSupportsContinuousListening, setBrowserSupportsContinuousListening] =
+    useState(_browserSupportsContinuousListening)
   const [{ interimTranscript, finalTranscript }, dispatch] = useReducer(transcriptReducer, {
     interimTranscript: recognitionManager.interimTranscript,
     finalTranscript: ''
@@ -131,7 +136,8 @@ const useSpeechRecognition = ({
       onListeningChange: setListening,
       onTranscriptChange: handleTranscriptChange,
       onClearTranscript: handleClearTranscript,
-      onBrowserSupportsSpeechRecognitionChange: setBrowserSupportsSpeechRecognition
+      onBrowserSupportsSpeechRecognitionChange: setBrowserSupportsSpeechRecognition,
+      onBrowserSupportsContinuousListeningChange: setBrowserSupportsContinuousListening
     }
     recognitionManager.subscribe(id, callbacks)
 
@@ -153,7 +159,8 @@ const useSpeechRecognition = ({
     finalTranscript,
     listening,
     resetTranscript,
-    browserSupportsSpeechRecognition
+    browserSupportsSpeechRecognition,
+    browserSupportsContinuousListening
   }
 }
 const SpeechRecognition = {
@@ -165,6 +172,7 @@ const SpeechRecognition = {
       recognitionManager = new RecognitionManager(PolyfillSpeechRecognition)
     }
     _browserSupportsSpeechRecognition = true
+    _browserSupportsContinuousListening = true
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {
@@ -188,7 +196,8 @@ const SpeechRecognition = {
     const recognitionManager = SpeechRecognition.getRecognitionManager()
     await recognitionManager.abortListening()
   },
-  browserSupportsSpeechRecognition: () => _browserSupportsSpeechRecognition
+  browserSupportsSpeechRecognition: () => _browserSupportsSpeechRecognition,
+  browserSupportsContinuousListening: () => _browserSupportsContinuousListening
 }
 
 export { useSpeechRecognition }

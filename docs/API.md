@@ -91,6 +91,18 @@ if (!browserSupportsSpeechRecognition) {
 
 It is recommended that you use this state to decide when to render fallback content rather than `SpeechRecognition.browserSupportsSpeechRecognition()` as this will correctly re-render your component if the browser support changes at run-time (e.g. due to a polyfill being applied).
 
+#### browserSupportsContinuousListening [bool]
+
+Continuous listening is not supported on all browsers, so it is recommended that you apply some fallback behaviour if your web app uses continuous listening and is running on a browser that doesn't support it:
+
+```
+if (browserSupportsContinuousListening) {
+  SpeechRecognition.startListening({ continuous: true })
+} else {
+  // Fallback behaviour
+}
+```
+
 ## SpeechRecognition
 
 Object providing functions to manage the global state of the microphone. Import with:
