@@ -68,8 +68,9 @@ export default class RecognitionManager {
 
   emitBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange) {
     Object.keys(this.subscribers).forEach((id) => {
-      const { onBrowserSupportsSpeechRecognitionChange } = this.subscribers[id]
+      const { onBrowserSupportsSpeechRecognitionChange, onBrowserSupportsContinuousListening } = this.subscribers[id]
       onBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange)
+      onBrowserSupportsContinuousListening(browserSupportsSpeechRecognitionChange)
     })
   }
 
