@@ -99,7 +99,7 @@ const Dictaphone = () => {
 
   return (
     <div>
-      <p>Microphone: {listening ? 'on' : 'off'}</p>x
+      <p>Microphone: {listening ? 'on' : 'off'}</p>
       <div
         onTouchStart={startListening}
         onMouseDown={startListening}
