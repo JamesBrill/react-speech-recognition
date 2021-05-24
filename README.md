@@ -71,10 +71,11 @@ You can see more examples in the example React app attached to this repo. See [D
 
 By default, speech recognition is not supported in all browsers, with the best native experience being available on desktop Chrome. To build a web app that supports voice input on _all_ browsers, it's recommended that you combine `react-speech-recognition` with a [speech recognition polyfill](docs/POLYFILLS.md). It currently supports polyfills for the following cloud providers:
 
-<div style="max-width: 500px; display: flex; justify-content: space-around;">
+<div>
   <a href="https://www.speechly.com/?utm_source=github">
     <img src="docs/logos/speechly.png" width="200" alt="Speechly">
   </a>
+  <img width="50"></img>
   <a href="https://azure.microsoft.com/en-gb/services/cognitive-services/speech-to-text/">
     <img src="docs/logos/microsoft.png" width="175" alt="Microsoft Azure Cognitive Services">
   </a>
