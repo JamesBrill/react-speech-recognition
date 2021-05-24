@@ -46,7 +46,7 @@ import React from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 const Dictaphone = () => {
-  const { transcript, resetTranscript } = useSpeechRecognition()
+  const { transcript, listening, resetTranscript } = useSpeechRecognition()
 
   if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
     return null
@@ -54,6 +54,7 @@ const Dictaphone = () => {
 
   return (
     <div>
+      <p>Microphone: {listening ? 'on' : 'off'}</p>
       <button onClick={SpeechRecognition.startListening}>Start</button>
       <button onClick={SpeechRecognition.stopListening}>Stop</button>
       <button onClick={resetTranscript}>Reset</button>
