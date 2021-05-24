@@ -42,14 +42,14 @@ To import in your React code:
 The most basic example of a component using this hook would be:
 
 ```
-import React from 'react'
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+import React from 'react';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 const Dictaphone = () => {
-  const { transcript, listening, resetTranscript } = useSpeechRecognition()
+  const { transcript, listening, resetTranscript } = useSpeechRecognition();
 
   if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-    return null
+    return <span>Browser doesn't support speech recognition.</span>;
   }
 
   return (
@@ -60,9 +60,9 @@ const Dictaphone = () => {
       <button onClick={resetTranscript}>Reset</button>
       <p>{transcript}</p>
     </div>
-  )
-}
-export default Dictaphone
+  );
+};
+export default Dictaphone;
 ```
 
 You can see more examples in the example React app attached to this repo. See [Developing](#developing).
