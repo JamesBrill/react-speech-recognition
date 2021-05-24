@@ -101,12 +101,12 @@ const Dictaphone = () => {
   return (
     <div>
       <p>Microphone: {listening ? 'on' : 'off'}</p>
-      <div
+      <button
         onTouchStart={startListening}
         onMouseDown={startListening}
         onTouchEnd={SpeechRecognition.stopListening}
         onMouseUp={SpeechRecognition.stopListening}
-      >Hold to talk</div>
+      >Hold to talk</button>
       <p>{transcript}</p>
     </div>
   );
