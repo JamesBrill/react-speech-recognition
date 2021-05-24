@@ -19,6 +19,7 @@ This version requires React 16.8 so that React hooks can be used. If you're used
 ## Useful links
 
 * [Basic example](#basic-example)
+* [Cross-browser example](#cross-browser-example)
 * [Supported browsers](#supported-browsers)
 * [Polyfills](docs/POLYFILLS.md)
 * [API docs](docs/API.md)
@@ -65,9 +66,55 @@ export default Dictaphone
 
 You can see more examples in the example React app attached to this repo. See [Developing](#developing).
 
+## Cross-browser example
+
+By default, speech recognition is not supported in all browsers, with the best native experience being available on desktop Chrome. To build a web app that supports voice input on _all_ browsers, it's recommended that you combine `react-speech-recognition` with a [speech recognition polyfill](docs/POLYFILLS.md). It currently supports polyfills for the following cloud providers:
+
+<div style="max-width: 500px; display: flex; justify-content: space-around;">
+  <a href="https://www.speechly.com/?utm_source=github">
+    <img src="docs/logos/speechly.png" width="200" alt="Speechly">
+  </a>
+  <a href="https://azure.microsoft.com/en-gb/services/cognitive-services/speech-to-text/">
+    <img src="docs/logos/microsoft.png" width="175" alt="Microsoft Azure Cognitive Services">
+  </a>
+</div>
+
+You can find the full guide for setting up a polyfill [here](docs/POLYFILLS.md). Alternatively, here is a quick (and free) example using Speechly:
+* Install `@speechly/speech-recognition-polyfill` in your web app
+* You will need a Speechly app ID. To get one of these, sign up for free with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/). Note that you can skip the steps for creating a Speechly configuration
+* Code:
+```
+import React, { useState } from 'react';
+import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+const appId = '<INSERT_SPEECHLY_APP_ID_HERE>';
+const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
+SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
+
+const Dictaphone = () => {
+  const { transcript, listening } = useSpeechRecognition();
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
+
+  return (
+    <div>
+      <p>Microphone: {listening ? 'on' : 'off'}</p>x
+      <div
+        onTouchStart={startListening}
+        onMouseDown={startListening}
+        onTouchEnd={SpeechRecognition.stopListening}
+        onMouseUp={SpeechRecognition.stopListening}
+      >Hold to talk</div>
+      <p>{transcript}</p>
+    </div>
+  );
+};
+export default Dictaphone;
+```
+
 ## Detecting browser support for Web Speech API
 
-Currently, this feature is not supported in all browsers (unless you integrate a [polyfill](docs/POLYFILLS.md)), with the best experience being available on desktop Chrome. However, it fails gracefully on other browsers. It is recommended that you render some fallback content if it is not supported by the user's browser:
+If you choose not to use a polyfill, this library still fails gracefully on browsers that don't support speech recognition. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
 if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
@@ -77,17 +124,14 @@ if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
 
 ### Supported browsers
 
-The Web Speech API is largely only supported by Google browsers - if you want it to work on other browsers, this library does support polyfills to enable speech recognition outside of Chrome (see [here](docs/POLYFILLS.md) for more details).
-
-As of January 2021, the following browsers support the Web Speech API:
+Without a polyfill, the Web Speech API is largely only supported by Google browsers. As of May 2021, the following browsers support the Web Speech API:
 
 * Chrome (desktop): this is by far the smoothest experience
+* Safari 14.1
 * Microsoft Edge
 * Chrome (Android): a word of warning about this platform, which is that there can be an annoying beeping sound when turning the microphone on. This is part of the Android OS and cannot be controlled from the browser
 * Android webview
 * Samsung Internet
-
-iOS does not support the API on any browser.
 
 For all other browsers, you can render fallback content using the `SpeechRecognition.browserSupportsSpeechRecognition` function described above. Alternatively, as mentioned before, you can integrate a [polyfill](docs/POLYFILLS.md).
 
