@@ -51,14 +51,14 @@ SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
 
 const Dictaphone = () => {
   const { transcript, listening } = useSpeechRecognition();
-  const listenContinuously = () => SpeechRecognition.startListening({ continuous: true });
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
 
   return (
     <div>
       <p>Microphone: {listening ? 'on' : 'off'}</p>x
       <div
-        onTouchStart={listenContinuously}
-        onMouseDown={listenContinuously}
+        onTouchStart={startListening}
+        onMouseDown={startListening}
         onTouchEnd={SpeechRecognition.stopListening}
         onMouseUp={SpeechRecognition.stopListening}
       >Hold to talk</div>
