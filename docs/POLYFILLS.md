@@ -22,9 +22,65 @@ Note that this type of polyfill that does not pollute the global scope is known 
 
 # Polyfill libraries
 
-Rather than roll your own, you should use a ready-made polyfill for one of the major cloud providers' speech recognition services.
+Rather than roll your own, you should use a ready-made polyfill for a cloud provider's speech recognition service. `react-speech-recognition` currently supports polyfills for the following cloud providers:
 
-## Azure Cognitive Services
+## Speechly
+
+<a href="https://www.speechly.com/?utm_source=github">
+  <img src="logos/speechly.png" width="200" alt="Speechly">
+</a>
+
+[Speechly](https://www.speechly.com/) specialises in enabling developers to create voice-driven UIs and provides a speech recognition API with a generous free tier to get you started. Their web speech recognition polyfill was developed with `react-speech-recognition` in mind so is a great choice to combine with this library. You can see an example of the two libraries working together in its [README](https://github.com/speechly/speech-recognition-polyfill#integrating-with-react-speech-recognition).
+
+* Polyfill repo: [speech-recognition-polyfill](https://github.com/speechly/speech-recognition-polyfill)
+* Polyfill author: [speechly](https://github.com/speechly)
+* Requirements: 
+  * Install `@speechly/speech-recognition-polyfill` in your web app
+  * You will need a Speechly app ID. To get one of these, sign up with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/). Note that you can skip the steps for creating a Speechly configuration
+
+Here is a basic example combining `speech-recognition-polyfill` and `react-speech-recognition` to get you started. This code worked with version 1.0.0 of the polyfill in May 2021 - if it has become outdated due to changes in the polyfill or in Speechly, please raise a GitHub issue or PR to get this updated.
+
+```
+import React, { useState } from 'react';
+import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+const appId = '<INSERT_SPEECHLY_APP_ID_HERE>';
+const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
+SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
+
+const Dictaphone = () => {
+  const { transcript, listening } = useSpeechRecognition();
+  const listenContinuously = () => SpeechRecognition.startListening({ continuous: true });
+
+  return (
+    <div>
+      <p>Microphone: {listening ? 'on' : 'off'}</p>x
+      <div
+        onTouchStart={listenContinuously}
+        onMouseDown={listenContinuously}
+        onTouchEnd={SpeechRecognition.stopListening}
+        onMouseUp={SpeechRecognition.stopListening}
+      >Hold to talk</div>
+      <p>{transcript}</p>
+    </div>
+  );
+};
+export default Dictaphone;
+```
+
+### Limitations
+* The `lang` property is currently unsupported, defaulting to English transcription. In `react-speech-recognition`, this means that the `language` property in `startListening` cannot be used to change languages when using this polyfill. New languages will be coming soon!
+* Transcripts are generated in uppercase letters without punctuation. If needed, you can transform them using [toLowerCase()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase)
+
+<br />
+<br />
+
+## Microsoft Azure Cognitive Services
+
+<a href="https://azure.microsoft.com/en-gb/services/cognitive-services/speech-to-text/">
+  <img src="logos/microsoft.png" width="175" alt="Microsoft Azure Cognitive Services">
+</a>
 
 This is Microsoft's offering for speech recognition (among many other features). The free trial gives you $200 of credit to get started. It's pretty easy to set up - see the [documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/).
 
@@ -91,11 +147,14 @@ const Dictaphone = () => {
 export default Dictaphone;
 ```
 
-### Caveats
+### Limitations
 * On Safari and Firefox, an error will be thrown if calling `startListening` to switch to a different language without first calling `stopListening`. It's recommended that you stick to one language and, if you do need to change languages, call `stopListening` first
 * If you don't specify a language, Azure will return a 400 response. When calling `startListening`, you will need to explicitly provide one of the language codes defined [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support). For English, use `en-GB` or `en-US`
 * Safari will throw an error on `localhost` as it requires HTTPS. [ngrok](https://ngrok.com/) is a nice tool for serving a local web app over HTTPS (also good for testing your web app on mobile devices as well)
 * Currently untested on iOS (let me know if it works!)
+
+<br />
+<br />
 
 ## AWS Transcribe
 
