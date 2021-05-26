@@ -83,10 +83,10 @@ By default, speech recognition is not supported in all browsers, with the best n
 
 You can find the full guide for setting up a polyfill [here](docs/POLYFILLS.md). Alternatively, here is a quick (and free) example using Speechly:
 * Install `@speechly/speech-recognition-polyfill` in your web app
-* You will need a Speechly app ID. To get one of these, sign up for free with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/). Note that you can skip the steps for creating a Speechly configuration
+* You will need a Speechly app ID. To get one of these, sign up for free with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/stt-only/)
 * Here's a component for a push-to-talk button. The basic example above would also work fine.
 ```
-import React, { useState } from 'react';
+import React from 'react';
 import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 

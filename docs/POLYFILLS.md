@@ -36,12 +36,12 @@ Rather than roll your own, you should use a ready-made polyfill for a cloud prov
 * Polyfill author: [speechly](https://github.com/speechly)
 * Requirements: 
   * Install `@speechly/speech-recognition-polyfill` in your web app
-  * You will need a Speechly app ID. To get one of these, sign up with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/). Note that you can skip the steps for creating a Speechly configuration
+  * You will need a Speechly app ID. To get one of these, sign up with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/stt-only/)
 
 Here is a basic example combining `speech-recognition-polyfill` and `react-speech-recognition` to get you started. This code worked with version 1.0.0 of the polyfill in May 2021 - if it has become outdated due to changes in the polyfill or in Speechly, please raise a GitHub issue or PR to get this updated.
 
 ```
-import React, { useState } from 'react';
+import React from 'react';
 import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
