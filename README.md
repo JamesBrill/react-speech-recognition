@@ -19,6 +19,7 @@ This version requires React 16.8 so that React hooks can be used. If you're used
 ## Useful links
 
 * [Basic example](#basic-example)
+* [Why you should use a polyfill with this library](#why-you-should-use-a-polyfill-with-this-library)
 * [Cross-browser example](#cross-browser-example)
 * [Supported browsers](#supported-browsers)
 * [Polyfills](docs/POLYFILLS.md)
@@ -67,9 +68,19 @@ export default Dictaphone;
 
 You can see more examples in the example React app attached to this repo. See [Developing](#developing).
 
-## Cross-browser example
+### Why you should use a polyfill with this library
 
-By default, speech recognition is not supported in all browsers, with the best native experience being available on desktop Chrome. To build a web app that supports voice input on _all_ browsers, it's recommended that you combine `react-speech-recognition` with a [speech recognition polyfill](docs/POLYFILLS.md). It currently supports polyfills for the following cloud providers:
+By default, speech recognition is not supported in all browsers, with the best native experience being available on desktop Chrome. To avoid the limitations of native browser speech recognition, it's recommended that you combine `react-speech-recognition` with a [speech recognition polyfill](docs/POLYFILLS.md). Why? Here's a comparison with and without polyfills:
+* ✅ With a polyfill, your web app will be voice-enabled on all modern browsers (except Internet Explorer)
+* ❌ Without a polyfill, your web app will only be voice-enabled on the browsers listed [here](#supported-browsers)
+* ✅ With a polyfill, your web app will have a consistent voice experience across browsers
+* ❌ Without a polyfill, different native implementations will produce different transcriptions, have different levels of accuracy, and have different formatting styles
+* ✅ With a polyfill, you control who is processing your users' voice data
+* ❌ Without a polyfill, your users' voice data will be sent to big tech companies like Google or Apple to be transcribed
+* ✅ With a polyfill, `react-speech-recognition` will be suitable for use in commercial applications
+* ❌ Without a polyfill, `react-speech-recognition` will still be fine for personal projects or use cases where cross-browser support is not needed
+ 
+`react-speech-recognition` currently supports polyfills for the following cloud providers:
 
 <div>
   <a href="https://www.speechly.com/?utm_source=github">
@@ -80,6 +91,8 @@ By default, speech recognition is not supported in all browsers, with the best n
     <img src="docs/logos/microsoft.png" width="175" alt="Microsoft Azure Cognitive Services">
   </a>
 </div>
+
+## Cross-browser example
 
 You can find the full guide for setting up a polyfill [here](docs/POLYFILLS.md). Alternatively, here is a quick (and free) example using Speechly:
 * Install `@speechly/speech-recognition-polyfill` in your web app
