@@ -3,8 +3,15 @@ import { CortiSpeechRecognition } from '../tests/vendor/corti'
 import SpeechRecognition, { useSpeechRecognition } from './SpeechRecognition'
 import isAndroid from './isAndroid'
 import RecognitionManager from './RecognitionManager'
+import { browserSupportsPolyfills } from './utils'
 
 jest.mock('./isAndroid')
+jest.mock('./utils', () => {
+  return {
+    ...jest.requireActual('./utils'),
+    browserSupportsPolyfills: jest.fn()
+  }
+})
 
 const mockRecognitionManager = () => {
   const recognitionManager = new RecognitionManager(window.SpeechRecognition)
@@ -15,6 +22,8 @@ const mockRecognitionManager = () => {
 describe('SpeechRecognition', () => {
   beforeEach(() => {
     isAndroid.mockClear()
+    browserSupportsPolyfills.mockImplementation(() => true)
+    SpeechRecognition.applyPolyfill(CortiSpeechRecognition)
   })
 
   test('sets applyPolyfill correctly', () => {
@@ -26,6 +35,18 @@ describe('SpeechRecognition', () => {
 
     expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(true)
     expect(SpeechRecognition.getRecognition() instanceof MockSpeechRecognition).toEqual(true)
+  })
+
+  test('sets browserSupportsContinuousListening to false when using polyfill on unsupported browser', () => {
+    browserSupportsPolyfills.mockImplementation(() => false)
+    const MockSpeechRecognition = class {}
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsContinuousListening } = result.current
+
+    expect(browserSupportsContinuousListening).toEqual(false)
+    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(false)
   })
 
   test('sets default transcripts correctly', () => {
