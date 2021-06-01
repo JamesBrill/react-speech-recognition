@@ -72,4 +72,17 @@ const compareTwoStringsUsingDiceCoefficient = (first, second) => {
   return (2.0 * intersectionSize) / (first.length + second.length - 2)
 }
 
-export { debounce, concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient }
+const browserSupportsPolyfills = () => {
+  return typeof window !== 'undefined' &&
+    window.navigator !== undefined &&
+    window.navigator.mediaDevices !== undefined &&
+    (window.AudioContext !== undefined || window.webkitAudioContext !== undefined)
+}
+
+export {
+  debounce,
+  concatTranscripts,
+  commandToRegExp,
+  compareTwoStringsUsingDiceCoefficient,
+  browserSupportsPolyfills
+}

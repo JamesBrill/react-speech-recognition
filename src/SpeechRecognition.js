@@ -1,5 +1,10 @@
 import { useState, useEffect, useReducer, useCallback, useRef } from 'react'
-import { concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient } from './utils'
+import {
+  concatTranscripts,
+  commandToRegExp,
+  compareTwoStringsUsingDiceCoefficient,
+  browserSupportsPolyfills
+} from './utils'
 import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
@@ -171,8 +176,8 @@ const SpeechRecognition = {
     } else {
       recognitionManager = new RecognitionManager(PolyfillSpeechRecognition)
     }
-    _browserSupportsSpeechRecognition = true
-    _browserSupportsContinuousListening = true
+    _browserSupportsSpeechRecognition = browserSupportsPolyfills()
+    _browserSupportsContinuousListening = browserSupportsPolyfills()
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {
