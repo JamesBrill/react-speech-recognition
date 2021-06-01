@@ -68,7 +68,7 @@ export default Dictaphone;
 
 You can see more examples in the example React app attached to this repo. See [Developing](#developing).
 
-### Why you should use a polyfill with this library
+## Why you should use a polyfill with this library
 
 By default, speech recognition is not supported in all browsers, with the best native experience being available on desktop Chrome. To avoid the limitations of native browser speech recognition, it's recommended that you combine `react-speech-recognition` with a [speech recognition polyfill](docs/POLYFILLS.md). Why? Here's a comparison with and without polyfills:
 * ✅ With a polyfill, your web app will be voice-enabled on all modern browsers (except Internet Explorer)
