@@ -76,6 +76,7 @@ const browserSupportsPolyfills = () => {
   return typeof window !== 'undefined' &&
     window.navigator !== undefined &&
     window.navigator.mediaDevices !== undefined &&
+    window.navigator.mediaDevices.getUserMedia !== undefined &&
     (window.AudioContext !== undefined || window.webkitAudioContext !== undefined)
 }
 
