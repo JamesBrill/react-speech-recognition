@@ -16,8 +16,7 @@ Note that this type of polyfill that does not pollute the global scope is known 
 
 ## Usage recommendations
 * Call this as early as possible to minimise periods where fallback content, which you should render while the polyfill is loading, is rendered
-* Use your own `loadingSpeechRecognition` state rather than `browserSupportsSpeechRecognition` to decide when to render fallback content when Speech Recognition is not available. This is because on Chrome, `browserSupportsSpeechRecognition` will return `true` - as a result, your speech recognition component will appear briefly with the Google Speech Recognition engine and then with the polyfill engine, potentially causing a janky user experience. Some example code using the loading state approach can be found below
-* After `applyPolyfill` has been called, `browserSupportsSpeechRecognition` will always be `true`. The polyfill itself may not work on all browsers - it's worth having a further fallback to cover that case. Polyfills will usually require WebRTC support in the browser, so it's worth checking that `window.navigator.mediaDevices.getUserMedia` is present
+* After `applyPolyfill` has been called, `browserSupportsSpeechRecognition` will be `true` on _most_ browsers, but there are still exceptions. Browsers like Internet Explorer do not support the APIs needed for polyfills - in these cases where `browserSupportsSpeechRecognition` is `false`, you should still have some suitable fallback content
 * Do not rely on polyfills being perfect implementations of the Speech Recognition specification - make sure you have tested them in different browsers and are aware of their individual limitations
 
 # Polyfill libraries
@@ -148,6 +147,7 @@ export default Dictaphone;
 ```
 
 ### Limitations
+* As the Azure polyfill loads asynchronously, it's recommended that you use your own `loadingSpeechRecognition` state rather than `browserSupportsSpeechRecognition` to decide when to render fallback content when Speech Recognition is not available. This is because on Chrome, `browserSupportsSpeechRecognition` will return `true` - as a result, your speech recognition component will appear briefly with the Google Speech Recognition engine and then with the polyfill engine, potentially causing a janky user experience. The example code above demonstrates the use of such a loading state
 * On Safari and Firefox, an error will be thrown if calling `startListening` to switch to a different language without first calling `stopListening`. It's recommended that you stick to one language and, if you do need to change languages, call `stopListening` first
 * If you don't specify a language, Azure will return a 400 response. When calling `startListening`, you will need to explicitly provide one of the language codes defined [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support). For English, use `en-GB` or `en-US`
 * Safari will throw an error on `localhost` as it requires HTTPS. [ngrok](https://ngrok.com/) is a nice tool for serving a local web app over HTTPS (also good for testing your web app on mobile devices as well)
