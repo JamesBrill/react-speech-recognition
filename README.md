@@ -47,9 +47,14 @@ import React from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 const Dictaphone = () => {
-  const { transcript, listening, resetTranscript } = useSpeechRecognition();
+  const {
+    transcript,
+    listening,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
 
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+  if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
 
@@ -108,8 +113,16 @@ const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
 SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
 
 const Dictaphone = () => {
-  const { transcript, listening } = useSpeechRecognition();
+  const {
+    transcript,
+    listening,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
   const startListening = () => SpeechRecognition.startListening({ continuous: true });
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
 
   return (
     <div>
@@ -132,7 +145,7 @@ export default Dictaphone;
 If you choose not to use a polyfill, this library still fails gracefully on browsers that don't support speech recognition. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
 ```
-if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+if (!browserSupportsSpeechRecognition) {
   // Render some fallback content
 }
 ```
@@ -273,9 +286,9 @@ const Dictaphone = () => {
     }
   ]
 
-  const { transcript } = useSpeechRecognition({ commands })
+  const { transcript, browserSupportsSpeechRecognition } = useSpeechRecognition({ commands })
 
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+  if (!browserSupportsSpeechRecognition) {
     return null
   }
 

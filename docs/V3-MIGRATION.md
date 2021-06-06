@@ -51,13 +51,13 @@ import React, { useEffect } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 const Dictaphone = () => {
-  const { transcript, resetTranscript } = useSpeechRecognition()
+  const { transcript, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition()
 
   useEffect(() => {
     SpeechRecognition.startListening({ continuous: true })
   }, []);
 
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+  if (!browserSupportsSpeechRecognition) {
     return null
   }
 

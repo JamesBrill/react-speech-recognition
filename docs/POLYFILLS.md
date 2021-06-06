@@ -49,8 +49,16 @@ const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
 SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
 
 const Dictaphone = () => {
-  const { transcript, listening } = useSpeechRecognition();
+  const {
+    transcript,
+    listening,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
   const startListening = () => SpeechRecognition.startListening({ continuous: true });
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
 
   return (
     <div>
@@ -102,7 +110,11 @@ const TOKEN_ENDPOINT = `https://${REGION}.api.cognitive.microsoft.com/sts/v1.0/i
 
 const Dictaphone = () => {
   const [loadingSpeechRecognition, setLoadingSpeechRecognition] = useState(true);
-  const { transcript, resetTranscript } = useSpeechRecognition();
+  const {
+    transcript,
+    resetTranscript,
+    browserSupportsSpeechRecognition
+  } = useSpeechRecognition();
 
   const startListening = () => SpeechRecognition.startListening({
     continuous: true,
@@ -130,7 +142,7 @@ const Dictaphone = () => {
     loadSpeechRecognition();
   }, []);
 
-  if (loadingSpeechRecognition) {
+  if (loadingSpeechRecognition || !browserSupportsSpeechRecognition) {
     return null;
   }
 
