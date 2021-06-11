@@ -256,7 +256,7 @@ This returns the underlying [object](https://developer.mozilla.org/en-US/docs/We
 
 #### applyPolyfill
 
-Replace the default Speech Recognition engine (if there is one) with a custom implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). See [Polyfills](./POLYFILLS.md) for more information on how to use this.
+Replace the native Speech Recognition engine (if there is one) with a custom implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). If there is a Speech Recognition implementation already listening to the microphone, this will be turned off. See [Polyfills](./POLYFILLS.md) for more information on how to use this.
 
 ```
 SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
