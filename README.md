@@ -4,7 +4,7 @@ A React hook that converts speech from the microphone to text and makes it avail
 [![npm version](https://img.shields.io/npm/v/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
 [![npm downloads](https://img.shields.io/npm/dm/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
 [![license](https://img.shields.io/github/license/JamesBrill/react-speech-recognition.svg)](https://opensource.org/licenses/MIT)
-[![Coverage Status](https://coveralls.io/repos/github/JamesBrill/react-speech-recognition/badge.svg?branch=commands)](https://coveralls.io/github/JamesBrill/react-speech-recognition?branch=commands)
+[![Coverage Status](https://coveralls.io/repos/github/JamesBrill/react-speech-recognition/badge.svg?branch=master)](https://coveralls.io/github/JamesBrill/react-speech-recognition?branch=master)
 
 ## How it works
 `useSpeechRecognition` is a React hook that gives a component access to a transcript of speech picked up from the user's microphone.
