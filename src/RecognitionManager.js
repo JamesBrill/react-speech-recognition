@@ -31,6 +31,13 @@ export default class RecognitionManager {
       isNative(SpeechRecognition) || browserSupportsPolyfills()
     )
     if (browserSupportsRecogniser) {
+      if (this.recognition) {
+        this.recognition.onresult = () => {}
+        this.recognition.onend = () => {}
+        if (this.listening) {
+          this.stopListening()
+        }
+      }
       this.recognition = new SpeechRecognition()
       this.recognition.continuous = false
       this.recognition.interimResults = true
