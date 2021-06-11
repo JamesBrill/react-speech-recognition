@@ -1,18 +1,17 @@
 import { useState, useEffect, useReducer, useCallback, useRef } from 'react'
-import { concatTranscripts, commandToRegExp, compareTwoStringsUsingDiceCoefficient } from './utils'
+import {
+  concatTranscripts,
+  commandToRegExp,
+  compareTwoStringsUsingDiceCoefficient,
+  browserSupportsPolyfills
+} from './utils'
 import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 import isAndroid from './isAndroid'
+import NativeSpeechRecognition from './NativeSpeechRecognition'
 
-const DefaultSpeechRecognition =
-  typeof window !== 'undefined' &&
-  (window.SpeechRecognition ||
-    window.webkitSpeechRecognition ||
-    window.mozSpeechRecognition ||
-    window.msSpeechRecognition ||
-    window.oSpeechRecognition)
-let _browserSupportsSpeechRecognition = !!DefaultSpeechRecognition
+let _browserSupportsSpeechRecognition = !!NativeSpeechRecognition
 let _browserSupportsContinuousListening = _browserSupportsSpeechRecognition && !isAndroid()
 let recognitionManager
 
@@ -171,12 +170,13 @@ const SpeechRecognition = {
     } else {
       recognitionManager = new RecognitionManager(PolyfillSpeechRecognition)
     }
-    _browserSupportsSpeechRecognition = true
-    _browserSupportsContinuousListening = true
+    const browserSupportsPolyfill = !!PolyfillSpeechRecognition && browserSupportsPolyfills()
+    _browserSupportsSpeechRecognition = browserSupportsPolyfill
+    _browserSupportsContinuousListening = browserSupportsPolyfill
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {
-      recognitionManager = new RecognitionManager(DefaultSpeechRecognition)
+      recognitionManager = new RecognitionManager(NativeSpeechRecognition)
     }
     return recognitionManager
   },

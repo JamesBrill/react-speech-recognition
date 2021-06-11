@@ -1,5 +1,6 @@
 import isAndroid from './isAndroid'
-import { debounce, concatTranscripts } from './utils'
+import { debounce, concatTranscripts, browserSupportsPolyfills } from './utils'
+import { isNative } from './NativeSpeechRecognition'
 
 export default class RecognitionManager {
   constructor(SpeechRecognition) {
@@ -26,14 +27,24 @@ export default class RecognitionManager {
   }
 
   setSpeechRecognition(SpeechRecognition) {
-    if (SpeechRecognition) {
+    const browserSupportsRecogniser = !!SpeechRecognition && (
+      isNative(SpeechRecognition) || browserSupportsPolyfills()
+    )
+    if (browserSupportsRecogniser) {
+      if (this.recognition) {
+        this.recognition.onresult = () => {}
+        this.recognition.onend = () => {}
+        if (this.listening) {
+          this.stopListening()
+        }
+      }
       this.recognition = new SpeechRecognition()
       this.recognition.continuous = false
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
       this.recognition.onend = this.onRecognitionDisconnect.bind(this)
-      this.emitBrowserSupportsSpeechRecognitionChange(true)
     }
+    this.emitBrowserSupportsSpeechRecognitionChange(browserSupportsRecogniser)
   }
 
   subscribe(id, callbacks) {

@@ -46,23 +46,23 @@ export default SpeechRecognition(Dictaphone);
 
 ### In v3
 
+Automatically enabling the microphone without any user input is no longer encouraged as most browsers now prevent this. This is due to concerns about privacy - users don't necessarily want their browser listening to them without being asked. The "auto-start" has been replaced with a button to trigger the microphone being turned on.
+
 ```
 import React, { useEffect } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
 const Dictaphone = () => {
-  const { transcript, resetTranscript } = useSpeechRecognition()
+  const { transcript, resetTranscript, browserSupportsSpeechRecognition } = useSpeechRecognition()
+  const startListening = () => SpeechRecognition.startListening({ continuous: true })
 
-  useEffect(() => {
-    SpeechRecognition.startListening({ continuous: true })
-  }, []);
-
-  if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+  if (!browserSupportsSpeechRecognition) {
     return null
   }
 
   return (
     <div>
+      <button onClick={startListening}>Start</button>
       <button onClick={resetTranscript}>Reset</button>
       <p>{transcript}</p>
     </div>
@@ -73,7 +73,11 @@ export default Dictaphone
 
 ## autoStart
 
-This was a global option in v2 that would cause the microphone to start listening from the beginning by default. In v3, the microphone is initially turned off by default. It can be turned on when your component first renders by either `useEffect` if you're using hooks or `componentDidMount` if you're still using class components. It is recommended that you do this close to the root of your application as this affects global state.
+This was a global option in v2 that would cause the microphone to start listening from the beginning by default. In v3, the microphone is initially turned off by default.
+
+Automatically enabling the microphone without any user input is no longer encouraged as most browsers now prevent this. This is due to concerns about privacy - users don't necessarily want their browser listening to them without being asked. The preferred approach is to have a button that starts the microphone when clicked.
+
+However, if you still want an auto-start feature for the purposes of testing in Chrome, which still allows it, you can do the following: the microphone can be turned on when your component first renders by either `useEffect` if you're using hooks or `componentDidMount` if you're still using class components. It is recommended that you do this close to the root of your application as this affects global state.
 
 ```
 useEffect(() => {

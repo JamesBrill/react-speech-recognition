@@ -89,8 +89,6 @@ if (!browserSupportsSpeechRecognition) {
 }
 ```
 
-It is recommended that you use this state to decide when to render fallback content rather than `SpeechRecognition.browserSupportsSpeechRecognition()` as this will correctly re-render your component if the browser support changes at run-time (e.g. due to a polyfill being applied).
-
 #### browserSupportsContinuousListening [bool]
 
 Continuous listening is not supported on all browsers, so it is recommended that you apply some fallback behaviour if your web app uses continuous listening and is running on a browser that doesn't support it:
@@ -252,25 +250,13 @@ SpeechRecognition.abortListening()
 
 This is an asynchronous function, so it will need to be awaited if you want to do something after the microphone has been turned off.
 
-#### browserSupportsSpeechRecognition
-
-The Web Speech API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
-
-```
-if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-  // Render some fallback content
-}
-```
-
-It is recommended that you instead use the `browserSupportsSpeechRecognition` state from `useSpeechRecognition` to decide when to render fallback content - that will correctly re-render your component if the browser support changes at run-time (e.g. due to a polyfill being applied).
-
 #### getRecognition
 
 This returns the underlying [object](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition) used by Web Speech API.
 
 #### applyPolyfill
 
-Replace the default Speech Recognition engine (if there is one) with a custom implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). See [Polyfills](./POLYFILLS.md) for more information on how to use this.
+Replace the native Speech Recognition engine (if there is one) with a custom implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). If there is a Speech Recognition implementation already listening to the microphone, this will be turned off. See [Polyfills](./POLYFILLS.md) for more information on how to use this.
 
 ```
 SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)

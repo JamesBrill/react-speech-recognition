@@ -3,8 +3,15 @@ import { CortiSpeechRecognition } from '../tests/vendor/corti'
 import SpeechRecognition, { useSpeechRecognition } from './SpeechRecognition'
 import isAndroid from './isAndroid'
 import RecognitionManager from './RecognitionManager'
+import { browserSupportsPolyfills } from './utils'
 
 jest.mock('./isAndroid')
+jest.mock('./utils', () => {
+  return {
+    ...jest.requireActual('./utils'),
+    browserSupportsPolyfills: jest.fn()
+  }
+})
 
 const mockRecognitionManager = () => {
   const recognitionManager = new RecognitionManager(window.SpeechRecognition)
@@ -15,6 +22,8 @@ const mockRecognitionManager = () => {
 describe('SpeechRecognition', () => {
   beforeEach(() => {
     isAndroid.mockClear()
+    browserSupportsPolyfills.mockImplementation(() => true)
+    SpeechRecognition.applyPolyfill(CortiSpeechRecognition)
   })
 
   test('sets applyPolyfill correctly', () => {
@@ -26,6 +35,84 @@ describe('SpeechRecognition', () => {
 
     expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(true)
     expect(SpeechRecognition.getRecognition() instanceof MockSpeechRecognition).toEqual(true)
+  })
+
+  test('does not collect transcripts from previous speech recognition after polyfill applied', async () => {
+    const cortiSpeechRecognition = SpeechRecognition.getRecognition()
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const speech = 'This is a test'
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.applyPolyfill(class {})
+    })
+    act(() => {
+      cortiSpeechRecognition.say(speech)
+    })
+
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
+  })
+
+  test('stops listening after polyfill applied', async () => {
+    const { result } = renderHook(() => useSpeechRecognition())
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.applyPolyfill(class {})
+    })
+
+    const { listening } = result.current
+    expect(listening).toEqual(false)
+  })
+
+  test('sets browserSupportsContinuousListening to false when using polyfill on unsupported browser', () => {
+    browserSupportsPolyfills.mockImplementation(() => false)
+    const MockSpeechRecognition = class {}
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsContinuousListening } = result.current
+
+    expect(browserSupportsContinuousListening).toEqual(false)
+    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(false)
+  })
+
+  test('sets browserSupportsSpeechRecognition to false when using polyfill on unsupported browser', () => {
+    browserSupportsPolyfills.mockImplementation(() => false)
+    const MockSpeechRecognition = class {}
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsSpeechRecognition } = result.current
+
+    expect(browserSupportsSpeechRecognition).toEqual(false)
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
+  })
+
+  test('sets browserSupportsContinuousListening to false when given falsey SpeechRecognition', () => {
+    SpeechRecognition.applyPolyfill()
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsContinuousListening } = result.current
+
+    expect(browserSupportsContinuousListening).toEqual(false)
+    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(false)
+  })
+
+  test('sets browserSupportsSpeechRecognition to false when given falsey SpeechRecognition', () => {
+    SpeechRecognition.applyPolyfill()
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsSpeechRecognition } = result.current
+
+    expect(browserSupportsSpeechRecognition).toEqual(false)
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
   })
 
   test('sets default transcripts correctly', () => {
