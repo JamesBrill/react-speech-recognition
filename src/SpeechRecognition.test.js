@@ -37,6 +37,40 @@ describe('SpeechRecognition', () => {
     expect(SpeechRecognition.getRecognition() instanceof MockSpeechRecognition).toEqual(true)
   })
 
+  test('does not collect transcripts from previous speech recognition after polyfill applied', async () => {
+    const cortiSpeechRecognition = SpeechRecognition.getRecognition()
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const speech = 'This is a test'
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.applyPolyfill(class {})
+    })
+    act(() => {
+      cortiSpeechRecognition.say(speech)
+    })
+
+    const { transcript, interimTranscript, finalTranscript } = result.current
+    expect(transcript).toEqual('')
+    expect(interimTranscript).toEqual('')
+    expect(finalTranscript).toEqual('')
+  })
+
+  test('stops listening after polyfill applied', async () => {
+    const { result } = renderHook(() => useSpeechRecognition())
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+    act(() => {
+      SpeechRecognition.applyPolyfill(class {})
+    })
+
+    const { listening } = result.current
+    expect(listening).toEqual(false)
+  })
+
   test('sets browserSupportsContinuousListening to false when using polyfill on unsupported browser', () => {
     browserSupportsPolyfills.mockImplementation(() => false)
     const MockSpeechRecognition = class {}
