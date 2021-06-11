@@ -170,8 +170,9 @@ const SpeechRecognition = {
     } else {
       recognitionManager = new RecognitionManager(PolyfillSpeechRecognition)
     }
-    _browserSupportsSpeechRecognition = browserSupportsPolyfills()
-    _browserSupportsContinuousListening = browserSupportsPolyfills()
+    const browserSupportsPolyfill = !!PolyfillSpeechRecognition && browserSupportsPolyfills()
+    _browserSupportsSpeechRecognition = browserSupportsPolyfill
+    _browserSupportsContinuousListening = browserSupportsPolyfill
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {

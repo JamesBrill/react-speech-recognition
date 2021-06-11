@@ -27,7 +27,7 @@ export default class RecognitionManager {
   }
 
   setSpeechRecognition(SpeechRecognition) {
-    const browserSupportsRecogniser = SpeechRecognition && (
+    const browserSupportsRecogniser = !!SpeechRecognition && (
       isNative(SpeechRecognition) || browserSupportsPolyfills()
     )
     if (browserSupportsRecogniser) {
