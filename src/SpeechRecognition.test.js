@@ -49,6 +49,38 @@ describe('SpeechRecognition', () => {
     expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(false)
   })
 
+  test('sets browserSupportsSpeechRecognition to false when using polyfill on unsupported browser', () => {
+    browserSupportsPolyfills.mockImplementation(() => false)
+    const MockSpeechRecognition = class {}
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsSpeechRecognition } = result.current
+
+    expect(browserSupportsSpeechRecognition).toEqual(false)
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
+  })
+
+  test('sets browserSupportsContinuousListening to false when given falsey SpeechRecognition', () => {
+    SpeechRecognition.applyPolyfill()
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsContinuousListening } = result.current
+
+    expect(browserSupportsContinuousListening).toEqual(false)
+    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(false)
+  })
+
+  test('sets browserSupportsSpeechRecognition to false when given falsey SpeechRecognition', () => {
+    SpeechRecognition.applyPolyfill()
+
+    const { result } = renderHook(() => useSpeechRecognition())
+    const { browserSupportsSpeechRecognition } = result.current
+
+    expect(browserSupportsSpeechRecognition).toEqual(false)
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
+  })
+
   test('sets default transcripts correctly', () => {
     const { result } = renderHook(() => useSpeechRecognition())
 
