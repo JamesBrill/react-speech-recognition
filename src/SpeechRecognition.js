@@ -9,15 +9,9 @@ import { clearTrancript, appendTrancript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 import isAndroid from './isAndroid'
+import NativeSpeechRecognition from './NativeSpeechRecognition'
 
-const DefaultSpeechRecognition =
-  typeof window !== 'undefined' &&
-  (window.SpeechRecognition ||
-    window.webkitSpeechRecognition ||
-    window.mozSpeechRecognition ||
-    window.msSpeechRecognition ||
-    window.oSpeechRecognition)
-let _browserSupportsSpeechRecognition = !!DefaultSpeechRecognition
+let _browserSupportsSpeechRecognition = !!NativeSpeechRecognition
 let _browserSupportsContinuousListening = _browserSupportsSpeechRecognition && !isAndroid()
 let recognitionManager
 
@@ -181,7 +175,7 @@ const SpeechRecognition = {
   },
   getRecognitionManager: () => {
     if (!recognitionManager) {
-      recognitionManager = new RecognitionManager(DefaultSpeechRecognition)
+      recognitionManager = new RecognitionManager(NativeSpeechRecognition)
     }
     return recognitionManager
   },
