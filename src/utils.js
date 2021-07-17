@@ -21,7 +21,7 @@ const concatTranscripts = (...transcriptParts) => {
 // The command matching code is a modified version of Backbone.Router by Jeremy Ashkenas, under the MIT license.
 const optionalParam = /\s*\((.*?)\)\s*/g
 const optionalRegex = /(\(\?:[^)]+\))\?/g
-const fuzzyParam = /\<(.*?)\>/g
+const fuzzyParam = /<(.*?)>/g
 const namedParam = /(\(\?)?:\w+/g
 const splatParam = /\*/g
 const escapeRegExp = /[-{}[\]+?.,\\^$|#]/g
