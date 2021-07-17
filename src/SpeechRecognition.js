@@ -60,14 +60,45 @@ const useSpeechRecognition = ({
     return null
   }
 
-  const testMatch = (command, input) => {
+  const testMatch = (command, input, fuzzyMatchers) => {
     const pattern = commandToRegExp(command)
     const result = pattern.exec(input)
     if (result) {
-      return {
+      const fuzzyResults = {}
+      if (fuzzyMatchers) {
+        const fuzzyGroups = result.groups
+        if (!fuzzyGroups) {
+          return null
+        }
+        const fuzzyMatcherNames = Object.keys(fuzzyMatchers)
+        for (let i = 0; i < fuzzyMatcherNames.length; i += 1) {
+          const fuzzyMatcherName = fuzzyMatcherNames[i]
+          const fuzzyGroup = fuzzyGroups[fuzzyMatcherName]
+          const { command, fuzzyMatchingThreshold } = fuzzyMatchers[fuzzyMatcherName]
+          const subcommands = Array.isArray(command) ? command : [command]
+          const results = subcommands
+            .map(subcommand =>
+              testFuzzyMatch(subcommand, fuzzyGroup, fuzzyMatchingThreshold)
+            )
+            .filter(x => x)
+            .sort((a, b) => b.howSimilar - a.howSimilar)
+          if (results.length === 0) {
+            return null
+          }
+          fuzzyResults[fuzzyMatcherName] = {
+            utterance: fuzzyGroup,
+            ...results[0]
+          }
+        }
+      }
+      const matchResult = {
         command,
         parameters: result.slice(1)
       }
+      if (fuzzyMatchers) {
+        matchResult.fuzzyResults = fuzzyResults
+      }
+      return matchResult
     }
     return null
   }
@@ -80,7 +111,8 @@ const useSpeechRecognition = ({
         matchInterim = false,
         isFuzzyMatch = false,
         fuzzyMatchingThreshold = 0.8,
-        bestMatchOnly = false
+        bestMatchOnly = false,
+        fuzzyMatchers = null
       }) => {
         const input = !newFinalTranscript && matchInterim
           ? newInterimTranscript.trim()
@@ -90,7 +122,7 @@ const useSpeechRecognition = ({
           if (isFuzzyMatch) {
             return testFuzzyMatch(subcommand, input, fuzzyMatchingThreshold)
           }
-          return testMatch(subcommand, input)
+          return testMatch(subcommand, input, fuzzyMatchers)
         }).filter(x => x)
         if (isFuzzyMatch && bestMatchOnly && results.length >= 2) {
           results.sort((a, b) => b.howSimilar - a.howSimilar)
@@ -102,8 +134,8 @@ const useSpeechRecognition = ({
               const { command, commandWithoutSpecials, howSimilar } = result
               callback(commandWithoutSpecials, input, howSimilar, { command, resetTranscript })
             } else {
-              const { command, parameters } = result
-              callback(...parameters, { command, resetTranscript })
+              const { command, parameters, fuzzyResults } = result
+              callback(...parameters, { command, resetTranscript, fuzzyResults })
             }
           })
         }

@@ -21,6 +21,7 @@ const concatTranscripts = (...transcriptParts) => {
 // The command matching code is a modified version of Backbone.Router by Jeremy Ashkenas, under the MIT license.
 const optionalParam = /\s*\((.*?)\)\s*/g
 const optionalRegex = /(\(\?:[^)]+\))\?/g
+const fuzzyParam = /\<(.*?)\>/g
 const namedParam = /(\(\?)?:\w+/g
 const splatParam = /\*/g
 const escapeRegExp = /[-{}[\]+?.,\\^$|#]/g
@@ -36,6 +37,7 @@ const commandToRegExp = (command) => {
     })
     .replace(splatParam, '(.*?)')
     .replace(optionalRegex, '\\s*$1?\\s*')
+    .replace(fuzzyParam, '(?<$1>.*)')
   return new RegExp('^' + command + '$', 'i')
 }
 
