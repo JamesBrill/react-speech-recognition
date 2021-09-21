@@ -9,6 +9,7 @@ export default class RecognitionManager {
     this.interimTranscript = ''
     this.finalTranscript = ''
     this.listening = false
+    this.isMicrophoneAvailable = true
     this.subscribers = {}
     this.onStopListening = () => {}
     this.previousResultWasFinalOnly = false
@@ -60,6 +61,14 @@ export default class RecognitionManager {
     Object.keys(this.subscribers).forEach((id) => {
       const { onListeningChange } = this.subscribers[id]
       onListeningChange(listening)
+    })
+  }
+
+  emitMicrophoneAvailabilityChange(isMicrophoneAvailable) {
+    this.isMicrophoneAvailable = isMicrophoneAvailable
+    Object.keys(this.subscribers).forEach((id) => {
+      const { onMicrophoneAvailabilityChange } = this.subscribers[id]
+      onMicrophoneAvailabilityChange(isMicrophoneAvailable)
     })
   }
 
@@ -178,11 +187,15 @@ export default class RecognitionManager {
         this.emitClearTranscript()
       }
       try {
-        this.start()
-      } catch (DOMException) {
-        // Tried to start recognition after it has already started - safe to swallow this error
+        await this.start()
+        this.emitListeningChange(true)
+      } catch (e) {
+        // DOMExceptions indicate a redundant microphone start - safe to swallow
+        if (!(e instanceof DOMException)) {
+          this.emitMicrophoneAvailabilityChange(false)
+          await this.abortListening()
+        }
       }
-      this.emitListeningChange(true)
     }
   }
 
@@ -206,9 +219,9 @@ export default class RecognitionManager {
     return this.recognition
   }
 
-  start() {
+  async start() {
     if (this.recognition && !this.listening) {
-      this.recognition.start()
+      await this.recognition.start()
       this.listening = true
     }
   }

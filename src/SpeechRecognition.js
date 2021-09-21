@@ -30,6 +30,8 @@ const useSpeechRecognition = ({
     finalTranscript: ''
   })
   const [listening, setListening] = useState(recognitionManager.listening)
+  const [isMicrophoneAvailable, setMicrophoneAvailable] =
+    useState(recognitionManager.isMicrophoneAvailable)
   const commandsRef = useRef(commands)
   commandsRef.current = commands
 
@@ -133,6 +135,7 @@ const useSpeechRecognition = ({
     SpeechRecognition.counter += 1
     const callbacks = {
       onListeningChange: setListening,
+      onMicrophoneAvailabilityChange: setMicrophoneAvailable,
       onTranscriptChange: handleTranscriptChange,
       onClearTranscript: handleClearTranscript,
       onBrowserSupportsSpeechRecognitionChange: setBrowserSupportsSpeechRecognition,
@@ -157,6 +160,7 @@ const useSpeechRecognition = ({
     interimTranscript,
     finalTranscript,
     listening,
+    isMicrophoneAvailable,
     resetTranscript,
     browserSupportsSpeechRecognition,
     browserSupportsContinuousListening
