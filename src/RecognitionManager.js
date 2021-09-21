@@ -193,7 +193,6 @@ export default class RecognitionManager {
         // DOMExceptions indicate a redundant microphone start - safe to swallow
         if (!(e instanceof DOMException)) {
           this.emitMicrophoneAvailabilityChange(false)
-          await this.abortListening()
         }
       }
     }
