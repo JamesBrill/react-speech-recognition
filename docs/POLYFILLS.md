@@ -184,6 +184,7 @@ If you want to roll your own implementation of the Speech Recognition API, follo
   * `event.results[i][0].transcript`
   * `event.results[i][0].confidence`
 * `onend` (property)
+* `onerror` (property)
 * `start` (method)
 * `stop` (method)
 * `abort` (method)
