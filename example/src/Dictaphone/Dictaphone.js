@@ -12,7 +12,8 @@ const Dictaphone = ({ commands }) => {
     finalTranscript,
     resetTranscript,
     listening,
-    browserSupportsSpeechRecognition
+    browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
   } = useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands })
   useEffect(() => {
     if (interimTranscript !== '') {
@@ -25,6 +26,10 @@ const Dictaphone = ({ commands }) => {
 
   if (!browserSupportsSpeechRecognition) {
     return <span>No browser support</span>
+  }
+
+  if (!isMicrophoneAvailable) {
+    return <span>Please allow access to the microphone</span>
   }
 
   return (
