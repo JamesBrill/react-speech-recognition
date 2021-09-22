@@ -9,6 +9,7 @@ export default class RecognitionManager {
     this.interimTranscript = ''
     this.finalTranscript = ''
     this.listening = false
+    this.isMicrophoneAvailable = true
     this.subscribers = {}
     this.onStopListening = () => {}
     this.previousResultWasFinalOnly = false
@@ -18,6 +19,7 @@ export default class RecognitionManager {
     this.stopListening = this.stopListening.bind(this)
     this.abortListening = this.abortListening.bind(this)
     this.setSpeechRecognition = this.setSpeechRecognition.bind(this)
+    this.disableRecognition = this.disableRecognition.bind(this)
 
     this.setSpeechRecognition(SpeechRecognition)
 
@@ -31,18 +33,13 @@ export default class RecognitionManager {
       isNative(SpeechRecognition) || browserSupportsPolyfills()
     )
     if (browserSupportsRecogniser) {
-      if (this.recognition) {
-        this.recognition.onresult = () => {}
-        this.recognition.onend = () => {}
-        if (this.listening) {
-          this.stopListening()
-        }
-      }
+      this.disableRecognition()
       this.recognition = new SpeechRecognition()
       this.recognition.continuous = false
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
       this.recognition.onend = this.onRecognitionDisconnect.bind(this)
+      this.recognition.onerror = this.onError.bind(this)
     }
     this.emitBrowserSupportsSpeechRecognitionChange(browserSupportsRecogniser)
   }
@@ -60,6 +57,14 @@ export default class RecognitionManager {
     Object.keys(this.subscribers).forEach((id) => {
       const { onListeningChange } = this.subscribers[id]
       onListeningChange(listening)
+    })
+  }
+
+  emitMicrophoneAvailabilityChange(isMicrophoneAvailable) {
+    this.isMicrophoneAvailable = isMicrophoneAvailable
+    Object.keys(this.subscribers).forEach((id) => {
+      const { onMicrophoneAvailabilityChange } = this.subscribers[id]
+      onMicrophoneAvailabilityChange(isMicrophoneAvailable)
     })
   }
 
@@ -101,6 +106,24 @@ export default class RecognitionManager {
           this.pauseAfterDisconnect = true
           this.stop()
       }
+    }
+  }
+
+  disableRecognition() {
+    if (this.recognition) {
+      this.recognition.onresult = () => {}
+      this.recognition.onend = () => {}
+      this.recognition.onerror = () => {}
+      if (this.listening) {
+        this.stopListening()
+      }
+    }
+  }
+
+  onError(event) {
+    if (event && event.error && event.error === 'not-allowed') {
+      this.emitMicrophoneAvailabilityChange(false)
+      this.disableRecognition()
     }
   }
 
@@ -178,11 +201,14 @@ export default class RecognitionManager {
         this.emitClearTranscript()
       }
       try {
-        this.start()
-      } catch (DOMException) {
-        // Tried to start recognition after it has already started - safe to swallow this error
+        await this.start()
+        this.emitListeningChange(true)
+      } catch (e) {
+        // DOMExceptions indicate a redundant microphone start - safe to swallow
+        if (!(e instanceof DOMException)) {
+          this.emitMicrophoneAvailabilityChange(false)
+        }
       }
-      this.emitListeningChange(true)
     }
   }
 
@@ -206,9 +232,9 @@ export default class RecognitionManager {
     return this.recognition
   }
 
-  start() {
+  async start() {
     if (this.recognition && !this.listening) {
-      this.recognition.start()
+      await this.recognition.start()
       this.listening = true
     }
   }

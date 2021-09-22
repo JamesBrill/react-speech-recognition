@@ -163,6 +163,16 @@ Without a polyfill, the Web Speech API is largely only supported by Google brows
 
 For all other browsers, you can render fallback content using the `SpeechRecognition.browserSupportsSpeechRecognition` function described above. Alternatively, as mentioned before, you can integrate a [polyfill](docs/POLYFILLS.md).
 
+## Detecting when the user denies access to the microphone
+
+Even if the browser supports the Web Speech API, the user still has to give permission for their microphone to be used before transcription can begin. They are asked for permission when `react-speech-recognition` first tries to start listening. At this point, you can detect when the user denies access via the `isMicrophoneAvailable` state. When this becomes `false`, it's advised that you disable voice-driven features and indicate that microphone access is needed for them to work.
+
+```
+if (!isMicrophoneAvailable) {
+  // Render some fallback content
+}
+```
+
 ## Controlling the microphone
 
 Before consuming the transcript, you should be familiar with `SpeechRecognition`, which gives you control over the microphone. The state of the microphone is global, so any functions you call on this object will affect _all_ components using `useSpeechRecognition`.

@@ -19,6 +19,17 @@ const mockRecognitionManager = () => {
   return recognitionManager
 }
 
+const mockMicrophoneUnavailable = () => {
+  const mockSpeechRecognition =
+    jest.createMockFromModule('../tests/vendor/corti').CortiSpeechRecognition
+  mockSpeechRecognition.mockImplementation(() => ({
+    start: async () => Promise.reject(new Error())
+  }))
+  SpeechRecognition.applyPolyfill(mockSpeechRecognition)
+  const recognitionManager = new RecognitionManager(mockSpeechRecognition)
+  SpeechRecognition.getRecognitionManager = () => recognitionManager
+}
+
 describe('SpeechRecognition', () => {
   beforeEach(() => {
     isAndroid.mockClear()
@@ -1111,5 +1122,33 @@ describe('SpeechRecognition', () => {
 
     expect(mockCommandCallback.mock.calls.length).toBe(1)
     expect(mockCommandCallback).toBeCalledWith('I would like a pizza', 'I would like a pizza', 1, { command, resetTranscript })
+  })
+
+  test('sets isMicrophoneAvailable to false when recognition.start() throws', async () => {
+    mockMicrophoneUnavailable()
+    const { result } = renderHook(() => useSpeechRecognition())
+
+    expect(result.current.isMicrophoneAvailable).toEqual(true)
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+
+    expect(result.current.isMicrophoneAvailable).toEqual(false)
+  })
+
+  test('sets isMicrophoneAvailable to false when not-allowed error emitted', async () => {
+    mockRecognitionManager()
+    const { result } = renderHook(() => useSpeechRecognition())
+
+    expect(result.current.isMicrophoneAvailable).toEqual(true)
+
+    await act(async () => {
+      await SpeechRecognition.getRecognitionManager().recognition.onerror({
+        error: 'not-allowed'
+      })
+    })
+
+    expect(result.current.isMicrophoneAvailable).toEqual(false)
   })
 })
