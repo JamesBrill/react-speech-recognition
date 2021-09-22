@@ -45,6 +45,7 @@ These are returned from `useSpeechRecognition`:
     resetTranscript,
     listening,
     browserSupportsSpeechRecognition,
+    isMicrophoneAvailable,
   } = useSpeechRecognition()
 ```
 
@@ -98,6 +99,16 @@ if (browserSupportsContinuousListening) {
   SpeechRecognition.startListening({ continuous: true })
 } else {
   // Fallback behaviour
+}
+```
+
+#### isMicrophoneAvailable [bool]
+
+The user has to give permission for their microphone to be used before transcription can begin. They are asked for permission when `react-speech-recognition` first tries to start listening. This state will become `false` if they deny access. In this case, it's advised that you disable voice-driven features and indicate that microphone access is needed for them to work.
+
+```
+if (!isMicrophoneAvailable) {
+  // Render some fallback content
 }
 ```
 
