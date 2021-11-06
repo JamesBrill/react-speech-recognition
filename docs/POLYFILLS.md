@@ -97,19 +97,25 @@ This is Microsoft's offering for speech recognition (among many other features).
   * Install `web-speech-cognitive-services` and `microsoft-cognitiveservices-speech-sdk` in your web app for this polyfill to function
   * You will need two things to configure this polyfill: the name of the Azure region your Speech Service is deployed in, plus a subscription key (or better still, an authorization token). [This doc](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/overview#find-keys-and-region) explains how to find those
 
-Here is a basic example combining `web-speech-cognitive-services` and `react-speech-recognition` to get you started. This code worked with version 7.1.0 of the polyfill in February 2021 - if it has become outdated due to changes in the polyfill or in Azure Cognitive Services, please raise a GitHub issue or PR to get this updated.
+Here is a basic example combining `web-speech-cognitive-services` and `react-speech-recognition` to get you started (do not use this in production; for a production-friendly version, read on below). This code worked with version 7.1.0 of the polyfill in February 2021 - if it has become outdated due to changes in the polyfill or in Azure Cognitive Services, please raise a GitHub issue or PR to get this updated.
 
 ```
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 const SUBSCRIPTION_KEY = '<INSERT_SUBSCRIPTION_KEY_HERE>';
 const REGION = '<INSERT_REGION_HERE>';
-const TOKEN_ENDPOINT = `https://${REGION}.api.cognitive.microsoft.com/sts/v1.0/issuetoken`;
+
+const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
+  credentials: {
+    region: REGION,
+    subscriptionKey: SUBSCRIPTION_KEY,
+  }
+});
+SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
 
 const Dictaphone = () => {
-  const [loadingSpeechRecognition, setLoadingSpeechRecognition] = useState(true);
   const {
     transcript,
     resetTranscript,
@@ -121,35 +127,14 @@ const Dictaphone = () => {
     language: 'en-US'
   });
 
-  useEffect(() => {
-    const loadSpeechRecognition = async () => {
-      const response = await fetch(TOKEN_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Ocp-Apim-Subscription-Key': SUBSCRIPTION_KEY }
-      });
-      const authorizationToken = await response.text();
-      const {
-        SpeechRecognition: AzureSpeechRecognition
-      } = await createSpeechServicesPonyfill({
-        credentials: {
-          region: REGION,
-          authorizationToken,
-        }
-      });
-      SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
-      setLoadingSpeechRecognition(false);
-    }
-    loadSpeechRecognition();
-  }, []);
-
-  if (loadingSpeechRecognition || !browserSupportsSpeechRecognition) {
+  if (!browserSupportsSpeechRecognition) {
     return null;
   }
 
   return (
     <div>
       <button onClick={startListening}>Start</button>
-      <button onClick={SpeechRecognition.stopListening}>Stop</button>
+      <button onClick={SpeechRecognition.abortListening}>Abort</button>
       <button onClick={resetTranscript}>Reset</button>
       <p>{transcript}</p>
     </div>
@@ -158,11 +143,24 @@ const Dictaphone = () => {
 export default Dictaphone;
 ```
 
+### Usage in production
+
+Your subscription key is a secret that you should not be leaking to your users in production. In other words, it should never be downloaded to your users' browsers. A more secure approach that's recommended by Microsoft is to exchange your subscription key for an authorization token, which has a limited lifetime. You should get this token on your backend and pass this to your frontend React app. Microsoft give guidance on how to do this [here](https://docs.microsoft.com/en-us/azure/cognitive-services/authentication?tabs=powershell).
+
+Once your React app has the authorization token, it should be passed into the polyfill creator instead of the subscription key like this:
+```
+const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
+  credentials: {
+    region: REGION,
+    authorizationToken: AUTHORIZATION_TOKEN,
+  }
+});
+```
+
 ### Limitations
-* As the Azure polyfill loads asynchronously, it's recommended that you use your own `loadingSpeechRecognition` state rather than `browserSupportsSpeechRecognition` to decide when to render fallback content when Speech Recognition is not available. This is because on Chrome, `browserSupportsSpeechRecognition` will return `true` - as a result, your speech recognition component will appear briefly with the Google Speech Recognition engine and then with the polyfill engine, potentially causing a janky user experience. The example code above demonstrates the use of such a loading state
+* There is currently a [bug](https://github.com/compulim/web-speech-cognitive-services/issues/166) in this polyfill's `stop` method when using continuous listening. If you are using `continuous: true`, use `abortListening` to stop the transcription. Otherwise, you can use `stopListening`.
 * On Safari and Firefox, an error will be thrown if calling `startListening` to switch to a different language without first calling `stopListening`. It's recommended that you stick to one language and, if you do need to change languages, call `stopListening` first
 * If you don't specify a language, Azure will return a 400 response. When calling `startListening`, you will need to explicitly provide one of the language codes defined [here](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/language-support). For English, use `en-GB` or `en-US`
-* Safari will throw an error on `localhost` as it requires HTTPS. [ngrok](https://ngrok.com/) is a nice tool for serving a local web app over HTTPS (also good for testing your web app on mobile devices as well)
 * Currently untested on iOS (let me know if it works!)
 
 <br />
