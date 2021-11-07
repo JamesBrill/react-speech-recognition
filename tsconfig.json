@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "outDir": "./lib",
+    "allowJs": true,
+    "target": "es5",
+    "strict": true,
+    "types": [
+      "jest"
+    ]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["./src/**/*test*"]
+}

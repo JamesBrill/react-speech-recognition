@@ -14,6 +14,8 @@ jobs:
           node-version: 12
       - name: Install Node.js dependencies
         run: npm ci
+      - name: Type check
+        run: npm run typecheck
       - name: Run JS linter
         run: npm run lint
       - name: Run unit tests with code coverage

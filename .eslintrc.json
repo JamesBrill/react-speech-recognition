@@ -1,36 +1,12 @@
 {
-    "env": {
-        "browser": true,
-        "es6": true,
-        "jest/globals": true
-    },
-    "extends": [
-        "standard",
-        "plugin:react/recommended"
-    ],
-    "globals": {
-        "Atomics": "readonly",
-        "SharedArrayBuffer": "readonly"
-    },
-    "parser": "babel-eslint",
-    "parserOptions": {
-        "ecmaFeatures": {
-            "jsx": true
-        },
-        "ecmaVersion": 2018,
-        "sourceType": "module"
-    },
+    "root": true,
+    "parser": "@typescript-eslint/parser",
     "plugins": [
-        "react",
-        "jest"
+      "@typescript-eslint"
     ],
-    "rules": {
-        "space-before-function-paren": 0,
-        "standard/no-callback-literal": 0
-    },
-    "settings": {
-        "react": {
-          "version": ">=16"
-        }
-    }
-}
+    "extends": [
+      "eslint:recommended",
+      "plugin:@typescript-eslint/eslint-recommended",
+      "plugin:@typescript-eslint/recommended"
+    ]
+  }
