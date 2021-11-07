@@ -3,6 +3,7 @@
   "version": "3.9.0",
   "description": "💬Speech recognition for your React app",
   "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
     "lint": "eslint src tests",

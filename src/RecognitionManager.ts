@@ -1,19 +1,31 @@
 import isAndroid from './isAndroid'
 import { debounce, concatTranscripts, browserSupportsPolyfills } from './utils'
 import { isNative } from './NativeSpeechRecognition'
+import type {
+  Maybe,
+  SpeechRecognition,
+  SubscriberMap,
+  SubscriberCallbacks,
+  SubscriberId,
+  Transcript,
+  SpeechRecognitionErrorEvent,
+  SpeechRecognitionEvent,
+  ListeningOptions,
+} from './types';
+import { Disconnect } from './types';
 
 export default class RecognitionManager {
-  constructor(SpeechRecognition) {
-    this.recognition = null
-    this.pauseAfterDisconnect = false
-    this.interimTranscript = ''
-    this.finalTranscript = ''
-    this.listening = false
-    this.isMicrophoneAvailable = true
-    this.subscribers = {}
-    this.onStopListening = () => {}
-    this.previousResultWasFinalOnly = false
+  recognition: Maybe<SpeechRecognition> = null;
+  pauseAfterDisconnect = false
+  interimTranscript = ''
+  finalTranscript = ''
+  listening = false
+  isMicrophoneAvailable = true
+  subscribers: SubscriberMap = {}
+  onStopListening = () => {}
+  previousResultWasFinalOnly = false
 
+  constructor(SpeechRecognitionImpl: SpeechRecognition) {
     this.resetTranscript = this.resetTranscript.bind(this)
     this.startListening = this.startListening.bind(this)
     this.stopListening = this.stopListening.bind(this)
@@ -21,20 +33,20 @@ export default class RecognitionManager {
     this.setSpeechRecognition = this.setSpeechRecognition.bind(this)
     this.disableRecognition = this.disableRecognition.bind(this)
 
-    this.setSpeechRecognition(SpeechRecognition)
+    this.setSpeechRecognition(SpeechRecognitionImpl)
 
     if (isAndroid()) {
       this.updateFinalTranscript = debounce(this.updateFinalTranscript, 250, true)
     }
   }
 
-  setSpeechRecognition(SpeechRecognition) {
-    const browserSupportsRecogniser = !!SpeechRecognition && (
-      isNative(SpeechRecognition) || browserSupportsPolyfills()
+  setSpeechRecognition(SpeechRecognitionImpl: SpeechRecognition){
+    const browserSupportsRecogniser = !!SpeechRecognitionImpl && (
+      isNative(SpeechRecognitionImpl) || browserSupportsPolyfills()
     )
     if (browserSupportsRecogniser) {
       this.disableRecognition()
-      this.recognition = new SpeechRecognition()
+      this.recognition = new SpeechRecognitionImpl()
       this.recognition.continuous = false
       this.recognition.interimResults = true
       this.recognition.onresult = this.updateTranscript.bind(this)
@@ -44,15 +56,15 @@ export default class RecognitionManager {
     this.emitBrowserSupportsSpeechRecognitionChange(browserSupportsRecogniser)
   }
 
-  subscribe(id, callbacks) {
+  subscribe(id: SubscriberId, callbacks: SubscriberCallbacks) {
     this.subscribers[id] = callbacks
   }
 
-  unsubscribe(id) {
+  unsubscribe(id: SubscriberId) {
     delete this.subscribers[id]
   }
 
-  emitListeningChange(listening) {
+  emitListeningChange(listening: boolean) {
     this.listening = listening
     Object.keys(this.subscribers).forEach((id) => {
       const { onListeningChange } = this.subscribers[id]
@@ -60,7 +72,7 @@ export default class RecognitionManager {
     })
   }
 
-  emitMicrophoneAvailabilityChange(isMicrophoneAvailable) {
+  emitMicrophoneAvailabilityChange(isMicrophoneAvailable: boolean) {
     this.isMicrophoneAvailable = isMicrophoneAvailable
     Object.keys(this.subscribers).forEach((id) => {
       const { onMicrophoneAvailabilityChange } = this.subscribers[id]
@@ -68,7 +80,7 @@ export default class RecognitionManager {
     })
   }
 
-  emitTranscriptChange(interimTranscript, finalTranscript) {
+  emitTranscriptChange(interimTranscript: Transcript, finalTranscript: Transcript) {
     Object.keys(this.subscribers).forEach((id) => {
       const { onTranscriptChange } = this.subscribers[id]
       onTranscriptChange(interimTranscript, finalTranscript)
@@ -82,7 +94,7 @@ export default class RecognitionManager {
     })
   }
 
-  emitBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange) {
+  emitBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange: boolean) {
     Object.keys(this.subscribers).forEach((id) => {
       const { onBrowserSupportsSpeechRecognitionChange, onBrowserSupportsContinuousListeningChange } = this.subscribers[id]
       onBrowserSupportsSpeechRecognitionChange(browserSupportsSpeechRecognitionChange)
@@ -90,18 +102,18 @@ export default class RecognitionManager {
     })
   }
 
-  disconnect(disconnectType) {
+  disconnect(disconnectType: Disconnect) {
     if (this.recognition && this.listening) {
       switch (disconnectType) {
-        case 'ABORT':
+        case Disconnect.Abort:
           this.pauseAfterDisconnect = true
           this.abort()
           break
-        case 'RESET':
+        case Disconnect.Reset:
           this.pauseAfterDisconnect = false
           this.abort()
           break
-        case 'STOP':
+        case Disconnect.Stop:
         default:
           this.pauseAfterDisconnect = true
           this.stop()
@@ -120,7 +132,7 @@ export default class RecognitionManager {
     }
   }
 
-  onError(event) {
+  onError(event: SpeechRecognitionErrorEvent) {
     if (event && event.error && event.error === 'not-allowed') {
       this.emitMicrophoneAvailabilityChange(false)
       this.disableRecognition()
@@ -142,7 +154,7 @@ export default class RecognitionManager {
     this.pauseAfterDisconnect = false
   }
 
-  updateTranscript({ results, resultIndex }) {
+  updateTranscript({ results, resultIndex }: SpeechRecognitionEvent) {
     const currentIndex = resultIndex === undefined ? results.length - 1 : resultIndex
     this.interimTranscript = ''
     this.finalTranscript = ''
@@ -170,7 +182,7 @@ export default class RecognitionManager {
     }
   }
 
-  updateFinalTranscript(newFinalTranscript) {
+  updateFinalTranscript(newFinalTranscript: Transcript) {
     this.finalTranscript = concatTranscripts(
       this.finalTranscript,
       newFinalTranscript
@@ -178,10 +190,10 @@ export default class RecognitionManager {
   }
 
   resetTranscript() {
-    this.disconnect('RESET')
+    this.disconnect(Disconnect.Reset)
   }
 
-  async startListening({ continuous = false, language } = {}) {
+  async startListening({ continuous = false, language }: ListeningOptions = {}) {
     if (!this.recognition) {
       return
     }
@@ -213,17 +225,17 @@ export default class RecognitionManager {
   }
 
   async abortListening() {
-    this.disconnect('ABORT')
+    this.disconnect(Disconnect.Abort)
     this.emitListeningChange(false)
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       this.onStopListening = resolve
     })
   }
 
   async stopListening() {
-    this.disconnect('STOP')
+    this.disconnect(Disconnect.Stop)
     this.emitListeningChange(false)
-    await new Promise(resolve => {
+    await new Promise<void>(resolve => {
       this.onStopListening = resolve
     })
   }

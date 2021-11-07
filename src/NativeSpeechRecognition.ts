@@ -1,3 +1,5 @@
+import type { SpeechRecognition } from './types'
+
 const NativeSpeechRecognition = typeof window !== 'undefined' && (
   window.SpeechRecognition ||
   window.webkitSpeechRecognition ||
@@ -6,6 +8,6 @@ const NativeSpeechRecognition = typeof window !== 'undefined' && (
   window.oSpeechRecognition
 )
 
-export const isNative = (SpeechRecognition) => SpeechRecognition === NativeSpeechRecognition
+export const isNative = (SpeechRecognitionImpl: SpeechRecognition) => SpeechRecognitionImpl === NativeSpeechRecognition
 
 export default NativeSpeechRecognition

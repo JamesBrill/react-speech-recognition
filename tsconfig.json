@@ -6,6 +6,10 @@
     "strict": true,
     "types": [
       "jest"
+    ],
+    "lib": [
+      "ES2015",
+      "dom"
     ]
   },
   "include": ["./src/**/*"],
