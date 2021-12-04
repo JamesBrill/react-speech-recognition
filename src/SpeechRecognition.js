@@ -5,7 +5,7 @@ import {
   compareTwoStringsUsingDiceCoefficient,
   browserSupportsPolyfills
 } from './utils'
-import { clearTrancript, appendTrancript } from './actions'
+import { clearTranscript, appendTranscript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 import isAndroid from './isAndroid'
@@ -35,13 +35,13 @@ const useSpeechRecognition = ({
   const commandsRef = useRef(commands)
   commandsRef.current = commands
 
-  const clearTranscript = () => {
-    dispatch(clearTrancript())
+  const dispatchClearTranscript = () => {
+    dispatch(clearTranscript())
   }
 
   const resetTranscript = useCallback(() => {
     recognitionManager.resetTranscript()
-    clearTranscript()
+    dispatchClearTranscript()
   }, [recognitionManager])
 
   const testFuzzyMatch = (command, input, fuzzyMatchingThreshold) => {
@@ -116,7 +116,7 @@ const useSpeechRecognition = ({
   const handleTranscriptChange = useCallback(
     (newInterimTranscript, newFinalTranscript) => {
       if (transcribing) {
-        dispatch(appendTrancript(newInterimTranscript, newFinalTranscript))
+        dispatch(appendTranscript(newInterimTranscript, newFinalTranscript))
       }
       matchCommands(newInterimTranscript, newFinalTranscript)
     }, [matchCommands, transcribing]
@@ -125,7 +125,7 @@ const useSpeechRecognition = ({
   const handleClearTranscript = useCallback(
     () => {
       if (clearTranscriptOnListen) {
-        clearTranscript()
+        dispatchClearTranscript()
       }
     }, [clearTranscriptOnListen]
   )
