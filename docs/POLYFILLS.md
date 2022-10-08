@@ -14,6 +14,12 @@ SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
 
 Note that this type of polyfill that does not pollute the global scope is known as a "ponyfill" - the distinction is explained [here](https://ponyfoo.com/articles/polyfills-or-ponyfills). `react-speech-recognition` will also pick up traditional polyfills - just make sure you import them before `react-speech-recognition`.
 
+Polyfills can be removed using `removePolyfill`. This can be useful when the user switches to a language that is supported by the native Speech Recognition engine but not the polyfill engine.
+
+```
+SpeechRecognition.removePolyfill()
+```
+
 ## Usage recommendations
 * Call this as early as possible to minimise periods where fallback content, which you should render while the polyfill is loading, is rendered. Also note that if there is a Speech Recognition implementation already listening to the microphone, this will be turned off when the polyfill is applied, so make sure the polyfill is applied before rendering any buttons to start listening
 * After `applyPolyfill` has been called, `browserSupportsSpeechRecognition` will be `true` on _most_ browsers, but there are still exceptions. Browsers like Internet Explorer do not support the APIs needed for polyfills - in these cases where `browserSupportsSpeechRecognition` is `false`, you should still have some suitable fallback content

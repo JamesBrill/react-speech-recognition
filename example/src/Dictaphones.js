@@ -25,6 +25,7 @@ export default () => {
       <button onClick={listenContinuouslyInChinese}>Listen continuously (Chinese)</button>
       <button onClick={toggleShowFirstWidget}>Toggle first widget</button>
       <button onClick={SpeechRecognition.stopListening}>Stop</button>
+      <button onClick={SpeechRecognition.removePolyfill}>Remove polyfill</button>
     </div>
   )
 }

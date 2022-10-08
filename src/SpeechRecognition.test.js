@@ -106,6 +106,25 @@ describe('SpeechRecognition', () => {
     expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
   })
 
+  test('reverts to native recognition when removePolyfill called', () => {
+    const MockSpeechRecognition = class {}
+    SpeechRecognition.applyPolyfill(MockSpeechRecognition)
+
+    expect(SpeechRecognition.getRecognition() instanceof MockSpeechRecognition).toEqual(true)
+
+    browserSupportsPolyfills.mockImplementation(() => false)
+    SpeechRecognition.applyPolyfill()
+
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(false)
+    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(false)
+
+    SpeechRecognition.removePolyfill()
+
+    expect(SpeechRecognition.browserSupportsSpeechRecognition()).toEqual(true)
+    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(true)
+    expect(SpeechRecognition.getRecognition() instanceof CortiSpeechRecognition).toEqual(true)
+  })
+
   test('sets browserSupportsContinuousListening to false when given falsey SpeechRecognition', () => {
     SpeechRecognition.applyPolyfill()
 

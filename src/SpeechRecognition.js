@@ -178,6 +178,15 @@ const SpeechRecognition = {
     _browserSupportsSpeechRecognition = browserSupportsPolyfill
     _browserSupportsContinuousListening = browserSupportsPolyfill
   },
+  removePolyfill: () => {
+    if (recognitionManager) {
+      recognitionManager.setSpeechRecognition(NativeSpeechRecognition)
+    } else {
+      recognitionManager = new RecognitionManager(NativeSpeechRecognition)
+    }
+    _browserSupportsSpeechRecognition = !!NativeSpeechRecognition
+    _browserSupportsContinuousListening = _browserSupportsSpeechRecognition && !isAndroid()
+  },
   getRecognitionManager: () => {
     if (!recognitionManager) {
       recognitionManager = new RecognitionManager(NativeSpeechRecognition)
