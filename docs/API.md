@@ -272,3 +272,11 @@ Replace the native Speech Recognition engine (if there is one) with a custom imp
 ```
 SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
 ```
+
+#### removePolyfill
+
+If a polyfill was applied using `applyPolyfill`, reset the Speech Recognition engine to the native implementation. This can be useful when the user switches to a language that is supported by the native engine but not the polyfill engine.
+
+```
+SpeechRecognition.removePolyfill()
+```
