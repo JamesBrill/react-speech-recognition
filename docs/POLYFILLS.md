@@ -8,7 +8,7 @@ Under the hood, Web Speech API in Chrome uses Google's speech recognition server
 
 The `SpeechRecognition` class exported by `react-speech-recognition` has the method `applyPolyfill`. This can take an implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). From then on, that implementation will used by `react-speech-recognition` to transcribe speech picked up by the microphone.
 
-```
+```js
 SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
 ```
 
@@ -16,7 +16,7 @@ Note that this type of polyfill that does not pollute the global scope is known 
 
 Polyfills can be removed using `removePolyfill`. This can be useful when the user switches to a language that is supported by the native Speech Recognition engine but not the polyfill engine.
 
-```
+```js
 SpeechRecognition.removePolyfill()
 ```
 
@@ -45,7 +45,7 @@ Rather than roll your own, you should use a ready-made polyfill for a cloud prov
 
 Here is a basic example combining `speech-recognition-polyfill` and `react-speech-recognition` to get you started. This code worked with version 1.0.0 of the polyfill in May 2021 - if it has become outdated due to changes in the polyfill or in Speechly, please raise a GitHub issue or PR to get this updated.
 
-```
+```jsx
 import React from 'react';
 import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
@@ -105,7 +105,7 @@ This is Microsoft's offering for speech recognition (among many other features).
 
 Here is a basic example combining `web-speech-cognitive-services` and `react-speech-recognition` to get you started (do not use this in production; for a production-friendly version, read on below). This code worked with version 7.1.0 of the polyfill in February 2021 - if it has become outdated due to changes in the polyfill or in Azure Cognitive Services, please raise a GitHub issue or PR to get this updated.
 
-```
+```jsx
 import React from 'react';
 import createSpeechServicesPonyfill from 'web-speech-cognitive-services';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
@@ -154,7 +154,7 @@ export default Dictaphone;
 Your subscription key is a secret that you should not be leaking to your users in production. In other words, it should never be downloaded to your users' browsers. A more secure approach that's recommended by Microsoft is to exchange your subscription key for an authorization token, which has a limited lifetime. You should get this token on your backend and pass this to your frontend React app. Microsoft give guidance on how to do this [here](https://docs.microsoft.com/en-us/azure/cognitive-services/authentication?tabs=powershell).
 
 Once your React app has the authorization token, it should be passed into the polyfill creator instead of the subscription key like this:
-```
+```js
 const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
   credentials: {
     region: REGION,

@@ -32,17 +32,21 @@ This version requires React 16.8 so that React hooks can be used. If you're used
 
 To install:
 
-`npm install --save react-speech-recognition`
+```shell
+npm install --save react-speech-recognition
+```
 
 To import in your React code:
 
-`import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'`
+```js
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
+```
 
 ## Basic example
 
 The most basic example of a component using this hook would be:
 
-```
+```jsx
 import React from 'react';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
@@ -103,7 +107,7 @@ You can find the full guide for setting up a polyfill [here](docs/POLYFILLS.md).
 * Install `@speechly/speech-recognition-polyfill` in your web app
 * You will need a Speechly app ID. To get one of these, sign up for free with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/stt-only/)
 * Here's a component for a push-to-talk button. The basic example above would also work fine.
-```
+```jsx
 import React from 'react';
 import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
@@ -144,7 +148,7 @@ export default Dictaphone;
 
 If you choose not to use a polyfill, this library still fails gracefully on browsers that don't support speech recognition. It is recommended that you render some fallback content if it is not supported by the user's browser:
 
-```
+```js
 if (!browserSupportsSpeechRecognition) {
   // Render some fallback content
 }
@@ -167,7 +171,7 @@ For all other browsers, you can render fallback content using the `SpeechRecogni
 
 Even if the browser supports the Web Speech API, the user still has to give permission for their microphone to be used before transcription can begin. They are asked for permission when `react-speech-recognition` first tries to start listening. At this point, you can detect when the user denies access via the `isMicrophoneAvailable` state. When this becomes `false`, it's advised that you disable voice-driven features and indicate that microphone access is needed for them to work.
 
-```
+```js
 if (!isMicrophoneAvailable) {
   // Render some fallback content
 }
@@ -181,7 +185,7 @@ Before consuming the transcript, you should be familiar with `SpeechRecognition`
 
 To start listening to speech, call the `startListening` function.
 
-```
+```js
 SpeechRecognition.startListening()
 ```
 
@@ -191,13 +195,13 @@ This is an asynchronous function, so it will need to be awaited if you want to d
 
 To turn the microphone off, but still finish processing any speech in progress, call `stopListening`.
 
-```
+```js
 SpeechRecognition.stopListening()
 ```
 
 To turn the microphone off, and cancel the processing of any speech in progress, call `abortListening`.
 
-```
+```js
 SpeechRecognition.abortListening()
 ```
 
@@ -205,7 +209,7 @@ SpeechRecognition.abortListening()
 
 To make the microphone transcript available in your component, simply add:
 
-```
+```js
 const { transcript } = useSpeechRecognition()
 ```
 
@@ -213,7 +217,7 @@ const { transcript } = useSpeechRecognition()
 
 To set the transcript to an empty string, you can call the `resetTranscript` function provided by `useSpeechRecognition`. Note that this is local to your component and does not affect any other components using Speech Recognition.
 
-```
+```js
 const { resetTranscript } = useSpeechRecognition()
 ```
 
@@ -248,7 +252,7 @@ To make commands easier to write, the following symbols are supported:
 
 ### Example with commands
 
-```
+```jsx
 import React, { useState } from 'react'
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 
@@ -318,13 +322,13 @@ By default, the microphone will stop listening when the user stops speaking. Thi
 
 If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
 
-```
+```js
 SpeechRecognition.startListening({ continuous: true })
 ```
 
 Be warned that not all browsers have good support for continuous listening. Chrome on Android in particular constantly restarts the microphone, leading to a frustrating and noisy (from the beeping) experience. To avoid enabling continuous listening on these browsers, you can make use of the `browserSupportsContinuousListening` state from `useSpeechRecognition` to detect support for this feature.
 
-```
+```js
 if (browserSupportsContinuousListening) {
   SpeechRecognition.startListening({ continuous: true })
 } else {
@@ -338,7 +342,7 @@ Alternatively, you can try one of the [polyfills](docs/POLYFILLS.md) to enable c
 
 To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`. See [here](docs/API.md#language-string) for a list of supported languages.
 
-```
+```js
 SpeechRecognition.startListening({ language: 'zh-CN' })
 ```
 
@@ -359,7 +363,7 @@ If you are building an offline web app, you can detect when the browser is offli
 ## Developing
 
 You can run an example React app that uses `react-speech-recognition` with:
-```
+```shell
 npm i
 npm run dev
 ```
