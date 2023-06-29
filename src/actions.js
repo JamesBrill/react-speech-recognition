@@ -1,4 +1,4 @@
-import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT } from './constants'
+import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT, MUTATE_TRANSCRIPT } from './constants'
 
 export const clearTranscript = () => {
   return { type: CLEAR_TRANSCRIPT }
@@ -10,6 +10,15 @@ export const appendTranscript = (interimTranscript, finalTranscript) => {
     payload: {
       interimTranscript,
       finalTranscript
+    }
+  }
+}
+
+export const mutateTranscript = (mutatedTranscript) => {
+  return {
+    type: MUTATE_TRANSCRIPT,
+    payload: {
+      mutatedTranscript
     }
   }
 }
