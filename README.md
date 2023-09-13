@@ -173,6 +173,10 @@ if (!isMicrophoneAvailable) {
 }
 ```
 
+## Detecting errors during speech recognition
+  
+Some browsers that do support `SpeechRecognition` API and have access to microphone still fail to function correctly. See [issue with brave for example](https://github.com/brave/brave-browser/issues/3725#issuecomment-555694620). In this case you can detect the error via `error` state. Initially it has `null` value, when `SpeechRecognition` error event is emitted it will receive its value.
+
 ## Controlling the microphone
 
 Before consuming the transcript, you should be familiar with `SpeechRecognition`, which gives you control over the microphone. The state of the microphone is global, so any functions you call on this object will affect _all_ components using `useSpeechRecognition`.
