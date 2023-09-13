@@ -1170,4 +1170,32 @@ describe('SpeechRecognition', () => {
 
     expect(result.current.isMicrophoneAvailable).toEqual(false)
   })
+
+  test('sets error value when recognition.start() throws', async () => {
+    mockMicrophoneUnavailable()
+    const { result } = renderHook(() => useSpeechRecognition())
+
+    expect(result.current.error).toEqual(null)
+
+    await act(async () => {
+      await SpeechRecognition.startListening()
+    })
+
+    expect(result.current.error).toBeInstanceOf(Error)
+  })
+
+  test('sets error with error value when not-allowed error emitted', async () => {
+    mockRecognitionManager()
+    const { result } = renderHook(() => useSpeechRecognition())
+
+    expect(result.current.error).toEqual(null)
+
+    await act(async () => {
+      await SpeechRecognition.getRecognitionManager().recognition.onerror({
+        error: 'not-allowed'
+      })
+    })
+
+    expect(result.current.error).toHaveProperty('error', 'not-allowed')
+  })
 })
