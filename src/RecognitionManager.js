@@ -10,6 +10,7 @@ export default class RecognitionManager {
     this.finalTranscript = ''
     this.listening = false
     this.isMicrophoneAvailable = true
+    this.error = null
     this.subscribers = {}
     this.onStopListening = () => {}
     this.previousResultWasFinalOnly = false
@@ -40,6 +41,7 @@ export default class RecognitionManager {
       this.recognition.onresult = this.updateTranscript.bind(this)
       this.recognition.onend = this.onRecognitionDisconnect.bind(this)
       this.recognition.onerror = this.onError.bind(this)
+      this.error = null
     }
     this.emitBrowserSupportsSpeechRecognitionChange(browserSupportsRecogniser)
   }
@@ -65,6 +67,14 @@ export default class RecognitionManager {
     Object.keys(this.subscribers).forEach((id) => {
       const { onMicrophoneAvailabilityChange } = this.subscribers[id]
       onMicrophoneAvailabilityChange(isMicrophoneAvailable)
+    })
+  }
+
+  emitErrorChange(error) {
+    this.error = error
+    Object.keys(this.subscribers).forEach((id) => {
+      const { onError } = this.subscribers[id]
+      onError(error)
     })
   }
 
@@ -121,6 +131,7 @@ export default class RecognitionManager {
   }
 
   onError(event) {
+    this.emitErrorChange(event)
     if (event && event.error && event.error === 'not-allowed') {
       this.emitMicrophoneAvailabilityChange(false)
       this.disableRecognition()
@@ -204,6 +215,7 @@ export default class RecognitionManager {
         await this.start()
         this.emitListeningChange(true)
       } catch (e) {
+        this.emitErrorChange(e)
         // DOMExceptions indicate a redundant microphone start - safe to swallow
         if (!(e instanceof DOMException)) {
           this.emitMicrophoneAvailabilityChange(false)
