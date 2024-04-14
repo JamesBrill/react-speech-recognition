@@ -9,7 +9,7 @@
 
 React hook for consuming speech recorded by the microphone. Import with:
 
-```
+```js
 import { useSpeechRecognition } from 'react-speech-recognition'
 ```
 
@@ -17,7 +17,7 @@ import { useSpeechRecognition } from 'react-speech-recognition'
 
 These are passed as an object argument to `useSpeechRecognition`:
 
-```
+```js
 useSpeechRecognition({ transcribing, clearTranscriptOnListen, commands })
 ```
 
@@ -37,7 +37,7 @@ See [Commands](../README.md#Commands).
 
 These are returned from `useSpeechRecognition`:
 
-```
+```js
   const {
     transcript,
     interimTranscript,
@@ -84,7 +84,7 @@ Transcription of speech that the Web Speech API has finished processing.
 
 The Web Speech API is not supported on all browsers, so it is recommended that you render some fallback content if it is not supported by the user's browser:
 
-```
+```js
 if (!browserSupportsSpeechRecognition) {
   // Render some fallback content
 }
@@ -94,7 +94,7 @@ if (!browserSupportsSpeechRecognition) {
 
 Continuous listening is not supported on all browsers, so it is recommended that you apply some fallback behaviour if your web app uses continuous listening and is running on a browser that doesn't support it:
 
-```
+```js
 if (browserSupportsContinuousListening) {
   SpeechRecognition.startListening({ continuous: true })
 } else {
@@ -106,7 +106,7 @@ if (browserSupportsContinuousListening) {
 
 The user has to give permission for their microphone to be used before transcription can begin. They are asked for permission when `react-speech-recognition` first tries to start listening. This state will become `false` if they deny access. In this case, it's advised that you disable voice-driven features and indicate that microphone access is needed for them to work.
 
-```
+```js
 if (!isMicrophoneAvailable) {
   // Render some fallback content
 }
@@ -116,7 +116,7 @@ if (!isMicrophoneAvailable) {
 
 Object providing functions to manage the global state of the microphone. Import with:
 
-```
+```js
 import SpeechRecognition from 'react-speech-recognition'
 ```
 
@@ -126,7 +126,7 @@ import SpeechRecognition from 'react-speech-recognition'
 
 Start listening to speech.
 
-```
+```js
 SpeechRecognition.startListening()
 ```
 
@@ -134,7 +134,7 @@ This is an asynchronous function, so it will need to be awaited if you want to d
 
 It can be called with an options argument. For example:
 
-```
+```js
 SpeechRecognition.startListening({
   continuous: true,
   language: 'zh-CN'
@@ -149,7 +149,7 @@ By default, the microphone will stop listening when the user stops speaking (`co
 
 If you want to listen continuously, set the `continuous` property to `true` when calling `startListening`. The microphone will continue to listen, even after the user has stopped speaking.
 
-```
+```js
 SpeechRecognition.startListening({ continuous: true })
 ```
 
@@ -157,7 +157,7 @@ SpeechRecognition.startListening({ continuous: true })
 
 To listen for a specific language, you can pass a language tag (e.g. `'zh-CN'` for Chinese) when calling `startListening`.
 
-```
+```js
 SpeechRecognition.startListening({ language: 'zh-CN' })
 ```
 
@@ -245,7 +245,7 @@ Some known supported languages (based on [this Stack Overflow post](http://stack
 
 Turn the microphone off, but still finish processing any speech in progress.
 
-```
+```js
 SpeechRecognition.stopListening()
 ```
 
@@ -255,7 +255,7 @@ This is an asynchronous function, so it will need to be awaited if you want to d
 
 Turn the microphone off, and cancel the processing of any speech in progress.
 
-```
+```js
 SpeechRecognition.abortListening()
 ```
 
@@ -269,7 +269,7 @@ This returns the underlying [object](https://developer.mozilla.org/en-US/docs/We
 
 Replace the native Speech Recognition engine (if there is one) with a custom implementation of the [W3C SpeechRecognition specification](https://wicg.github.io/speech-api/#speechreco-section). If there is a Speech Recognition implementation already listening to the microphone, this will be turned off. See [Polyfills](./POLYFILLS.md) for more information on how to use this.
 
-```
+```js
 SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
 ```
 
@@ -277,6 +277,6 @@ SpeechRecognition.applyPolyfill(SpeechRecognitionPolyfill)
 
 If a polyfill was applied using `applyPolyfill`, reset the Speech Recognition engine to the native implementation. This can be useful when the user switches to a language that is supported by the native engine but not the polyfill engine.
 
-```
+```js
 SpeechRecognition.removePolyfill()
 ```
