@@ -5,7 +5,7 @@ import {
   compareTwoStringsUsingDiceCoefficient,
   browserSupportsPolyfills
 } from './utils'
-import { clearTranscript, appendTranscript } from './actions'
+import { clearTranscript, appendTranscript, mutateTranscript } from './actions'
 import { transcriptReducer } from './reducers'
 import RecognitionManager from './RecognitionManager'
 import isAndroid from './isAndroid'
@@ -39,9 +39,18 @@ const useSpeechRecognition = ({
     dispatch(clearTranscript())
   }
 
+  const dispatchMutateTranscript = (mutatedTranscript) => {
+    dispatch(mutateTranscript(mutatedTranscript))
+  }
+
   const resetTranscript = useCallback(() => {
     recognitionManager.resetTranscript()
     dispatchClearTranscript()
+  }, [recognitionManager])
+
+  const editTranscript = useCallback((mutatedTranscript) => {
+    recognitionManager.resetTranscript()
+    dispatchMutateTranscript(mutatedTranscript)
   }, [recognitionManager])
 
   const testFuzzyMatch = (command, input, fuzzyMatchingThreshold) => {
@@ -163,7 +172,8 @@ const useSpeechRecognition = ({
     isMicrophoneAvailable,
     resetTranscript,
     browserSupportsSpeechRecognition,
-    browserSupportsContinuousListening
+    browserSupportsContinuousListening,
+    editTranscript
   }
 }
 const SpeechRecognition = {
