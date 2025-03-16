@@ -1,21 +1,24 @@
-import { CLEAR_TRANSCRIPT, APPEND_TRANSCRIPT } from './constants'
-import { concatTranscripts } from './utils'
+import { APPEND_TRANSCRIPT, CLEAR_TRANSCRIPT } from "./constants";
+import { concatTranscripts } from "./utils";
 
 const transcriptReducer = (state, action) => {
   switch (action.type) {
     case CLEAR_TRANSCRIPT:
       return {
-        interimTranscript: '',
-        finalTranscript: ''
-      }
+        interimTranscript: "",
+        finalTranscript: "",
+      };
     case APPEND_TRANSCRIPT:
       return {
         interimTranscript: action.payload.interimTranscript,
-        finalTranscript: concatTranscripts(state.finalTranscript, action.payload.finalTranscript)
-      }
+        finalTranscript: concatTranscripts(
+          state.finalTranscript,
+          action.payload.finalTranscript,
+        ),
+      };
     default:
-      throw new Error()
+      throw new Error();
   }
-}
+};
 
-export { transcriptReducer }
+export { transcriptReducer };
