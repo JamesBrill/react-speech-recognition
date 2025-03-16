@@ -1,20 +1,12 @@
-name: Publish
+name: Builds, tests & co
 
 on:
-  release:
-    types:
-      - published
-
-permissions: read-all
+  - push
+  - pull_request
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
     steps:
       - name: Checkout tree
         uses: actions/checkout@v4
@@ -29,6 +21,13 @@ jobs:
 
       - run: yarn install --immutable
 
-      - run: yarn npm publish --tolerate-republish
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: yarn lint
+
+      - run: yarn build
+
+      - run: yarn test --coverage
+
+      - name: Generate code coverage report
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ github.token }}
