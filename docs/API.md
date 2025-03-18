@@ -202,7 +202,7 @@ Some known supported languages (based on [this Stack Overflow post](http://stack
 * Italian `it-IT`
 * Indonesian `id`
 * Japanese `ja`
-* Korean `ko`
+* Korean `ko-KR`
 * Latin `la`
 * Mandarin Chinese `zh-CN`
 * Taiwanese `zh-TW`
