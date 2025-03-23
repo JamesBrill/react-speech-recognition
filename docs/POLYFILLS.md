@@ -29,66 +29,6 @@ SpeechRecognition.removePolyfill()
 
 Rather than roll your own, you should use a ready-made polyfill for a cloud provider's speech recognition service. `react-speech-recognition` currently supports polyfills for the following cloud providers:
 
-## Speechly
-
-<a href="https://www.speechly.com/?utm_source=github">
-  <img src="logos/speechly.png" width="200" alt="Speechly">
-</a>
-
-[Speechly](https://www.speechly.com/) specialises in enabling developers to create voice-driven UIs and provides a speech recognition API with a generous free tier to get you started. Their web speech recognition polyfill was developed with `react-speech-recognition` in mind so is a great choice to combine with this library. You can see an example of the two libraries working together in its [README](https://github.com/speechly/speech-recognition-polyfill#integrating-with-react-speech-recognition).
-
-* Polyfill repo: [speech-recognition-polyfill](https://github.com/speechly/speech-recognition-polyfill)
-* Polyfill author: [speechly](https://github.com/speechly)
-* Requirements: 
-  * Install `@speechly/speech-recognition-polyfill` in your web app
-  * You will need a Speechly app ID. To get one of these, sign up with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/stt-only/)
-
-Here is a basic example combining `speech-recognition-polyfill` and `react-speech-recognition` to get you started. This code worked with version 1.0.0 of the polyfill in May 2021 - if it has become outdated due to changes in the polyfill or in Speechly, please raise a GitHub issue or PR to get this updated.
-
-```jsx
-import React from 'react';
-import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
-
-const appId = '<INSERT_SPEECHLY_APP_ID_HERE>';
-const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
-SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
-
-const Dictaphone = () => {
-  const {
-    transcript,
-    listening,
-    browserSupportsSpeechRecognition
-  } = useSpeechRecognition();
-  const startListening = () => SpeechRecognition.startListening({ continuous: true });
-
-  if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
-  }
-
-  return (
-    <div>
-      <p>Microphone: {listening ? 'on' : 'off'}</p>
-      <button
-        onTouchStart={startListening}
-        onMouseDown={startListening}
-        onTouchEnd={SpeechRecognition.stopListening}
-        onMouseUp={SpeechRecognition.stopListening}
-      >Hold to talk</button>
-      <p>{transcript}</p>
-    </div>
-  );
-};
-export default Dictaphone;
-```
-
-### Limitations
-* The `lang` property is currently unsupported, defaulting to English transcription. In `react-speech-recognition`, this means that the `language` property in `startListening` cannot be used to change languages when using this polyfill. New languages will be coming soon!
-* Transcripts are generated in uppercase letters without punctuation. If needed, you can transform them using [toLowerCase()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/toLowerCase)
-
-<br />
-<br />
-
 ## Microsoft Azure Cognitive Services
 
 <a href="https://azure.microsoft.com/en-gb/services/cognitive-services/speech-to-text/">
