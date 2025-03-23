@@ -92,10 +92,6 @@ By default, speech recognition is not supported in all browsers, with the best n
 `react-speech-recognition` currently supports polyfills for the following cloud providers:
 
 <div>
-  <a href="https://www.speechly.com/?utm_source=github">
-    <img src="docs/logos/speechly.png" width="200" alt="Speechly">
-  </a>
-  <img width="50"></img>
   <a href="https://azure.microsoft.com/en-gb/services/cognitive-services/speech-to-text/">
     <img src="docs/logos/microsoft.png" width="175" alt="Microsoft Azure Cognitive Services">
   </a>
@@ -103,40 +99,47 @@ By default, speech recognition is not supported in all browsers, with the best n
 
 ## Cross-browser example
 
-You can find the full guide for setting up a polyfill [here](docs/POLYFILLS.md). Alternatively, here is a quick (and free) example using Speechly:
-* Install `@speechly/speech-recognition-polyfill` in your web app
-* You will need a Speechly app ID. To get one of these, sign up for free with Speechly and follow [the guide here](https://docs.speechly.com/quick-start/stt-only/)
+You can find the full guide for setting up a polyfill [here](docs/POLYFILLS.md). Alternatively, here is a quick example using Azure:
+* Install `web-speech-cognitive-services` and `microsoft-cognitiveservices-speech-sdk` in your web app.
+* You will need two things to configure this polyfill: the name of the Azure region your Speech Service is deployed in, plus a subscription key (or better still, an authorization token). [This doc](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/overview#find-keys-and-region) explains how to find those
 * Here's a component for a push-to-talk button. The basic example above would also work fine.
 ```jsx
 import React from 'react';
-import { createSpeechlySpeechRecognition } from '@speechly/speech-recognition-polyfill';
+import createSpeechServicesPonyfill from 'web-speech-cognitive-services';
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-const appId = '<INSERT_SPEECHLY_APP_ID_HERE>';
-const SpeechlySpeechRecognition = createSpeechlySpeechRecognition(appId);
-SpeechRecognition.applyPolyfill(SpeechlySpeechRecognition);
+const SUBSCRIPTION_KEY = '<INSERT_SUBSCRIPTION_KEY_HERE>';
+const REGION = '<INSERT_REGION_HERE>';
+
+const { SpeechRecognition: AzureSpeechRecognition } = createSpeechServicesPonyfill({
+  credentials: {
+    region: REGION,
+    subscriptionKey: SUBSCRIPTION_KEY,
+  }
+});
+SpeechRecognition.applyPolyfill(AzureSpeechRecognition);
 
 const Dictaphone = () => {
   const {
     transcript,
-    listening,
+    resetTranscript,
     browserSupportsSpeechRecognition
   } = useSpeechRecognition();
-  const startListening = () => SpeechRecognition.startListening({ continuous: true });
+
+  const startListening = () => SpeechRecognition.startListening({
+    continuous: true,
+    language: 'en-US'
+  });
 
   if (!browserSupportsSpeechRecognition) {
-    return <span>Browser doesn't support speech recognition.</span>;
+    return null;
   }
 
   return (
     <div>
-      <p>Microphone: {listening ? 'on' : 'off'}</p>
-      <button
-        onTouchStart={startListening}
-        onMouseDown={startListening}
-        onTouchEnd={SpeechRecognition.stopListening}
-        onMouseUp={SpeechRecognition.stopListening}
-      >Hold to talk</button>
+      <button onClick={startListening}>Start</button>
+      <button onClick={SpeechRecognition.abortListening}>Abort</button>
+      <button onClick={resetTranscript}>Reset</button>
       <p>{transcript}</p>
     </div>
   );
