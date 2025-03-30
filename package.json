@@ -50,7 +50,7 @@
   "peerDependencies": {
     "react": ">=16.8.0"
   },
-  "packageManager": "yarn@4.7.0",
+  "packageManager": "yarn@4.8.1",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org"
