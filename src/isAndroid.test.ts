@@ -1,0 +1,28 @@
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
+import isAndroid from "./isAndroid.js";
+
+beforeEach(() => {
+  vi.stubGlobal("navigator", { userAgent: undefined });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+test("returns false when navigator.userAgent does not contain android string", () => {
+  vi.stubGlobal("navigator", { userAgent: "safari browser" });
+  const result = isAndroid();
+  expect(result).toBe(false);
+});
+
+test("returns true when navigator.userAgent contains android string", () => {
+  vi.stubGlobal("navigator", { userAgent: "android browser" });
+  const result = isAndroid();
+  expect(result).toBe(true);
+});
+
+test("returns false when navigator is undefined", () => {
+  vi.stubGlobal("navigator", undefined);
+  const result = isAndroid();
+  expect(result).toBe(false);
+});

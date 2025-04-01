@@ -1439,6 +1439,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"corti@npm:1.0.0":
+  version: 1.0.0
+  resolution: "corti@npm:1.0.0"
+  checksum: 10c0/8223f7ef6c0b950a11b4acb38acf85f600c32f0fd419fe03a2d787a246629781023b194f6134c06ced34036376abe7a0e6cb6d33520fe191ec12b4efdc41e1ee
+  languageName: node
+  linkType: hard
+
 "cross-spawn@npm:^7.0.6":
   version: 7.0.6
   resolution: "cross-spawn@npm:7.0.6"
@@ -2783,6 +2790,7 @@ __metadata:
     "@types/lodash.debounce": "npm:4.0.9"
     "@vitest/coverage-v8": "npm:3.1.1"
     bunchee: "npm:6.5.0"
+    corti: "npm:1.0.0"
     jsdom: "npm:26.0.0"
     lodash.debounce: "npm:^4.0.8"
     react: "npm:16.14.0"
