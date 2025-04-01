@@ -1,4 +1,3 @@
-# react-speech-recognition
 A React hook that converts speech from the microphone to text and makes it available to your React components.
 
 [![npm version](https://img.shields.io/npm/v/react-speech-recognition.svg)](https://www.npmjs.com/package/react-speech-recognition)
@@ -88,7 +87,7 @@ By default, speech recognition is not supported in all browsers, with the best n
 * ❌ Without a polyfill, your users' voice data will be sent to big tech companies like Google or Apple to be transcribed
 * ✅ With a polyfill, `react-speech-recognition` will be suitable for use in commercial applications
 * ❌ Without a polyfill, `react-speech-recognition` will still be fine for personal projects or use cases where cross-browser support is not needed
- 
+
 `react-speech-recognition` currently supports polyfills for the following cloud providers:
 
 <div>

@@ -1,20 +1,12 @@
-const debounce = (func, wait, immediate) => {
-  let timeout;
-  return function () {
-    const context = this;
-    const args = arguments;
-    const later = function () {
-      timeout = null;
-      if (!immediate) func.apply(context, args);
-    };
-    const callNow = immediate && !timeout;
-    clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
-    if (callNow) func.apply(context, args);
-  };
-};
+import type { Phrase } from "./types";
 
-const concatTranscripts = (...transcriptParts) => {
+declare global {
+  interface Window {
+    webkitAudioContext?: typeof AudioContext;
+  }
+}
+
+const concatTranscripts = (...transcriptParts: string[]) => {
   return transcriptParts
     .map((t) => t.trim())
     .join(" ")
@@ -27,7 +19,7 @@ const optionalRegex = /(\(\?:[^)]+\))\?/g;
 const namedParam = /(\(\?)?:\w+/g;
 const splatParam = /\*/g;
 const escapeRegExp = /[-{}[\]+?.,\\^$|#]/g;
-const commandToRegExp = (command) => {
+const commandToRegExp = (command: Phrase) => {
   if (command instanceof RegExp) {
     return new RegExp(command.source, "i");
   }
@@ -43,7 +35,10 @@ const commandToRegExp = (command) => {
 };
 
 // this is from https://github.com/aceakash/string-similarity
-const compareTwoStringsUsingDiceCoefficient = (first, second) => {
+const compareTwoStringsUsingDiceCoefficient = (
+  first: string,
+  second: string,
+) => {
   first = first.replace(/\s+/g, "").toLowerCase();
   second = second.replace(/\s+/g, "").toLowerCase();
 
@@ -53,10 +48,10 @@ const compareTwoStringsUsingDiceCoefficient = (first, second) => {
   if (first.length === 1 && second.length === 1) return 0; // both are 1-letter strings
   if (first.length < 2 || second.length < 2) return 0; // if either is a 1-letter string
 
-  const firstBigrams = new Map();
+  const firstBigrams = new Map<string, number>();
   for (let i = 0; i < first.length - 1; i++) {
     const bigram = first.substring(i, i + 2);
-    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) + 1 : 1;
+    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram)! + 1 : 1;
 
     firstBigrams.set(bigram, count);
   }
@@ -64,7 +59,7 @@ const compareTwoStringsUsingDiceCoefficient = (first, second) => {
   let intersectionSize = 0;
   for (let i = 0; i < second.length - 1; i++) {
     const bigram = second.substring(i, i + 2);
-    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram) : 0;
+    const count = firstBigrams.has(bigram) ? firstBigrams.get(bigram)! : 0;
 
     if (count > 0) {
       firstBigrams.set(bigram, count - 1);
@@ -87,7 +82,6 @@ const browserSupportsPolyfills = () => {
 };
 
 export {
-  debounce,
   concatTranscripts,
   commandToRegExp,
   compareTwoStringsUsingDiceCoefficient,

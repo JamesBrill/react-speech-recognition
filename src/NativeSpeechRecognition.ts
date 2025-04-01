@@ -6,7 +6,7 @@ const NativeSpeechRecognition =
     window.msSpeechRecognition ||
     window.oSpeechRecognition);
 
-export const isNative = (SpeechRecognition) =>
+export const isNative = (SpeechRecognition: unknown) =>
   SpeechRecognition === NativeSpeechRecognition;
 
 export default NativeSpeechRecognition;
