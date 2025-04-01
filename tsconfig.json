@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/strictest",
+  "compilerOptions": {
+    "exactOptionalPropertyTypes": false,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "noEmit": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "noUncheckedIndexedAccess": false,
+    "target": "ESNext"
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["_site", "node_modules", "dist", "coverage"]
+}

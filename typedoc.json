@@ -1,0 +1,7 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "React Speech Recognition API Reference",
+  "entryPoints": ["src/*.ts"],
+  "projectDocuments": ["docs/POLYFILLS.md", "docs/V3-MIGRATION.md"],
+  "out": "_site"
+}

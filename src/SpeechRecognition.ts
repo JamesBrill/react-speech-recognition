@@ -1,27 +1,31 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import NativeSpeechRecognition from "./NativeSpeechRecognition";
-import RecognitionManager from "./RecognitionManager";
-import { appendTranscript, clearTranscript } from "./actions";
-import isAndroid from "./isAndroid";
-import { transcriptReducer } from "./reducers";
+import NativeSpeechRecognition from "./NativeSpeechRecognition.js";
+import RecognitionManager from "./RecognitionManager.js";
+import { appendTranscript, clearTranscript } from "./actions.js";
+import isAndroid from "./isAndroid.js";
+import { transcriptReducer } from "./reducers.js";
+import type {
+  FuzzyMatch,
+  ListeningOptions,
+  Match,
+  Phrase,
+  SpeechRecognition as PolyfillSpeechRecognition,
+  Transcript,
+  UseSpeechRecognitionOptions,
+} from "./types.js";
 import {
   browserSupportsPolyfills,
   commandToRegExp,
   compareTwoStringsUsingDiceCoefficient,
   concatTranscripts,
-} from "./utils";
-
-let _browserSupportsSpeechRecognition = !!NativeSpeechRecognition;
-let _browserSupportsContinuousListening =
-  _browserSupportsSpeechRecognition && !isAndroid();
-let recognitionManager;
+} from "./utils.js";
 
 const useSpeechRecognition = ({
   transcribing = true,
   clearTranscriptOnListen = true,
   commands = [],
-} = {}) => {
-  const [recognitionManager] = useState(
+}: UseSpeechRecognitionOptions = {}) => {
+  const [recognitionManager] = useState<RecognitionManager>(
     SpeechRecognition.getRecognitionManager(),
   );
   const [
@@ -55,7 +59,11 @@ const useSpeechRecognition = ({
     dispatchClearTranscript();
   }, [recognitionManager]);
 
-  const testFuzzyMatch = (command, input, fuzzyMatchingThreshold) => {
+  const testFuzzyMatch = (
+    command: Phrase,
+    input: Transcript,
+    fuzzyMatchingThreshold: number,
+  ): FuzzyMatch | null => {
     const commandToString =
       typeof command === "object" ? command.toString() : command;
     const commandWithoutSpecials = commandToString
@@ -77,20 +85,21 @@ const useSpeechRecognition = ({
     return null;
   };
 
-  const testMatch = (command, input) => {
+  const testMatch = (command: Phrase, input: Transcript): Match | null => {
     const pattern = commandToRegExp(command);
     const result = pattern.exec(input);
     if (result) {
       return {
         command,
         parameters: result.slice(1),
+        // isFuzzyMatch: false,
       };
     }
     return null;
   };
 
   const matchCommands = useCallback(
-    (newInterimTranscript, newFinalTranscript) => {
+    (newInterimTranscript: Transcript, newFinalTranscript: Transcript) => {
       commandsRef.current.forEach(
         ({
           command,
@@ -116,10 +125,13 @@ const useSpeechRecognition = ({
               }
               return testMatch(subcommand, input);
             })
-            .filter((x) => x);
+            .filter((x): x is FuzzyMatch | Match => x !== null);
           if (isFuzzyMatch && bestMatchOnly && results.length >= 2) {
-            results.sort((a, b) => b.howSimilar - a.howSimilar);
-            const { command, commandWithoutSpecials, howSimilar } = results[0];
+            (results as FuzzyMatch[]).sort(
+              (a, b) => b.howSimilar - a.howSimilar,
+            );
+            const { command, commandWithoutSpecials, howSimilar } =
+              results[0] as FuzzyMatch;
             callback(commandWithoutSpecials, input, howSimilar, {
               command,
               resetTranscript,
@@ -127,13 +139,14 @@ const useSpeechRecognition = ({
           } else {
             results.forEach((result) => {
               if (result.isFuzzyMatch) {
-                const { command, commandWithoutSpecials, howSimilar } = result;
+                const { command, commandWithoutSpecials, howSimilar } =
+                  result as FuzzyMatch;
                 callback(commandWithoutSpecials, input, howSimilar, {
                   command,
                   resetTranscript,
                 });
               } else {
-                const { command, parameters } = result;
+                const { command, parameters } = result as Match;
                 callback(...parameters, { command, resetTranscript });
               }
             });
@@ -145,7 +158,7 @@ const useSpeechRecognition = ({
   );
 
   const handleTranscriptChange = useCallback(
-    (newInterimTranscript, newFinalTranscript) => {
+    (newInterimTranscript: string, newFinalTranscript: string) => {
       if (transcribing) {
         dispatch(appendTranscript(newInterimTranscript, newFinalTranscript));
       }
@@ -161,7 +174,7 @@ const useSpeechRecognition = ({
   }, [clearTranscriptOnListen]);
 
   useEffect(() => {
-    const id = SpeechRecognition.counter;
+    const id = SpeechRecognition.counter.toString();
     SpeechRecognition.counter += 1;
     const callbacks = {
       onListeningChange: setListening,
@@ -198,9 +211,15 @@ const useSpeechRecognition = ({
     browserSupportsContinuousListening,
   };
 };
+
+let _browserSupportsSpeechRecognition = !!NativeSpeechRecognition;
+let _browserSupportsContinuousListening =
+  _browserSupportsSpeechRecognition && !isAndroid();
+let recognitionManager: RecognitionManager;
+
 const SpeechRecognition = {
   counter: 0,
-  applyPolyfill: (PolyfillSpeechRecognition) => {
+  applyPolyfill: (PolyfillSpeechRecognition: PolyfillSpeechRecognition) => {
     if (recognitionManager) {
       recognitionManager.setSpeechRecognition(PolyfillSpeechRecognition);
     } else {
@@ -231,7 +250,7 @@ const SpeechRecognition = {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     return recognitionManager.getRecognition();
   },
-  startListening: async ({ continuous, language } = {}) => {
+  startListening: async ({ continuous, language }: ListeningOptions = {}) => {
     const recognitionManager = SpeechRecognition.getRecognitionManager();
     await recognitionManager.startListening({ continuous, language });
   },
