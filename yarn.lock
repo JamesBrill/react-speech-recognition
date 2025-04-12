@@ -2128,6 +2128,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.debounce@npm:^4.0.8":
+  version: 4.0.8
+  resolution: "lodash.debounce@npm:4.0.8"
+  checksum: 10c0/762998a63e095412b6099b8290903e0a8ddcb353ac6e2e0f2d7e7d03abd4275fe3c689d88960eb90b0dde4f177554d51a690f22a343932ecbc50a5d111849987
+  languageName: node
+  linkType: hard
+
 "log-symbols@npm:^6.0.0":
   version: 6.0.0
   resolution: "log-symbols@npm:6.0.0"
@@ -2619,6 +2626,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:3.0.8"
     bunchee: "npm:6.4.0"
     jsdom: "npm:26.0.0"
+    lodash.debounce: "npm:^4.0.8"
     react: "npm:16.14.0"
     react-dom: "npm:16.14.0"
     react-test-renderer: "npm:16.14.0"

@@ -1,6 +1,7 @@
+import debounce from "lodash.debounce";
 import { isNative } from "./NativeSpeechRecognition";
 import isAndroid from "./isAndroid";
-import { browserSupportsPolyfills, concatTranscripts, debounce } from "./utils";
+import { browserSupportsPolyfills, concatTranscripts } from "./utils";
 
 export default class RecognitionManager {
   constructor(SpeechRecognition) {
@@ -24,11 +25,9 @@ export default class RecognitionManager {
     this.setSpeechRecognition(SpeechRecognition);
 
     if (isAndroid()) {
-      this.updateFinalTranscript = debounce(
-        this.updateFinalTranscript,
-        250,
-        true,
-      );
+      this.updateFinalTranscript = debounce(this.updateFinalTranscript, 250, {
+        leading: true,
+      });
     }
   }
 
