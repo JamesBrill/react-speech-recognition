@@ -53,6 +53,7 @@
   "packageManager": "yarn@4.9.1",
   "publishConfig": {
     "access": "public",
+    "provenance": true,
     "registry": "https://registry.npmjs.org"
   }
 }
