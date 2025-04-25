@@ -53,9 +53,10 @@
   "peerDependencies": {
     "react": ">=16.8.0"
   },
-  "packageManager": "yarn@4.8.1",
+  "packageManager": "yarn@4.9.1",
   "publishConfig": {
     "access": "public",
+    "provenance": true,
     "registry": "https://registry.npmjs.org"
   }
 }
