@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import NativeSpeechRecognition from "./NativeSpeechRecognition";
-import RecognitionManager from "./RecognitionManager";
 import { appendTranscript, clearTranscript } from "./actions";
 import isAndroid from "./isAndroid";
+import NativeSpeechRecognition from "./NativeSpeechRecognition";
+import RecognitionManager from "./RecognitionManager";
 import { transcriptReducer } from "./reducers";
 import {
   browserSupportsPolyfills,
@@ -53,14 +53,14 @@ const useSpeechRecognition = ({
   const resetTranscript = useCallback(() => {
     recognitionManager.resetTranscript();
     dispatchClearTranscript();
-  }, [recognitionManager]);
+  }, [recognitionManager, dispatchClearTranscript]);
 
   const testFuzzyMatch = (command, input, fuzzyMatchingThreshold) => {
     const commandToString =
       typeof command === "object" ? command.toString() : command;
     const commandWithoutSpecials = commandToString
       .replace(/[&/\\#,+()!$~%.'":*?<>{}]/g, "")
-      .replace(/  +/g, " ")
+      .replace(/ {2,}/g, " ")
       .trim();
     const howSimilar = compareTwoStringsUsingDiceCoefficient(
       commandWithoutSpecials,
@@ -141,7 +141,7 @@ const useSpeechRecognition = ({
         },
       );
     },
-    [resetTranscript],
+    [resetTranscript, testFuzzyMatch, testMatch],
   );
 
   const handleTranscriptChange = useCallback(
@@ -158,7 +158,7 @@ const useSpeechRecognition = ({
     if (clearTranscriptOnListen) {
       dispatchClearTranscript();
     }
-  }, [clearTranscriptOnListen]);
+  }, [clearTranscriptOnListen, dispatchClearTranscript]);
 
   useEffect(() => {
     const id = SpeechRecognition.counter;
@@ -178,13 +178,7 @@ const useSpeechRecognition = ({
     return () => {
       recognitionManager.unsubscribe(id);
     };
-  }, [
-    transcribing,
-    clearTranscriptOnListen,
-    recognitionManager,
-    handleTranscriptChange,
-    handleClearTranscript,
-  ]);
+  }, [recognitionManager, handleTranscriptChange, handleClearTranscript]);
 
   const transcript = concatTranscripts(finalTranscript, interimTranscript);
   return {

@@ -1,6 +1,6 @@
 import debounce from "lodash.debounce";
-import { isNative } from "./NativeSpeechRecognition";
 import isAndroid from "./isAndroid";
+import { isNative } from "./NativeSpeechRecognition";
 import { browserSupportsPolyfills, concatTranscripts } from "./utils";
 
 export default class RecognitionManager {
@@ -113,7 +113,6 @@ export default class RecognitionManager {
           this.pauseAfterDisconnect = false;
           this.abort();
           break;
-        case "STOP":
         default:
           this.pauseAfterDisconnect = true;
           this.stop();
@@ -127,13 +126,13 @@ export default class RecognitionManager {
       this.recognition.onend = () => {};
       this.recognition.onerror = () => {};
       if (this.listening) {
-        this.stopListening();
+        void this.stopListening();
       }
     }
   }
 
   onError(event) {
-    if (event && event.error && event.error === "not-allowed") {
+    if (event?.error && event.error === "not-allowed") {
       this.emitMicrophoneAvailabilityChange(false);
       this.disableRecognition();
     }
@@ -146,7 +145,7 @@ export default class RecognitionManager {
       this.emitListeningChange(false);
     } else if (this.recognition) {
       if (this.recognition.continuous) {
-        this.startListening({ continuous: this.recognition.continuous });
+        void this.startListening({ continuous: this.recognition.continuous });
       } else {
         this.emitListeningChange(false);
       }

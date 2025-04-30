@@ -2,11 +2,11 @@
 import { renderHook } from "@testing-library/react-hooks";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { CortiSpeechRecognition } from "../tests/vendor/corti.js";
+import isAndroid from "./isAndroid.js";
 import RecognitionManager from "./RecognitionManager.js";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "./SpeechRecognition.js";
-import isAndroid from "./isAndroid.js";
 import { browserSupportsPolyfills } from "./utils.js";
 
 vi.mock("./isAndroid");
