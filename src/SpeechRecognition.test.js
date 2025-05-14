@@ -2,11 +2,11 @@
 import { renderHook } from "@testing-library/react-hooks";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { CortiSpeechRecognition } from "../tests/vendor/corti.js";
+import isAndroid from "./isAndroid.js";
 import RecognitionManager from "./RecognitionManager.js";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "./SpeechRecognition.js";
-import isAndroid from "./isAndroid.js";
 import { browserSupportsPolyfills } from "./utils.js";
 
 vi.mock("./isAndroid");
@@ -225,7 +225,7 @@ describe("SpeechRecognition", () => {
     const speech = "This is a test";
 
     await SpeechRecognition.startListening();
-    SpeechRecognition.abortListening();
+    await SpeechRecognition.abortListening();
     SpeechRecognition.getRecognition().say(speech);
 
     const { transcript, interimTranscript, finalTranscript } = result.current;
@@ -328,7 +328,7 @@ describe("SpeechRecognition", () => {
     const speech = "This is a test";
 
     await SpeechRecognition.startListening();
-    SpeechRecognition.stopListening();
+    await SpeechRecognition.stopListening();
     SpeechRecognition.getRecognition().say(speech);
 
     const { transcript, interimTranscript, finalTranscript } = result.current;
@@ -397,7 +397,7 @@ describe("SpeechRecognition", () => {
     expect(result.current.interimTranscript).toBe("");
     expect(result.current.finalTranscript).toBe(speech);
 
-    SpeechRecognition.stopListening();
+    await SpeechRecognition.stopListening();
 
     expect(result.current.transcript).toBe(speech);
     expect(result.current.interimTranscript).toBe("");
@@ -423,7 +423,7 @@ describe("SpeechRecognition", () => {
     expect(result.current.interimTranscript).toBe("");
     expect(result.current.finalTranscript).toBe(speech);
 
-    SpeechRecognition.stopListening();
+    await SpeechRecognition.stopListening();
 
     expect(result.current.transcript).toBe(speech);
     expect(result.current.interimTranscript).toBe("");
