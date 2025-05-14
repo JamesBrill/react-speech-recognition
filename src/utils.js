@@ -23,7 +23,7 @@ const commandToRegExp = (command) => {
     })
     .replace(splatParam, "(.*?)")
     .replace(optionalRegex, "\\s*$1?\\s*");
-  return new RegExp("^" + command + "$", "i");
+  return new RegExp(`^${command}$`, "i");
 };
 
 // this is from https://github.com/aceakash/string-similarity

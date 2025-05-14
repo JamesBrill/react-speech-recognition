@@ -225,7 +225,7 @@ describe("SpeechRecognition", () => {
     const speech = "This is a test";
 
     await SpeechRecognition.startListening();
-    SpeechRecognition.abortListening();
+    await SpeechRecognition.abortListening();
     SpeechRecognition.getRecognition().say(speech);
 
     const { transcript, interimTranscript, finalTranscript } = result.current;
@@ -328,7 +328,7 @@ describe("SpeechRecognition", () => {
     const speech = "This is a test";
 
     await SpeechRecognition.startListening();
-    SpeechRecognition.stopListening();
+    await SpeechRecognition.stopListening();
     SpeechRecognition.getRecognition().say(speech);
 
     const { transcript, interimTranscript, finalTranscript } = result.current;
@@ -397,7 +397,7 @@ describe("SpeechRecognition", () => {
     expect(result.current.interimTranscript).toBe("");
     expect(result.current.finalTranscript).toBe(speech);
 
-    SpeechRecognition.stopListening();
+    await SpeechRecognition.stopListening();
 
     expect(result.current.transcript).toBe(speech);
     expect(result.current.interimTranscript).toBe("");
@@ -423,7 +423,7 @@ describe("SpeechRecognition", () => {
     expect(result.current.interimTranscript).toBe("");
     expect(result.current.finalTranscript).toBe(speech);
 
-    SpeechRecognition.stopListening();
+    await SpeechRecognition.stopListening();
 
     expect(result.current.transcript).toBe(speech);
     expect(result.current.interimTranscript).toBe("");
