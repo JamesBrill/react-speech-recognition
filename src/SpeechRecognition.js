@@ -1,7 +1,4 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import NativeSpeechRecognition from "./NativeSpeechRecognition";
-import RecognitionManager from "./RecognitionManager";
-import { appendTranscript, clearTranscript } from "./actions";
 import isAndroid from "./isAndroid";
 import { transcriptReducer } from "./reducers";
 import {
@@ -10,6 +7,9 @@ import {
   compareTwoStringsUsingDiceCoefficient,
   concatTranscripts,
 } from "./utils";
+import { clearTranscript, appendTranscript, mutateTranscript } from "./actions";
+import RecognitionManager from "./RecognitionManager";
+import NativeSpeechRecognition from "./NativeSpeechRecognition";
 
 let _browserSupportsSpeechRecognition = !!NativeSpeechRecognition;
 let _browserSupportsContinuousListening =
@@ -22,7 +22,7 @@ const useSpeechRecognition = ({
   commands = [],
 } = {}) => {
   const [recognitionManager] = useState(
-    SpeechRecognition.getRecognitionManager(),
+    SpeechRecognition.getRecognitionManager()
   );
   const [
     browserSupportsSpeechRecognition,
@@ -37,11 +37,11 @@ const useSpeechRecognition = ({
     {
       interimTranscript: recognitionManager.interimTranscript,
       finalTranscript: "",
-    },
+    }
   );
   const [listening, setListening] = useState(recognitionManager.listening);
   const [isMicrophoneAvailable, setMicrophoneAvailable] = useState(
-    recognitionManager.isMicrophoneAvailable,
+    recognitionManager.isMicrophoneAvailable
   );
   const commandsRef = useRef(commands);
   commandsRef.current = commands;
@@ -50,10 +50,22 @@ const useSpeechRecognition = ({
     dispatch(clearTranscript());
   };
 
+  const dispatchMutateTranscript = (mutatedTranscript) => {
+    dispatch(mutateTranscript(mutatedTranscript));
+  };
+
   const resetTranscript = useCallback(() => {
     recognitionManager.resetTranscript();
     dispatchClearTranscript();
   }, [recognitionManager]);
+
+  const editTranscript = useCallback(
+    (mutatedTranscript) => {
+      recognitionManager.resetTranscript();
+      dispatchMutateTranscript(mutatedTranscript);
+    },
+    [recognitionManager]
+  );
 
   const testFuzzyMatch = (command, input, fuzzyMatchingThreshold) => {
     const commandToString =
@@ -64,7 +76,7 @@ const useSpeechRecognition = ({
       .trim();
     const howSimilar = compareTwoStringsUsingDiceCoefficient(
       commandWithoutSpecials,
-      input,
+      input
     );
     if (howSimilar >= fuzzyMatchingThreshold) {
       return {
@@ -111,7 +123,7 @@ const useSpeechRecognition = ({
                 return testFuzzyMatch(
                   subcommand,
                   input,
-                  fuzzyMatchingThreshold,
+                  fuzzyMatchingThreshold
                 );
               }
               return testMatch(subcommand, input);
@@ -138,10 +150,10 @@ const useSpeechRecognition = ({
               }
             });
           }
-        },
+        }
       );
     },
-    [resetTranscript],
+    [resetTranscript]
   );
 
   const handleTranscriptChange = useCallback(
@@ -151,7 +163,7 @@ const useSpeechRecognition = ({
       }
       matchCommands(newInterimTranscript, newFinalTranscript);
     },
-    [matchCommands, transcribing],
+    [matchCommands, transcribing]
   );
 
   const handleClearTranscript = useCallback(() => {
@@ -196,6 +208,7 @@ const useSpeechRecognition = ({
     resetTranscript,
     browserSupportsSpeechRecognition,
     browserSupportsContinuousListening,
+    editTranscript,
   };
 };
 const SpeechRecognition = {
