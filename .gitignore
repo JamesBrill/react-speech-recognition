@@ -1,7 +1,4 @@
-/node_modules
-/dist
-/lib
-/coverage
-
-npm-debug.log*
-.DS_Store
+/.yarn/
+/coverage/
+/dist/
+/node_modules/

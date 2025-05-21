@@ -1,32 +1,34 @@
-import isAndroid from './isAndroid'
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
+import isAndroid from "./isAndroid.js";
 
-const mockUserAgent = (userAgent) => {
-  Object.defineProperty(navigator, 'userAgent', { value: userAgent, writable: true })
-}
+describe("isAndroid", () => {
+  beforeEach(() => {
+    vi.stubGlobal("navigator", { userAgent: "" });
+  });
 
-const mockUndefinedNavigator = () => {
-  Object.defineProperty(global, 'navigator', { value: undefined, writable: true })
-}
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
 
-describe('isAndroid', () => {
-  test('returns false when navigator.userAgent does not contain android string', () => {
-    mockUserAgent('safari browser')
-    const result = isAndroid()
+  test("returns false when navigator.userAgent does not contain android string", () => {
+    vi.stubGlobal("navigator", { userAgent: "safari browser" });
+    const result = isAndroid();
 
-    expect(result).toEqual(false)
-  })
+    expect(result).toBe(false);
+  });
 
-  test('returns true when navigator.userAgent contains android string', () => {
-    mockUserAgent('android browser')
-    const result = isAndroid()
+  test("returns true when navigator.userAgent contains android string", () => {
+    vi.stubGlobal("navigator", { userAgent: "android browser" });
+    const result = isAndroid();
 
-    expect(result).toEqual(true)
-  })
+    expect(result).toBe(true);
+  });
 
-  test('returns false when navigator is undefined', () => {
-    mockUndefinedNavigator()
-    const result = isAndroid()
+  test("returns false when navigator is undefined", () => {
+    // navigatorをundefinedにモック
+    vi.stubGlobal("navigator", undefined);
+    const result = isAndroid();
 
-    expect(result).toEqual(false)
-  })
-})
+    expect(result).toBe(false);
+  });
+});
