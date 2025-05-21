@@ -1,20 +1,14 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from "react";
-import NativeSpeechRecognition from "./NativeSpeechRecognition";
-import RecognitionManager from "./RecognitionManager";
-import { appendTranscript, clearTranscript } from "./actions";
 import isAndroid from "./isAndroid";
 import { transcriptReducer } from "./reducers";
 import {
   browserSupportsPolyfills,
   commandToRegExp,
   compareTwoStringsUsingDiceCoefficient,
-  browserSupportsPolyfills,
   concatTranscripts,
 } from "./utils";
 import { clearTranscript, appendTranscript, mutateTranscript } from "./actions";
-import { transcriptReducer } from "./reducers";
 import RecognitionManager from "./RecognitionManager";
-import isAndroid from "./isAndroid";
 import NativeSpeechRecognition from "./NativeSpeechRecognition";
 
 let _browserSupportsSpeechRecognition = !!NativeSpeechRecognition;
