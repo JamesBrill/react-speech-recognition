@@ -1,71 +1,57 @@
 // @vitest-environment jsdom
 import { renderHook } from "@testing-library/react-hooks";
-import { beforeEach, describe, expect, test, vi } from "vitest";
-import "../tests/vendor/corti.js";
-import RecognitionManager from "./RecognitionManager.js";
+import { SpeechRecognition as CortiSpeechRecognition } from "corti";
+import { afterAll, beforeAll, expect, test, vi } from "vitest";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "./SpeechRecognition.js";
-import { browserSupportsPolyfills } from "./utils.js";
 
-vi.mock("./isAndroid", () => ({
-  default: () => true,
-}));
+const browserSupportsPolyfillsMock = vi.hoisted(() => vi.fn());
 
-vi.mock("./utils", async () => {
+vi.mock(import("./isAndroid.js"), () => {
   return {
-    ...(await vi.importActual("./utils")),
-    browserSupportsPolyfills: vi.fn(),
+    default: vi.fn(() => true),
   };
 });
 
-const mockRecognitionManager = () => {
-  const recognitionManager = new RecognitionManager(window.SpeechRecognition);
-  SpeechRecognition.getRecognitionManager = () => recognitionManager;
-  return recognitionManager;
-};
+vi.mock(import("./utils.js"), async (importOriginal) => {
+  const module = await importOriginal();
+  return {
+    ...module,
+    browserSupportsPolyfills: browserSupportsPolyfillsMock,
+  };
+});
 
-describe("SpeechRecognition (Android)", () => {
-  beforeEach(() => {
-    browserSupportsPolyfills.mockImplementation(() => true);
-  });
+beforeAll(() => {
+  vi.stubGlobal("SpeechRecognition", CortiSpeechRecognition);
+});
 
-  test("sets browserSupportsContinuousListening to false on Android", async () => {
-    mockRecognitionManager();
+afterAll(() => {
+  vi.unstubAllGlobals();
+});
 
-    const { result } = renderHook(() => useSpeechRecognition());
-    const { browserSupportsContinuousListening } = result.current;
+test("sets browserSupportsContinuousListening to false on Android", async () => {
+  browserSupportsPolyfillsMock.mockReturnValue(false);
+  const { result } = renderHook(() => useSpeechRecognition());
+  const { browserSupportsContinuousListening } = result.current;
+  expect(browserSupportsContinuousListening).toBe(false);
+  expect(SpeechRecognition.browserSupportsContinuousListening()).toBe(false);
+});
 
-    expect(browserSupportsContinuousListening).toEqual(false);
-    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(
-      false,
-    );
-  });
+test("sets browserSupportsContinuousListening to true when using polyfill", () => {
+  browserSupportsPolyfillsMock.mockReturnValue(true);
+  SpeechRecognition.applyPolyfill(CortiSpeechRecognition);
+  const { result } = renderHook(() => useSpeechRecognition());
+  const { browserSupportsContinuousListening } = result.current;
+  expect(browserSupportsContinuousListening).toBe(true);
+  expect(SpeechRecognition.browserSupportsContinuousListening()).toBe(true);
+});
 
-  test("sets browserSupportsContinuousListening to true when using polyfill", () => {
-    const MockSpeechRecognition = class {};
-    SpeechRecognition.applyPolyfill(MockSpeechRecognition);
-
-    const { result } = renderHook(() => useSpeechRecognition());
-    const { browserSupportsContinuousListening } = result.current;
-
-    expect(browserSupportsContinuousListening).toEqual(true);
-    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(
-      true,
-    );
-  });
-
-  test("sets browserSupportsContinuousListening to false when using polyfill on unsupported browser", () => {
-    browserSupportsPolyfills.mockImplementation(() => false);
-    const MockSpeechRecognition = class {};
-    SpeechRecognition.applyPolyfill(MockSpeechRecognition);
-
-    const { result } = renderHook(() => useSpeechRecognition());
-    const { browserSupportsContinuousListening } = result.current;
-
-    expect(browserSupportsContinuousListening).toEqual(false);
-    expect(SpeechRecognition.browserSupportsContinuousListening()).toEqual(
-      false,
-    );
-  });
+test("sets browserSupportsContinuousListening to false when using polyfill on unsupported browser", () => {
+  browserSupportsPolyfillsMock.mockReturnValue(false);
+  SpeechRecognition.applyPolyfill(CortiSpeechRecognition);
+  const { result } = renderHook(() => useSpeechRecognition());
+  const { browserSupportsContinuousListening } = result.current;
+  expect(browserSupportsContinuousListening).toBe(false);
+  expect(SpeechRecognition.browserSupportsContinuousListening()).toBe(false);
 });
